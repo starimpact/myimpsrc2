@@ -1,0 +1,1971 @@
+
+#include "imp_pea_detector.h"
+
+
+static IMP_VOID ipBGModelImageCreate( IpCodebookImage *codebookImage, IMP_S32 s32ImgW, IMP_S32 s32ImgH, MEM_MGR_ARRAY_S *mem_mgr )
+{
+	memset( codebookImage, 0, sizeof(IpCodebookImage) );
+	codebookImage->width = s32ImgW;
+	codebookImage->height = s32ImgH;
+	codebookImage->cwMaps = IMP_MMAlloc( mem_mgr, IMP_MEMBLK_TYPE_SLOW, s32ImgW*s32ImgH*sizeof(IpCodewordPixel) );
+}
+
+static IMP_VOID ipBGModelImageDestroy( IpCodebookImage *codebookImage, MEM_MGR_ARRAY_S *mem_mgr )
+{
+	IMP_MMFree( mem_mgr, IMP_MEMBLK_TYPE_SLOW, codebookImage->cwMaps );
+	memset( codebookImage, 0, sizeof(IpCodebookImage) );
+}
+
+static IMP_VOID ipBGModelImageClear( IpCodebookImage *codebookImage )
+{
+	IMP_S32 s32ImgW = codebookImage->width;
+	IMP_S32 s32ImgH = codebookImage->height;
+	memset( codebookImage->cwMaps, 0, s32ImgW*s32ImgH*sizeof(IpCodewordPixel) );
+}
+
+static IMP_VOID ipBGModelImageTranslate( IpCodebookImage *codebookImage, IMP_POINT_S *mv )
+{
+	IMP_S32 s32ImgW, s32ImgH, mvx, mvy;
+ 	IpCodewordPixel *data, *data2;
+	IMP_S32 xx, yy, lb_x, lb_y, ru_x, ru_y;
+	IMP_S32 offset, i, cpy_len, n, cpy_len2;
+
+	s32ImgW = codebookImage->width;
+	s32ImgH = codebookImage->height;
+	mvx = mv->s16X; mvy = mv->s16Y;
+	mvx = -mvx; mvy = -mvy;
+	data2 = codebookImage->cwMaps;
+	offset = s32ImgW*mvy+mvx;
+
+	if( offset>0 )
+	{
+		IpCodewordPixel * RESTRICT data_s = data2 + offset;
+		IpCodewordPixel * RESTRICT data_d = data2;
+		cpy_len = s32ImgW*s32ImgH-offset;
+		cpy_len = (cpy_len+3)&(~3);
+		cpy_len2 = (cpy_len>>2);
+
+		for( n=0; n<4; n++ )
+		{
+#ifdef _TIDSP
+	#pragma MUST_ITERATE(256,,1);
+#endif
+			for( i=0; i<cpy_len2; i++ )
+				*data_d++ = *data_s++;
+		}
+		cpy_len2 = cpy_len-cpy_len2*4;
+	}
+	else
+	{
+		IpCodewordPixel * RESTRICT data_s = data2 + s32ImgW*s32ImgH-1 - (-offset);
+		IpCodewordPixel * RESTRICT data_d = data2 + s32ImgW*s32ImgH-1;
+		cpy_len = s32ImgW*s32ImgH-(-offset);
+		cpy_len = (cpy_len+3)&(~3);
+		cpy_len2 = (cpy_len>>2);
+
+		for( n=0; n<4; n++ )
+		{
+#ifdef _TIDSP
+	#pragma MUST_ITERATE(256,,1);
+#endif
+			for( i=0; i<cpy_len2; i++ )
+				*data_d-- = *data_s--;
+		}
+		cpy_len2 = cpy_len-cpy_len2*4;
+	}
+
+	if( mvy )
+	{
+		lb_x = 0; ru_x = s32ImgW-1;
+		if( mvy>0 )
+		{
+			lb_y = s32ImgH-mvy;
+			ru_y = s32ImgH-1;
+		}
+		else
+		{
+			lb_y = 0;
+			ru_y = -mvy;
+		}
+		for( yy=lb_y; yy<=ru_y; yy++ )
+		{
+			data = data2 + s32ImgW*yy;
+			memset( data, 0, sizeof(IpCodewordPixel)*s32ImgW );
+		}
+	}
+	if( mvx )
+	{
+		lb_y = 0; ru_y = s32ImgH-1;
+		if( mvx>0 )
+		{
+			lb_x = s32ImgW-mvx;
+			ru_x = s32ImgW-1;
+		}
+		else
+		{
+			lb_x = 0;
+			ru_x = -mvx;
+		}
+		for( yy=lb_y; yy<=ru_y; yy++ )
+		{
+			data = data2 + s32ImgW*yy;
+			for( xx=lb_x; xx<=ru_x; xx++ )
+				memset( &data[xx], 0, sizeof(IpCodewordPixel) );
+		}
+	}
+}
+
+static IMP_VOID ipBgModelDataClear( IpForegroundRatioHistory *fgRatioHistory )
+{
+	memset( fgRatioHistory, 0, sizeof(IpForegroundRatioHistory) );
+}
+
+
+//extern IMP_S32 g_peopel_in;
+//////////////////////////////////////////////////////////////////////////
+//计算差分后噪声多少
+//返回值是当帧差分后的被判为前景的点数
+//////////////////////////////////////////////////////////////////////////
+static IMP_S32 calc_noise_area( IpBGCodeBookOptimizedModel *module )
+{
+#define NOISE_COLS	4
+#define NOISE_ROWS	4
+#define NOISE_STEP	1
+#define NREGION_CNT	(NOISE_COLS*NOISE_ROWS)
+	PEA_RESULT_S *iresult = module->iresult;
+	IpCodebookBgModelPara *mpara=&module->paramsFastLi;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_frm_diff = pstRgs->image_frm_diff;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+	IMP_S32 width = s32ImgW/NOISE_COLS;
+	IMP_S32 height = s32ImgH/NOISE_ROWS;
+	IMP_S32 width2 = width/2;
+	IMP_S32 height2 = height/2;
+	IMP_S32 ofsx = (width-width2)/2;
+	IMP_S32 ofsy = (height-height2)/2;
+	IMP_S32 sample_ratio = (width*height)/(width2*height2);
+	IMP_S32 noise_region_areas[NREGION_CNT];
+	IMP_S32 img_noise_area;
+	IMP_S32 irow, icol;
+	IMP_S32 i, j, k;
+	IMP_S32 theta_Icur = mpara->s32ThresholdCur;
+	IMP_S32 theta_Imax = mpara->s32ThresholdMax;
+
+	for( irow=0; irow<NOISE_ROWS; irow++ )
+		for( icol=0; icol<NOISE_COLS; icol++ )
+		{
+			IMP_S32 ys = irow*height+ofsy;
+			IMP_S32 xs = icol*width+ofsx;
+			IMP_S8 *data = (IMP_S8*)image_frm_diff->pu8Data + ys*s32ImgW+xs;
+			IMP_S32 noise_area = 0;
+			IMP_S32 yy, xx;
+			for( yy=0; yy<height2; yy+=NOISE_STEP )
+			{
+#ifdef _TIDSP
+#pragma MUST_ITERATE(32,,4);
+#endif
+				for( xx=0; xx<width2; xx+=NOISE_STEP )
+				{
+					IMP_S32 val = abs(data[xx]);
+					if( val && val<=theta_Imax )
+						noise_area++;
+				}
+				data += s32ImgW;
+			}
+
+			noise_area *= (NOISE_STEP*NOISE_STEP*sample_ratio);
+			noise_region_areas[irow*NOISE_COLS+icol] = noise_area;
+		}
+
+		for( i=0; i<NREGION_CNT; i++ )
+		{
+			k = i;
+			for( j=i+1; j<NREGION_CNT; j++ )
+			{
+				if( noise_region_areas[k] > noise_region_areas[j] )
+					k = j;
+			}
+			if( k!=i )
+			{
+				IMP_S32 temp = noise_region_areas[k];
+				noise_region_areas[k] = noise_region_areas[i];
+				noise_region_areas[i] = temp;
+			}
+		}
+
+		img_noise_area = 0;
+		for( i=(NREGION_CNT/4); i<(NREGION_CNT*3/4); i++ )
+		{
+			img_noise_area += noise_region_areas[i];
+		}
+		img_noise_area *= 2;
+
+		return img_noise_area;
+}
+////////////////////////////////////////////////////////////////////////////
+//根据图像的亮度判断差分的阈值
+////////////////////////////////////////////////////////////////////////////
+IMP_VOID ipIlluminationThreshold(IpBGCodeBookOptimizedModel *module,GRAY_IMAGE_S *image_in_gray)
+{
+	PEA_RESULT_S *iresult = module->iresult;
+	IpCodebookBgModelPara *paramsFastLi=&module->paramsFastLi;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+	IMP_S32 need_update;
+
+
+	module->noise_area += calc_noise_area( module );
+	module->frmcnt++;
+
+	//如果更新的时刻没满足更新时间间隔就返回
+	if( module->nframes < ( module->udpm_time_pre + paramsFastLi->s32ThresholdUdpm) )
+	{
+		return;
+	}
+
+	if( module->frmcnt <= 1 )
+		return;
+
+	module->noise_area_avg = module->noise_area / module->frmcnt;
+
+	need_update = 0;
+	need_update |= ( module->noise_area_avg * 1000 ) >= ( (s32ImgW*s32ImgH) * module->paramsFastLi.s32ThresholdNoiseRatio );
+
+	module->noise_adjust_theta_cnt++;
+
+	if( need_update )
+	{
+		paramsFastLi->s32ThresholdCur++;
+	}
+	else
+	{
+		if( module->noise_adjust_theta_cnt >= module->paramsFastLi.s32ThresholdUp2DwRatio)
+		{
+			module->noise_adjust_theta_cnt = 0;
+			module->paramsFastLi.s32ThresholdCur--;
+		}
+	}
+
+
+	if( paramsFastLi->s32ThresholdCur < paramsFastLi->s32ThresholdMin )
+		paramsFastLi->s32ThresholdCur = paramsFastLi->s32ThresholdMin;
+	if( paramsFastLi->s32ThresholdCur > paramsFastLi->s32ThresholdMax )
+		paramsFastLi->s32ThresholdCur = paramsFastLi->s32ThresholdMax;
+
+	module->udpm_time_pre = module->nframes;//设置更新时刻
+	module->frmcnt = 0;
+	module->noise_area = 0;
+}
+
+/**
+*计算差分图像，差分结果大于theta_thld则结果为255，否则为0
+*/
+IMP_VOID ipCalcDiffImage(IMP_S32 s32ImgW, IMP_S32 s32ImgH, IMP_S32 theta_thld,
+					 IMP_U8 *img_cur_dat, IMP_U8 *img_pre_dat,	IMP_U8 *img_diff_dat)
+{
+	int i;
+	IMP_S8 diff;
+	IMP_U8 *p1,*p2,*p3;
+	p1=img_cur_dat;
+	p2=img_pre_dat;
+	p3=img_diff_dat;
+	for (i=0;i<s32ImgW*s32ImgH;i++)
+	{
+		diff=((*p1)-(*p2));
+		if (diff>=theta_thld)
+		{
+			*p3=(IMP_U8)diff;
+		}
+		else
+		{
+			*p3=0;
+		}
+		p1++;
+		p2++;
+		p3++;
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 吸收从其它模块获得反馈信息
+static IMP_VOID ipSetRegionHoldFlag( PEA_DETECTED_REGION_S *pstDrg, GRAY_IMAGE_S *image_fg_org, GRAY_IMAGE_S *image_fg_rgn, IMP_S32 flag )
+{
+	IMP_U8 *fg_val_motion, *out_val_motion;
+	IMP_S32 x, y, xs, xe, ys, ye, sn;
+	IMP_S32 fg_org, fg_rgn;
+	IMP_S32 s32ImgW = image_fg_org->s32W;
+
+	xs = pstDrg->stRect.s16X1;	xe = pstDrg->stRect.s16X2;
+	ys = pstDrg->stRect.s16Y1;	ye = pstDrg->stRect.s16Y2;
+	sn = pstDrg->u8Sign;
+	xs = xs&(~1); xe = xe|1;
+	fg_val_motion = image_fg_org->pu8Data + s32ImgW*ys;
+	out_val_motion = image_fg_rgn->pu8Data + s32ImgW*ys;
+	for( y=ys; y<=ye; y++ )
+	{
+#ifdef _TIDSP
+		// 	#pragma MUST_ITERATE(4,,4);
+#endif
+		for( x=xs; x<=xe; x+=2 )
+		{
+			IMP_S32 fg_org2, fg_rgn2;
+			fg_org = fg_val_motion[x];
+			fg_rgn = out_val_motion[x];
+			fg_org2 = fg_val_motion[x+1];
+			fg_rgn2 = out_val_motion[x+1];
+#if 1
+			if( ( fg_org && fg_rgn==sn ) || ( fg_org2 && fg_rgn2==sn ) )
+			{
+				fg_val_motion[x] = (fg_org|flag);
+				fg_val_motion[x+1] = (fg_org2|flag);
+			}
+#else
+			if( fg_org && fg_rgn==sn )
+				fg_val_motion[x] = (fg_org|flag);
+			if( fg_org2 && fg_rgn2==sn )
+				fg_val_motion[x+1] = (fg_org2|flag);
+#endif
+		}
+		fg_val_motion += s32ImgW;
+		out_val_motion += s32ImgW;
+	}
+}
+
+IMP_VOID ipAbsorbTargetsFeadback( IpBGCodeBookOptimizedModel *module )
+{
+	PEA_RESULT_S *iresult = module->iresult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	IpTrackedTargetSet *tts = &iresult->stTrackedTargetSet;
+	PEA_DETECTED_REGION_S	*pstDrg;
+	IpTrackedTarget *target;
+	IMP_S32 i;
+
+   	for( i=0; i<IMP_MAX_TGT_CNT; i++ )
+	{
+		target = &tts->astTargets[i];
+		if( !ipTrackedTargetIsActiveMeasuredMtrend( target ) )
+			continue;
+
+		pstDrg = &pstRgs->astDrg[target->stTargetImage.s32DrgIndex];
+		if( IMP_IS_RGN_RSTATIC_R(pstDrg->u16Status) )
+			IMP_SET_RGN_RSTATIC_L(pstDrg->u16Status);
+	}
+}
+static IMP_VOID ipAbsorbUplevelFeedback( IpBGCodeBookOptimizedModel *module )
+{
+
+	IpCodebookPara *mpara = &module->mpara;
+	PEA_RESULT_S *iresult = module->iresult;
+	PEA_STATUS_S *istatus = &iresult->stSysStatus;
+
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+	GRAY_IMAGE_S *image_fg_rgn = pstRgs->image_fg_rgn;
+
+	IMP_S32 use_static_left = 1;
+	IMP_S32 use_static_removed = 0;
+	IMP_S32 use_motion = 1;
+	PEA_DETECTED_REGION_S	*pstDrg;
+	IMP_S32 i, s32Cnt;
+
+	IMP_GrayImageBinarys( image_fg_org );
+
+	if( mpara->fback_tgt2rgn )
+		ipAbsorbTargetsFeadback( module );
+
+	IMP_ITERATE_RGS_START
+	IMP_ASSERT( IMP_DRG_IS_COMPLETE(pstDrg->u8Used) );
+	{
+		if( 0 )
+		{
+		}
+		else
+		if( 0
+			|| ( use_motion && IMP_IS_RGN_RMOTION(pstDrg->u16Status) )
+			)// 对于运动目标，考虑其像素值不要融入背景
+		{
+			ipSetRegionHoldFlag( pstDrg, image_fg_org, image_fg_rgn, 0x03 );
+		}
+		else
+		if( 0
+			|| ( use_static_left && IMP_IS_RGN_RSTATIC_L(pstDrg->u16Status) )
+			|| ( use_static_removed && IMP_IS_RGN_RSTATIC_R(pstDrg->u16Status) )
+			)// 对于静止目标，考虑其像素值不要融入背景
+		{
+			ipSetRegionHoldFlag( pstDrg, image_fg_org, image_fg_rgn, 0x02 );
+		}
+	}
+	IMP_ITERATE_RGS_END
+
+#ifdef SUPPORT_CHANGE
+	if( IMP_STAT_BG_IS_UPDATED_CHG(istatus) && mpara->use_change_light )
+	{
+		pstRgs = &iresult->dregion_set_chg;
+// 		image_fg_org = pstRgs->image_fg_org;
+		image_fg_rgn = pstRgs->image_fg_rgn;
+// 		ipGrayImageBinarys( image_fg_org );
+
+		IMP_ITERATE_RGS_START
+		IMP_ASSERT( IMP_DRG_IS_COMPLETE(pstDrg->u8Used) );
+		if( IMP_IS_RGN_RLIGHT(pstDrg->u16Status)
+// 			|| ( use_static_left==2 && IS_RGN_RSTATIC_L(pstDrg->u16Status) )
+			|| ( use_static_removed==2 && IMP_IS_RGN_RSTATIC_R(pstDrg->u16Status) )
+			)
+		{
+			ipSetRegionHoldFlag( pstDrg, image_fg_org, image_fg_rgn, 0x04 );
+		}
+		IMP_ITERATE_RGS_END
+	}
+#endif
+}
+
+
+
+// 吸收从其它模块获得反馈信息
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 匹配背景模型
+
+static IMP_VOID suppress_global_light_change( IpBGCodeBookOptimizedModel *module );
+static IMP_VOID ipBackgroundMatch( IpBGCodeBookOptimizedModel *module )
+{
+	PEA_BG_MODEL_DATA_S *bgModelData = &module->bgModelData;
+//	IpForegroundRatioHistory *fgRatioHistory = &module->fgRatioHistory;
+	IpCodebookPara *mpara = &module->mpara;
+	IpCodewordPixel *bgmp = module->codebookImage.cwMaps;
+	PEA_RESULT_S *iresult = module->iresult;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+	IMP_U32 u32FrmTimeCur = iresult->u32FrmTimeCur;
+	IMP_U32 u32FrmTimePre = iresult->u32FrmTimePre;
+	IMP_U32 frm_time_cur_l = (u32FrmTimeCur & 0xFFFF);
+	IMP_U32 time_delta = u32FrmTimeCur - u32FrmTimePre;
+	// IMP_U32 time_delta2 = mpara->Tad_period;
+	IMP_U32 time_delta2 = 25;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+	IMP_U8 *p_gray_t = image_in_gray->pu8Data;
+	IMP_U8 gray_t;
+	IMP_S8 *p_fg_motion = (IMP_S8*)image_fg_org->pu8Data;
+	IMP_S8 fg_motion;
+#ifdef ACCUM_BGEDGE
+	GRAY_IMAGE_S *image_in_edge = pstRgs->image_in_edge;
+	IMP_U8 *p_edge_in = image_in_edge->pu8Data;
+	IMP_U8 edge_in;
+	IMP_S32 bgedge;
+#endif
+// 	IMP_S32 proc_slow_light = mpara->proc_slow_light;
+// 	IMP_S32 NRmnrl_bge = mpara->NRmnrl_bge;
+//  	IMP_S32 learn_rate = mpara->learn_rate;
+// 	IMP_S32 learn_rate2b = learn_rate;
+//  	IMP_S32 learn_rate2 = ((1<<learn_rate)-1);
+//  	IMP_S32 theta_Icur = bgModelData->detdata->theta_Icur;
+
+	IMP_S32 proc_slow_light = 0;
+	IMP_S32 NRmnrl_bge = 2;
+	IMP_S32 learn_rate = 2;
+	IMP_S32 learn_rate2b = learn_rate;
+	IMP_S32 learn_rate2 = ((1<<learn_rate)-1);
+ 	IMP_S32 theta_Icur = 10;
+
+
+	IMP_S32 theta_thld = theta_Icur;
+	IMP_S32 gray_cur;
+	IMP_S32 x, y;
+	IMP_S32 *fgHistogram = module->fgHistogram;
+	const IMP_S32 cst000 = 0;
+
+	memset( fgHistogram, 0, sizeof(IMP_S32)*256 );
+	fgHistogram += 128;
+
+	for( y=0; y<s32ImgH; y++ )
+	for( x=0; x<s32ImgW; x++ )
+	{
+	IpCodeword *pcw, *pcw1, *pcw2;
+	IMP_S32 type, cw_type;
+	IMP_S32 gray_mean1, gray_delta1, type1, cw_type1, attl;
+	IMP_S32 gray_mean2, gray_delta2, type2, cw_type2, mnrl2;
+	IMP_S32 cw1_valid, cw2_valid;
+	IMP_S32 gray_delta1s, gray_delta2s;
+	IMP_U32 cw_idx_cur;
+	IMP_S32 gray_pre, gray_delta1p;
+	IMP_S32 suc1, suc2, suc3, fail3;
+	IMP_S32 hval;
+	IMP_S32 gray_mean3;
+	fg_motion = *p_fg_motion;
+	gray_t = *p_gray_t++;
+#ifdef ACCUM_BGEDGE
+	edge_in = *p_edge_in++;
+	bgedge = bgmp->bgedge;
+#endif
+
+	pcw1 = &bgmp->codewords[0];
+	pcw2 = &bgmp->codewords[1];
+
+	gray_mean1 = pcw1->cluster;
+	type1 = pcw1->type;
+	attl = pcw1->time;
+	gray_pre = pcw1->match;
+
+	gray_mean2 = pcw2->cluster;
+	type2 = pcw2->type;
+	mnrl2 = pcw2->time;
+	cw_idx_cur = pcw2->match;
+
+	cw_type = IP_CODEWORD_UNUSED;
+	gray_cur = gray_t<<IP_CHAR2INT_PRECISION;
+// 	if( theta_crl_gray )
+// 		theta_thld = theta_Icur+(gray_t>>THETA_INCR_BASE);
+
+	cw_type1 = IP_GET_CW_TYPE(type1);
+	cw_type2 = IP_GET_CW_TYPE(type2);
+
+	if( cw_type2 == IP_CODEWORD_FG_CHANGE )
+	{
+		if( fg_motion & 0x04 )
+			attl -= time_delta2;
+		fg_motion &= ~0x01;
+	}
+
+	if( cw_idx_cur )
+	{
+		if( fg_motion & 0x01 )
+			mnrl2 += time_delta;
+		if( fg_motion & 0x02 )
+			attl += time_delta;
+	}
+
+	if( attl < 0 )
+		attl = 0;
+
+	gray_delta1p = (abs(gray_t-gray_pre)>>1);
+	gray_delta1s = (gray_cur-gray_mean1)>>(IP_CHAR2INT_PRECISION+1);
+	gray_delta2s = (gray_cur-gray_mean2)>>(IP_CHAR2INT_PRECISION+1);
+	gray_delta1 = abs(gray_delta1s);
+	gray_delta2 = abs(gray_delta2s);
+	if( proc_slow_light && gray_delta1>gray_delta1p )
+		gray_delta1 = gray_delta1p;
+// 	IMP_ASSERT(gray_delta1s<=127 && gray_delta1s>=-127);
+// 	IMP_ASSERT(gray_delta2s<=127 && gray_delta2s>=-127);
+
+	pcw1->time = attl;
+	pcw2->time = mnrl2 + time_delta;
+
+	gray_mean1 = (gray_mean1*learn_rate2+gray_cur)>>learn_rate2b;
+	gray_mean2 = (gray_mean2*learn_rate2+gray_cur)>>learn_rate2b;
+
+	cw1_valid =( cw_type1 != IP_CODEWORD_UNUSED );
+	cw2_valid =( cw_type2 != IP_CODEWORD_UNUSED );
+
+	fail3 = ( !cw1_valid || (gray_delta2<gray_delta1) );
+	suc1 = cw1_valid && ( gray_delta1 < theta_thld );
+	suc2 = cw2_valid && ( gray_delta2 < theta_thld ) && fail3;
+	suc3 = !suc1 && !suc2 && !cw2_valid;
+	if( suc1 ) suc2 = 0;
+
+	cw_idx_cur = 0;
+	if( suc1 )
+	{
+		pcw = pcw1;
+		pcw->cluster = gray_mean1;
+// 		pcw->time = attl;
+		cw_idx_cur = 1;
+		cw_type = cw_type1;
+		pcw1->match = gray_t;
+	}
+	if( suc2 )
+	{
+		pcw = pcw2;
+		pcw->cluster = gray_mean2;
+		pcw->time = mnrl2;
+		cw_idx_cur = 2;
+		cw_type = cw_type2;
+	}
+	if( suc3 )
+	{
+		pcw = pcw2;
+		gray_mean3 = (pcw->cluster*learn_rate2+gray_cur)>>learn_rate2b;
+		pcw->cluster = pcw->cluster ? gray_mean3:gray_cur;
+		pcw->time = 0;
+		cw_idx_cur = 2;
+		cw_type = IP_CODEWORD_FG;
+		type = pcw->type;
+		IP_SET_CW_TYPE(type,IP_CODEWORD_FG);
+		pcw->type = type;
+
+		bgmp->life = frm_time_cur_l;
+		pcw1->time = 0;
+	}
+
+	pcw2->match = cw_idx_cur;
+	fg_motion = ( !cw1_valid || cw_type==IP_CODEWORD_BG ) ? cst000 : gray_delta1s;
+	hval = fgHistogram[fg_motion];
+
+#ifdef ACCUM_BGEDGE
+	if( cw1_valid && suc3 )
+		bgedge = 0;
+	if( edge_in )
+		bgedge += (NRmnrl_bge-1);
+	else
+		bgedge -= 1;
+	bgmp->bgedge = bgedge;
+#endif
+
+	hval++;
+	*p_fg_motion++ = fg_motion;
+	fgHistogram[fg_motion] = hval;
+
+	bgmp++;
+	}
+
+//	suppress_global_light_change( module );
+}
+IMP_VOID ipAbsortFastLiBgModel(IpBGCodeBookOptimizedModel *module,int threshold_back)
+{
+	PEA_BG_MODEL_DATA_S *bgModelData = &module->bgModelData;
+
+	IpCodebookPara *mpara = &module->mpara;
+	IpCodewordPixel *bgmp = module->codebookImage.cwMaps;
+	PEA_RESULT_S *iresult = module->iresult;
+	IMP_S32 i;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+	IMP_S32 w,h;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	IpTrackedTargetSet *tts = &iresult->stTrackedTargetSet;
+	IpTrackedTarget *target;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+	GRAY_IMAGE_S *image_frm_diff = pstRgs->image_frm_diff;
+	GRAY_IMAGE_S *image_gradient = pstRgs->bg_in_diff_mag_image;
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+	IMP_U8 *p,value,*pbg,*pfg,*pOrg,*pDiffImage,*pDImage,*pPreDImage,*pgrad;
+
+	GRAY_IMAGE_S *image_foreground = &module->foreground;
+	GRAY_IMAGE_S *image_background = &module->background;
+	GRAY_IMAGE_S *image_D_image = &module->D_image;
+	GRAY_IMAGE_S *image_prev_Dimage = &module->prev_Dimage;
+#ifdef SUPPORT_CODEBOOK_FAST
+	GRAY_IMAGE_S *image_fg_codebook_fast = &module->fgCodebookFast;
+	IMP_U8 *pFgCbFast=image_fg_codebook_fast->pu8Data;
+#endif
+
+	IpTargetPosition *pos0;
+
+	IMP_S32 frames = module->nframes;
+
+	p = image_in_gray->pu8Data;
+	pDiffImage=image_frm_diff->pu8Data;
+	pDImage=image_D_image->pu8Data;
+	pPreDImage=image_prev_Dimage->pu8Data;
+	pbg=image_background->pu8Data;
+	pfg=image_foreground->pu8Data;
+	pOrg=image_fg_org->pu8Data;
+	pgrad=image_gradient->pu8Data;
+
+	/////////////////////////////////////////////////////////////////////////////////
+	//改变检测策略
+	//第一个fastli的结果
+	pDImage = image_D_image->pu8Data ;
+    for( i=0; i<IMP_MAX_TGT_CNT; i++ )
+	{
+		target = &tts->astTargets[i];
+		if( ipTrackedTargetIsActiveMeasuredMtrend( target ) )//杩欑鐩爣鏄渶濂界殑锛屽氨澶勭悊杩欎釜鍗冲彲
+        {
+            pos0 = ipTargetTrajectoryGetPosition( &target->stTrajectory, 0 );
+            for(h= pos0->stRg.s16Y1; h< pos0->stRg.s16Y2; h++)
+            {
+                for(w= pos0->stRg.s16X1; w< pos0->stRg.s16X2; w++)
+                {
+					*(pDImage+h*s32ImgW+w) = 5;
+                }
+
+            }
+
+        }
+	}
+	if (frames > 500)
+	{
+		for (i=0;i<s32ImgW*s32ImgH;i++)
+		{
+			if (*pDiffImage || *pFgCbFast || *pOrg
+				|| (frames > 500 ? *pgrad : 0))	 //有运动的条件
+			{
+				*(pDImage)=5;
+			}
+			else
+			{
+				if( (*pPreDImage) > 1 )
+				{
+					(*pDImage)=(*pPreDImage)-1;
+				}
+				else
+				{
+					*pDImage=0;
+				}
+			}
+
+			if(  *pDImage < 1  )   // whether the pixel need update
+			{
+				value =  (*p >> 2 ) + 3 * ((*pbg) >> 2);
+				//value =  (*p >> 1 ) + ((*pbg) >> 1);
+				*pbg = value> 255 ? 255 : value;
+			}
+			if (abs((*p)-(*pbg)) >= threshold_back * 2 ||  *pDiffImage || *pFgCbFast
+				|| (frames > 500 ? *pgrad : 0))
+			{
+				*pfg = 255;
+			}
+			else
+			{
+				*pfg = 0;
+			}
+			p++;
+			pDiffImage++;
+			pFgCbFast++;
+			pOrg++;
+			pDImage++;
+			pPreDImage++;
+			pbg++;
+			pfg++;
+		}
+	}
+	else
+	{
+		for (i=0;i<s32ImgW*s32ImgH;i++)
+		{
+			if (*pDiffImage  || *pFgCbFast || *pOrg)	 //有运动的条件
+			{
+				*(pDImage)=5;
+			}
+			else
+			{
+				if( (*pPreDImage) > 1 )
+				{
+					(*pDImage)=(*pPreDImage)-1;
+				}
+				else
+				{
+					*pDImage=0;
+				}
+			}
+
+			if(  *pDImage < 1  )   // whether the pixel need update
+			{
+				value =  (*p >> 2 ) + 3 * ((*pbg) >> 2);
+				//value =  (*p >> 1 ) + ((*pbg) >> 1);
+				*pbg = value> 255 ? 255 : value;
+			}
+			if (abs((*p)-(*pbg)) >= threshold_back * 2 ||  *pDiffImage || *pFgCbFast)
+			{
+				*pfg = 255;
+			}
+			else
+			{
+				*pfg = 0;
+			}
+			p++;
+			pDiffImage++;
+			pFgCbFast++;
+			pOrg++;
+			pDImage++;
+			pPreDImage++;
+			pbg++;
+			pfg++;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+// 	for (i=0;i<s32ImgW*s32ImgH;i++)
+// 	{
+// 		if (*pDiffImage || *pgrad !=0 || *pOrg!=0 || *pFgCbFast!=0)	 //有运动的条件
+// 		{
+// 			*(pDImage)=5;
+// 		}
+// 		else
+// 		{
+// 			if( (*pPreDImage) > 1 )
+// 			{
+// 				(*pDImage)=(*pPreDImage)-1;
+// 			}
+// 			else
+// 			{
+// 				*pDImage=0;
+// 			}
+// 		}
+//
+// 		if(  *pDImage < 1  )   // whether the pixel need update
+// 		{
+// 			value=(IMP_U8)(((*pbg)*90+(*(p)*38))>>7);
+// 			//value=(IMP_U8)(0.7*(*pbg)+0.3*(*(p)));
+// 			*pbg=value>255?255:value;
+// 		}
+// // #ifdef SUPPORT_CODEBOOK_FAST
+// 		// #endif
+// 		// if (*pFgCbFast!=0 || *pOrg!=0||abs((*p)-(*pbg))>=threshold_back*2 ||(*pDImage)>=4 ||*pDiffImage)
+// 		if (*pFgCbFast!=0  || *pOrg!=0|| abs((*p)-(*pbg))>=threshold_back/* ||(*pDImage)>=4*/ )
+// 		{
+// 			*pfg=255;
+// 		}
+// 		else
+// 		{
+// 			*pfg=0;
+// 		}
+// 		pFgCbFast++;
+// 		p++;
+// 		pOrg++;
+// 		pDiffImage++;
+// 		pgrad++;
+// 		pDImage++;
+// 		pPreDImage++;
+// 		pbg++;
+// 		pfg++;
+// 	}
+}
+IMP_VOID ipFastLiBgModel(IpBGCodeBookOptimizedModel *module,int threshold_back)
+{
+	PEA_BG_MODEL_DATA_S *bgModelData = &module->bgModelData;
+
+	IpCodebookPara *mpara = &module->mpara;
+	IpCodewordPixel *bgmp = module->codebookImage.cwMaps;
+	PEA_RESULT_S *iresult = module->iresult;
+	IMP_S32 i;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+	GRAY_IMAGE_S *image_frm_diff = pstRgs->image_frm_diff;
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+	IMP_U8 *p,value,*pbg,*pfg,*pDiffImage,*pDImage,*pPreDImage;
+
+	GRAY_IMAGE_S *image_foreground = &module->foreground;
+	GRAY_IMAGE_S *image_background = &module->background;
+	GRAY_IMAGE_S *image_D_image = &module->D_image;
+	GRAY_IMAGE_S *image_prev_Dimage = &module->prev_Dimage;
+
+	p = image_in_gray->pu8Data;
+	pDiffImage=image_frm_diff->pu8Data;
+	pDImage=image_D_image->pu8Data;
+	pPreDImage=image_prev_Dimage->pu8Data;
+	pbg=image_background->pu8Data;
+	pfg=image_foreground->pu8Data;
+
+	for (i=0;i<s32ImgW*s32ImgH;i++)
+	{
+		if (*pDiffImage)	 //有运动的条件
+		{
+			*(pDImage)=5;
+		}
+		else
+		{
+			if( (*pPreDImage) > 1 )
+			{
+				(*pDImage)=(*pPreDImage)-1;
+			}
+			else
+			{
+				*pDImage=0;
+			}
+		}
+
+		if(  *pDImage < 1  )   // whether the pixel need update
+		{
+			value=(IMP_S8)(((*pbg)*90+(*(p)*38))>>7);
+			*pbg=value>255?255:value;
+		}
+
+		if (abs((*p)-(*pbg))>=threshold_back*2 ||(*pDImage)>=4 /*||*pDiffImage>=threshold_back*/)
+		{
+			*pfg=255;
+		}
+		else
+		{
+			*pfg=0;
+		}
+
+		p++;
+		pDiffImage++;
+		pDImage++;
+		pPreDImage++;
+		pbg++;
+		pfg++;
+	}
+}
+/**
+*中心码剔除规则：①当码权值更新后值减少到0 时，中心码被删除。②当码书要主动删
+除时，选择按权值页码积最小的码书删除，删除后的码书权值先分配给待加入码，再把剩下
+的权值按照页码从大到小分配给其他页码。
+*/
+int ipBGCodeBookClearStale(IpBGCodeBookFastElem *pCodebookElem,IMP_U8 value,int type)
+{
+	int i;
+	int n=0;
+	IMP_U8 weight=CODE_WEIGHT;
+	if (type==IP_INITIATIVE)//主动更新
+	{
+		//先查找最小权重的码字
+		for (i=0;i<CODEBOOK_LEN;i++)
+		{
+			if (pCodebookElem[i].weight<weight)
+			{
+				weight=pCodebookElem[i].weight;
+				n=i;//权重最小
+			}
+		}
+		//删除权重最小的码字，后面的码字依次往前翻页
+		for (i=n;i<CODEBOOK_LEN-1;i++)
+		{
+			pCodebookElem[i].weight=pCodebookElem[i+1].weight;
+			pCodebookElem[i].clusterCenter=pCodebookElem[i+1].clusterCenter;
+		}
+		//赋值，放到码书的最后
+		pCodebookElem[CODEBOOK_LEN-1].clusterCenter=value;
+		pCodebookElem[CODEBOOK_LEN-1].weight=weight;
+
+		return n;
+	}
+	else
+	{
+		for (i=0;i<CODEBOOK_LEN;i++)
+		{
+			if (pCodebookElem[i].weight==0)
+			{
+				pCodebookElem[i].clusterCenter=0;
+				n=i;
+				break;
+			}
+		}
+		for (i=n;i<CODEBOOK_LEN-1;i++)
+		{
+			pCodebookElem[i].weight=pCodebookElem[i+1].weight;
+			pCodebookElem[i].clusterCenter=pCodebookElem[i+1].clusterCenter;
+		}
+		//赋值0，放到码书的最后
+		pCodebookElem[CODEBOOK_LEN-1].clusterCenter=0;
+		pCodebookElem[CODEBOOK_LEN-1].weight=0;
+	}
+	return 1;
+
+}
+//codebook 主程序
+//更新
+//type标志是更新cache层，还是长背景层
+IMP_VOID ipBGCodeBookUpdate(IMP_U8 *p,IpBGCodeBookFastElem *pCodebookElem)
+{
+	IMP_S32 i,n;
+	IMP_U8 value,weight;
+
+	/*
+	当码书存在空白页，待加入的中心码与码书中没有同类码时，
+	按照页码从小到大把中心码依次加入到码书。②当码书各页已经填满，待加入的中心码与码
+	书中没有相同值时，需要剔除码书某一页的中心码xi，xi 所在页码后面的中心码依次向前页
+	移动一页，新加入的中心码加到最后一页，需要剔除的中心码按照中心码书剔除规则选择。
+	③当待加入的中心码与码书中有相同值时，xi 所在页码后面的中心码依次向前页移动一页，
+	*/
+
+	for (i=0;i<CODEBOOK_LEN;i++)
+	{
+		//查找有没有符合条件的码字
+		if (abs(*p-pCodebookElem[i].clusterCenter)>CLASTER_DISTANCE)
+		{
+			continue;
+		}
+		else//有符合的码字
+		{
+			//更新码字每次新加入或更新一个中心码，第一页的权值减少α。
+			//新加入或更新的中心码权值增加α，中心码的权值更新后最大值为1。
+			weight=pCodebookElem[i].weight;
+			value=pCodebookElem[i].clusterCenter;
+			//新的中心和权重
+			value=(weight*value+UPDATE_TIME*(*p))/(weight+UPDATE_TIME);
+			weight+=UPDATE_TIME;
+			if (weight>10)
+			{
+				weight=10;
+			}
+
+			//更新权重，后面码字往前移一页
+			for (n=i;n<CODEBOOK_LEN-1;n++)
+			{
+				pCodebookElem[n].weight=pCodebookElem[n+1].weight;
+				pCodebookElem[n].clusterCenter=pCodebookElem[n+1].clusterCenter;
+			}
+			pCodebookElem[n].weight=0;
+			pCodebookElem[n].clusterCenter=0;
+			//插入新的码字
+			for (n=0;n<CODEBOOK_LEN;n++)
+			{
+				if (pCodebookElem[n].weight==0)//寻找空白页
+				{
+					pCodebookElem[n].weight=weight;
+					pCodebookElem[n].clusterCenter=value;
+				}
+				break;
+			}
+
+			break;
+		}
+	}
+	//如果没有匹配上的码字
+	if (i==CODEBOOK_LEN)
+	{
+		for (n=0;n<CODEBOOK_LEN;n++)
+		{
+			//当码书存在空白
+			if (pCodebookElem[n].weight==0)
+			{
+				if (n==0)//第一个码字也是空白，则权重为设置为10
+				{
+					pCodebookElem[n].weight=CODE_WEIGHT;
+					pCodebookElem[n].clusterCenter=(*p);
+				}
+				else
+				{
+					pCodebookElem[0].weight-=UPDATE_TIME;
+					pCodebookElem[n].weight=UPDATE_TIME;
+					pCodebookElem[n].clusterCenter=(*p);
+
+					//判断0码字调整权重后，权重是否为0，如果是0，则移除该码字
+					if (pCodebookElem[0].weight==0)
+					{
+						for (n=0;n<CODEBOOK_LEN-1;n++)
+						{
+							pCodebookElem[n].weight=pCodebookElem[n+1].weight;
+							pCodebookElem[n].clusterCenter=pCodebookElem[n+1].clusterCenter;
+						}
+						pCodebookElem[n].weight=0;
+						pCodebookElem[n].clusterCenter=0;
+					}
+				}
+				break;
+			}
+		}
+		//码书已满
+		if (n==CODEBOOK_LEN)
+		{
+			ipBGCodeBookClearStale(pCodebookElem,(*p),IP_INITIATIVE);//主动更新
+		}
+	}
+
+}
+//codebookCache 主程序
+//更新
+IMP_VOID ipBGCodeBookCacheUpdate(IpBGCodeBookOptimizedModel *module)
+{
+	IMP_S32 i,j,n;
+	IMP_U8 value,weight;
+
+	PEA_RESULT_S *iresult = module->iresult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+	GRAY_IMAGE_S *foreground = &module->foreground;
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+	IMP_S32 t = module->nframes;
+	IMP_S32 s32ImgW = image_in_gray->s32W;
+	IMP_S32 s32ImgH = image_in_gray->s32H;
+	IMP_U8 *p=(IMP_U8*)image_in_gray->pu8Data;
+	IMP_U8 *pfg=(IMP_U8*)foreground->pu8Data;
+	IpBGCodeBookFastModel *pCodebookModel=module->pCodebook;
+	IpBGCodeBookFastElem *pCodebookElem;
+
+
+	/*
+	当码书存在空白页，待加入的中心码与码书中没有同类码时，
+	按照页码从小到大把中心码依次加入到码书。②当码书各页已经填满，待加入的中心码与码
+	书中没有相同值时，需要剔除码书某一页的中心码xi，xi 所在页码后面的中心码依次向前页
+	移动一页，新加入的中心码加到最后一页，需要剔除的中心码按照中心码书剔除规则选择。
+	③当待加入的中心码与码书中有相同值时，xi 所在页码后面的中心码依次向前页移动一页，
+	*/
+	for(j = 0; j < s32ImgW*s32ImgH; j++)
+	{
+		pCodebookElem=pCodebookModel->codebookElems;//指向短背景层
+
+		for (i=0;i<CODEBOOK_LEN;i++)
+		{
+			//查找有没有符合条件的码字
+			if (abs(*p-pCodebookElem[i].clusterCenter)>CLASTER_DISTANCE)
+			{
+				continue;
+			}
+			else//有符合的码字
+			{
+				//更新码字每次新加入或更新一个中心码，第一页的权值减少α。
+				//新加入或更新的中心码权值增加α，中心码的权值更新后最大值为1。
+				weight=pCodebookElem[i].weight;
+				value=pCodebookElem[i].clusterCenter;
+				//新的中心和权重
+				value=(weight*value+UPDATE_TIME*(*p))/(weight+UPDATE_TIME);
+				weight+=UPDATE_TIME;
+				if (weight>10)
+				{
+					weight=10;
+				}
+
+				//更新权重，后面码字往前移一页
+				for (n=i;n<CODEBOOK_LEN-1;n++)
+				{
+					pCodebookElem[n].weight=pCodebookElem[n+1].weight;
+					pCodebookElem[n].clusterCenter=pCodebookElem[n+1].clusterCenter;
+				}
+				pCodebookElem[n].weight=0;
+				pCodebookElem[n].clusterCenter=0;
+				//插入新的码字
+				for (n=0;n<CODEBOOK_LEN;n++)
+				{
+					if (pCodebookElem[n].weight==0)//寻找空白页
+					{
+						pCodebookElem[n].weight=weight;
+						pCodebookElem[n].clusterCenter=value;
+					}
+					break;
+				}
+
+				break;
+			}
+		}
+
+		p++;
+		pCodebookModel++;
+		pfg++;
+	}
+}
+
+IMP_VOID ipBGCodeBookDiff(IpBGCodeBookOptimizedModel *module,IMP_S32 threshold_back)
+{
+	IMP_S32 i,j,t;
+
+	PEA_RESULT_S *iresult = module->iresult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+	GRAY_IMAGE_S *image_fg_codebook_fast = &module->fgCodebookFast;
+	GRAY_IMAGE_S *image_background = &module->background;
+	GRAY_IMAGE_S *D_image= &module->D_image;
+	GRAY_IMAGE_S *prev_Dimage= &module->prev_Dimage;
+	GRAY_IMAGE_S *image_frm_diff= pstRgs->image_frm_diff;
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+
+	IMP_S32 s32ImgW = image_in_gray->s32W;
+	IMP_S32 s32ImgH = image_in_gray->s32H;
+	IMP_U8 *p=(IMP_U8*)image_in_gray->pu8Data;
+	IMP_U8 *pfg;
+	IpCodebookBgModelPara *mpara=&module->paramsFastLi;
+	IpBGCodeBookFastModel *pCodebookModel=module->pCodebook;
+	IpBGCodeBookFastElem *pCodebookElem;
+	IMP_S32 u8UpdateSpeedMax=mpara->u8UpdateSpeedMax;
+	t=mpara->s32TCatch;
+
+	p=(IMP_U8*)image_in_gray->pu8Data;
+// 	pfg=(IMP_U8*)image_foreground->pu8Data;
+// 	pbg=(IMP_U8*)image_background->pu8Data;
+	pfg=(IMP_U8*)image_fg_codebook_fast->pu8Data;
+// 	pPreDImage=(IMP_U8*)prev_Dimage->pu8Data;
+// 	pDiffImage=(IMP_U8*)image_frm_diff->pu8Data;
+	for(j = 0; j < s32ImgW*s32ImgH; j++)
+	{
+		pCodebookElem=pCodebookModel->codebookElems;
+
+		for (i=0;i<CODEBOOK_LEN;i++)
+		{
+			//查找有没有符合条件的码字
+			if (abs(*p-pCodebookElem[i].clusterCenter)<CLASTER_DISTANCE)
+			{
+				break;
+			}
+		}
+		if(i>=CODEBOOK_LEN)//没有找到匹配的，为前景
+		{
+			*pfg=255;
+		}
+		else
+		{
+			*pfg=0;
+		}
+
+		p++;
+		pfg++;
+		pCodebookModel++;
+	}
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 更新背景模型
+
+static IMP_VOID ipUpdateBackgroundModel( IpBGCodeBookOptimizedModel *module ,IMP_S32 flag)
+{
+	PEA_BG_MODEL_DATA_S *bgModelData = &module->bgModelData;
+//	IpForegroundRatioHistory *fgRatioHistory = &module->fgRatioHistory;
+	IpCodebookPara *mpara = &module->mpara;
+	IpCodebookImage *codebookImage = &module->codebookImage;
+	IpCodewordPixel *bgmp = codebookImage->cwMaps;
+	PEA_RESULT_S *iresult = module->iresult;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+// 	IMP_U32 Tinit_add = mpara->Tinit_add;
+// 	IMP_U32 Twork_add = mpara->Twork_add;
+// 	IMP_U32 Tstatic_add = mpara->Tstatic_add;
+// 	IMP_U32 Tchange_add = mpara->Tchange_add;
+// 	IMP_U32 Tbg_add = 0;
+// 	IMP_U32 NRattl = mpara->NRattl;
+// 	IMP_U32 NRmnrl = mpara->NRmnrl;
+
+	IMP_U32 Tinit_add = 50;
+	IMP_U32 Twork_add = 100;
+	IMP_U32 Tstatic_add = 1600;
+	IMP_U32 Tchange_add = 0;
+	IMP_U32 Tbg_add = 0;
+	IMP_U32 NRattl = 3;
+	IMP_U32 NRmnrl = 4;
+
+
+
+	IpCodeword *pcw_lx, *pcw_l3;
+	IMP_U32 type_lx, type_l3;
+	IMP_U32 gray_mean_lx, gray_mean_l3;
+	IMP_U32 cwtype_lx, cwtype_l3;
+	IMP_U32 mnrl_lx, life_lx;
+	IMP_U32 attl;
+	IMP_U32 u32FrmTimeCur = iresult->u32FrmTimeCur;
+	IMP_S32 bg_work_num, xx, yy, s32Cnt;
+	IMP_U32 lumi, bg_lumi;
+	IMP_S32 bg_is_changing;
+	PEA_DETECTED_REGIONSET_S *rgs_m = &iresult->stDRegionSet;
+	IMP_U8 *gray_bg;
+	GRAY_IMAGE_S *image_bg_gray;
+	GRAY_IMAGE_S *image_bg_edge;
+
+#ifdef SUPPORT_CHANGE
+	PEA_DETECTED_REGIONSET_S *rgs_c = &iresult->dregion_set_chg;
+	GRAY_IMAGE_S *image_lv2_gray = rgs_c->image_in_gray;
+	IMP_U8 *gray_lv2 = image_lv2_gray->pu8Data;
+	GRAY_IMAGE_S *image_lv2_fg = rgs_c->image_fg_org;
+	IMP_U8 *dat_chg = image_lv2_fg->pu8Data;
+	GRAY_IMAGE16_S *image_lv2_life = rgs_c->pstImgFgLife;
+	IMP_U16 *dat_clife = image_lv2_life->ps16Data;
+	IMP_U32 lv2_fg, lv2_life;
+#ifdef ACCUM_BGEDGE
+	GRAY_IMAGE_S *image_lv2_edge = rgs_c->image_in_edge;
+	IMP_U8 *edge_lv2 = image_lv2_edge->pu8Data;
+#endif
+#endif
+#ifdef ACCUM_BGEDGE
+	image_bg_edge = rgs_m->image_bg_edge;
+	IMP_U8 *edge_bg = image_bg_edge->pu8Data;
+#endif
+	IMP_S32 theta_time = 0;
+// 	IMP_S32 last_is_person_enter = module->bgModelData->last_person_enter;
+// 	IMP_S32 is_person_enter = module->bgModelData->person_enter;
+// 	IMP_S32 enter_start_time = module->bgModelData->enter_start_time;
+//
+// 	if (is_person_enter == 1)
+// 	{
+// 		return;
+// 	}
+//
+// 	if (enter_start_time)
+// 	{
+// 		theta_time = u32FrmTimeCur - enter_start_time;
+// 		module->bgModelData->enter_start_time = 0;
+// 	}
+
+	if (flag == IP_BACKGROUND_SHORT)
+	{
+		 image_bg_gray = rgs_m->image_st_bg_gray;
+	}
+	else
+	{
+		image_bg_gray = rgs_m->image_bg_gray;
+	}
+	gray_bg = image_bg_gray->pu8Data;
+	s32Cnt = s32ImgW * s32ImgH;
+	bg_work_num = 1;
+	bg_lumi = 0;
+
+	for( yy=0; yy<s32ImgH; yy++ )
+	{
+	for( xx=0; xx<s32ImgW; xx++ )
+	{
+		pcw_l3 = bgmp->codewords + 0;
+		type_l3 = pcw_l3->type;
+ 		attl = pcw_l3->time;
+		gray_mean_l3 = pcw_l3->cluster;
+
+		pcw_lx = bgmp->codewords + 1;
+		type_lx = pcw_lx->type;
+ 		mnrl_lx = pcw_lx->time;
+		gray_mean_lx = pcw_lx->cluster;
+
+		cwtype_l3 = IP_GET_CW_TYPE(type_l3);
+		cwtype_lx = IP_GET_CW_TYPE(type_lx);
+
+		bgmp->life = bgmp->life+theta_time;
+
+		life_lx = u32FrmTimeCur - bgmp->life;
+		life_lx &= 0xFFFF;
+
+		Tbg_add = cwtype_l3==IP_CODEWORD_BG ? Twork_add : Tinit_add;
+
+		if( cwtype_lx != IP_CODEWORD_UNUSED )
+		{
+			IMP_S32 init_cond = ( cwtype_l3!=IP_CODEWORD_BG && life_lx>=Tinit_add );
+			IMP_S32 work_cond = ( cwtype_l3==IP_CODEWORD_BG && life_lx>=Twork_add );
+			IMP_S32 bg_cond = ( life_lx>=Tstatic_add || attl*NRattl<life_lx );
+// 			IMP_S32 bg_cond = ( life_lx>=Tstatic_add || attl*NRattl<life_lx*(NRattl-1) );
+
+			if( mnrl_lx*NRmnrl>life_lx )
+			{
+				IP_SET_CW_TYPE(type_lx,IP_CODEWORD_UNUSED);
+				cwtype_lx = IP_CODEWORD_UNUSED;
+				pcw_lx->type = type_lx;
+				Tbg_add = 0;
+			}
+			else if( init_cond || ( work_cond && bg_cond ) )
+			{
+				IP_SET_CW_TYPE(type_lx,IP_CODEWORD_UNUSED);
+				IP_SET_CW_TYPE(type_l3,IP_CODEWORD_BG);
+				cwtype_lx = IP_CODEWORD_UNUSED;
+				cwtype_l3 = IP_CODEWORD_BG;
+				pcw_lx->type = type_lx;
+				pcw_l3->type = type_l3;
+				gray_mean_l3 = gray_mean_lx;
+				pcw_l3->cluster = gray_mean_lx;
+			}
+			else if( work_cond && !bg_cond )
+			{
+				IP_SET_CW_TYPE(type_lx,IP_CODEWORD_FG_CHANGE);
+				cwtype_lx = IP_CODEWORD_FG_CHANGE;
+				pcw_lx->type = type_lx;
+			}
+		}
+
+		if( Tchange_add )
+			bg_is_changing = ( cwtype_lx!=IP_CODEWORD_UNUSED && life_lx>=Tchange_add );
+		else
+			bg_is_changing = ( cwtype_lx==IP_CODEWORD_FG_CHANGE );
+
+		if( cwtype_l3 == IP_CODEWORD_BG )
+		{
+			bg_work_num++;
+
+			lumi = gray_mean_l3>>IP_CHAR2INT_PRECISION;
+			gray_bg[0] = lumi;
+			bg_lumi += lumi;
+
+#ifdef SUPPORT_CHANGE
+			lv2_fg = 0;
+			lv2_life = 0;
+			if( bg_is_changing )
+			{
+				lv2_fg = 255;
+// 				lv2_life = (life_lx+16)>>5;
+				lv2_life = life_lx;
+				lumi = gray_mean_lx>>IP_CHAR2INT_PRECISION;
+			}
+			dat_chg[0] = lv2_fg;
+			dat_clife[0] = lv2_life;
+			gray_lv2[0] = lumi;
+#endif
+		}
+		else
+		{
+			gray_bg[0] = 0;
+#ifdef SUPPORT_CHANGE
+			dat_chg[0] = 0;
+			dat_clife[0] = 0;
+			gray_lv2[0] = 0;
+#endif
+		}
+
+#ifdef ACCUM_BGEDGE
+		if( cwtype_l3==IP_CODEWORD_BG )
+		{
+			IMP_S32 bgedge = bgmp->bgedge;
+
+			if( cwtype_lx==IP_CODEWORD_UNUSED && life_lx>=Tbg_add )
+			{
+				if( Tbg_add )
+				{
+					if( bgedge > 0 )
+						edge_bg[0] = 0xFE;
+					else
+						edge_bg[0] = 0;
+				}
+				bgedge = 0;
+				bgmp->life = (u32FrmTimeCur & 0xFFFF);
+			}
+
+#ifdef SUPPORT_CHANGE
+			if( bg_is_changing )
+			{
+				if( bgedge > 0 )
+					edge_lv2[0] = 0xFE;
+				else
+					edge_lv2[0] = 0;
+			}
+			else
+			{
+				edge_lv2[0] = edge_bg[0];
+			}
+#endif
+
+			bgmp->bgedge = bgedge;
+		}
+#endif
+
+		bgmp++;
+		gray_bg++;
+#ifdef SUPPORT_CHANGE
+		gray_lv2++;
+		dat_chg++;
+		dat_clife++;
+#ifdef ACCUM_BGEDGE
+		edge_lv2++;
+#endif
+#endif
+#ifdef ACCUM_BGEDGE
+		edge_bg++;
+#endif
+	}
+	}
+	bgModelData->u32BgWorkRatio = (bg_work_num*100/s32Cnt);
+	bgModelData->s32BgLumi = bg_lumi/s32Cnt;
+
+	// 背景边缘
+	{
+		PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+		GRAY_IMAGE_S *image_bg_gray;// = pstRgs->image_bg_gray;
+		GRAY_IMAGE16_S *image_bg_edge_grad = pstRgs->image_bg_edge_grad;
+		GRAY_IMAGE_S *image_bg_edge_mag = pstRgs->image_bg_edge_mag;
+		// IMP_S32 theta_thld = bgModelData->detdata->theta_Icur * 2;
+		IMP_S32 theta_thld = 10 * 2;
+		if (flag == IP_BACKGROUND_SHORT)
+		{
+			 image_bg_gray = rgs_m->image_st_bg_gray;
+		}
+		else
+		{
+			image_bg_gray = rgs_m->image_bg_gray;
+		}
+
+#ifdef ACCUM_BGEDGE
+		if( bgModelData->do_stabilize )
+		{
+			ipCanny( image_bg_gray->pu8Data,
+						(IMP_S8*)image_bg_edge_grad->pu8Data,
+							image_bg_edge_mag->pu8Data,
+							bgModelData->detdata->pstImgBgEdgeG->pu8Data,
+							0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
+							theta_thld );
+		}
+		else
+		{
+			ipCannyCalcGradmag( image_bg_gray->pu8Data,
+						(IMP_S8*)image_bg_edge_grad->ps16Data,
+							image_bg_edge_mag->pu8Data,
+							0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH );
+		}
+#else
+		image_bg_edge = pstRgs->image_bg_edge;
+		ipCanny( image_bg_gray->pu8Data,
+					(IMP_S8*)image_bg_edge_grad->ps16Data,
+						image_bg_edge_mag->pu8Data,
+						image_bg_edge->pu8Data,
+						0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
+						theta_thld );
+#endif
+	}
+
+	// 变化边缘
+#ifdef SUPPORT_CHANGE
+	{
+		PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->dregion_set_chg;
+		GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+		GRAY_IMAGE16_S *image_in_edge_grad = pstRgs->image_in_edge_grad;
+		GRAY_IMAGE_S *image_in_edge_mag = pstRgs->image_in_edge_mag;
+#ifdef ACCUM_BGEDGE
+		ipCannyCalcGradmag( image_in_gray->pu8Data,
+					(IMP_S8*)image_in_edge_grad->ps16Data,
+						image_in_edge_mag->pu8Data,
+						0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH );
+#else
+		GRAY_IMAGE_S *image_in_edge = pstRgs->image_in_edge;
+//		IMP_S32 theta_thld = bgModelData->detdata->theta_Icur * 2;
+		IMP_S32 theta_thld = 10 * 2;
+		ipCanny( image_in_gray->pu8Data,
+					(IMP_S8*)image_in_edge_grad->ps16Data,
+						image_in_edge_mag->pu8Data,
+						image_in_edge->pu8Data,
+						0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
+						theta_thld );
+#endif
+// 		{
+// 		IP_RECT rc;
+// 		GRAY_IMAGE_S *image_bg_edge = pstRgs->image_bg_edge;
+// 		GRAY_IMAGE_S *image_mat_bgfg = pstRgs->image_mat_bgfg;
+// 		SET_IP_RECT( rc, 1, 1, s32ImgW-2, s32ImgH-2 );
+// 		match_two_image_edge( image_in_edge, image_bg_edge, image_mat_bgfg, &rc );
+// 		}
+	}
+#endif
+}
+
+// 更新背景模型
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static IMP_VOID cvClearCodebookBgModel( IpBGCodeBookOptimizedModel *module )
+{
+	ipBgModelDataClear( &module->fgRatioHistory );
+	ipBGModelImageClear( &module->codebookImage );
+}
+IMP_VOID ipCreateCodebookOptimizedBgModel( IpBGCodeBookOptimizedModel *module, PEA_DETECTOR_DATA_S *detdata, PEA_RESULT_S *iresult, GA_HARDWARE_RS_S *hw_resource )
+{
+	IMP_S32 s32ImgH, s32ImgW,length;
+	MEM_MGR_ARRAY_S *mem_mgr;
+
+	memset( module, 0, sizeof(IpBGCodeBookOptimizedModel) );
+	module->hw_resource = hw_resource;
+	module->iresult = iresult;
+	module->bgModelData.pstDetectorData = detdata;
+	mem_mgr = &hw_resource->stMemMgr;
+	s32ImgH = iresult->s32Height;
+	s32ImgW = iresult->s32Width;
+
+	ipBGModelImageCreate( &module->codebookImage, s32ImgW, s32ImgH, mem_mgr );
+	IMP_HistoryImageCreate( &module->imghis, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &module->background, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &module->foreground, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &module->D_image, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &module->prev_Dimage, s32ImgW, s32ImgH, mem_mgr );
+
+
+
+	module->nframes=0;
+	module->noise_area=0;
+	module->noise_adjust_theta_cnt=0;
+	module->frmcnt=0;
+	module->udpm_time_pre=0;
+#ifdef SUPPORT_CODEBOOK_FAST
+	IMP_GrayImageCreate( &module->fgCodebookFast, s32ImgW, s32ImgH, mem_mgr );
+	length=sizeof(IpBGCodeBookFastModel);
+	module->pCodebook = (IpBGCodeBookFastModel*)IMP_MMAlloc(mem_mgr, IMP_MEMBLK_TYPE_SLOW,(s32ImgW*s32ImgH+1)*sizeof(IpBGCodeBookFastModel));
+#endif
+	memset( module->pCodebook, 0,(s32ImgW*s32ImgH+1)*sizeof(IpBGCodeBookFastModel) );
+
+
+	cvClearCodebookBgModel( module );
+}
+
+IMP_VOID ipReleaseCodebookOptimizedBgModel( IpBGCodeBookOptimizedModel *module )
+{
+	MEM_MGR_ARRAY_S *mem_mgr = &module->hw_resource->stMemMgr;
+
+#ifdef SUPPORT_CODEBOOK_FAST
+	//释放内存
+	IpBGCodeBookFastModel *pCodebook=module->pCodebook;
+
+	if (pCodebook)
+	{
+		IMP_MMFree( mem_mgr, IMP_MEMBLK_TYPE_SLOW, pCodebook);
+		pCodebook=NULL;
+	}
+	IMP_GrayImageDestroy( &module->fgCodebookFast, mem_mgr );
+#endif
+	ipBGModelImageDestroy( &module->codebookImage, mem_mgr );
+	IMP_HistoryImageDestroy( &module->imghis, mem_mgr );
+	IMP_GrayImageDestroy( &module->background, mem_mgr );
+	IMP_GrayImageDestroy( &module->foreground, mem_mgr );
+	IMP_GrayImageDestroy( &module->D_image, mem_mgr );
+	IMP_GrayImageDestroy( &module->prev_Dimage, mem_mgr );
+
+
+	memset( module, 0, sizeof(IpBGCodeBookOptimizedModel) );
+}
+
+IMP_VOID ipConfigCodebookOptimizedBgModel( IpBGCodeBookOptimizedModel *module, IpCodebookPara *mpara )
+{
+	PEA_RESULT_S *iresult = module->iresult;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+	IpCodebookBgModelPara *params=&module->paramsFastLi;
+	mpara->th_suplit_pix_ratio=20;
+	mpara->th_suplit_pix_num = mpara->th_suplit_pix_ratio * (s32ImgW*s32ImgH) / 1000;
+
+	memcpy( &module->mpara, mpara, sizeof(IpCodebookPara) );
+
+
+// 	if( gpara == NULL )
+    {
+		module->paramsFastLi.s32ThresholdCur = DEFAULT_LI_BGFG_MOG_SUBTRACTION_THRESHOLD_M;
+		module->paramsFastLi.dGradientPointScale=DEFAULT_LI_BFFG_MOG_GRADIENT_POINT_SCALE;
+		module->paramsFastLi.dLumiThreshold=DEFAULT_LI_BGFG_MOG_LUMINANCE_LOW_THRESHOLD;
+		module->paramsFastLi.u8UpdateSpeedMax=UPDATE_SPEED;
+		module->paramsFastLi.u8LearnRate=LEARN_RATE;
+		module->paramsFastLi.s32TAdd=TADD;
+		module->paramsFastLi.s32TCatch=2;
+		module->paramsFastLi.s32ThresholdMax=15;
+		module->paramsFastLi.s32ThresholdMin=4;
+		module->paramsFastLi.s32ThresholdUdpm=10;
+		module->paramsFastLi.s32ThresholdNoiseRatio=10;
+		module->paramsFastLi.s32ThresholdUp2DwRatio=10;
+
+	}
+// 	else
+// 	{
+// 		//module->params.s32ThresholdCur = gpara->s32ThresholdCur;
+// 		module->params.s32ThresholdCur = DEFAULT_LI_BGFG_MOG_SUBTRACTION_THRESHOLD_M;
+// 		// module->params.dGradientPointScale=gpara->dGradientPointScale;
+// 		// module->params.dLumiThreshold=gpara->dLumiThreshold;
+// 		module->params.u8UpdateSpeedMax=gpara->u8UpdateSpeedMax;
+// 		module->params.learn_rate=gpara->learn_rate;
+// 		module->params.Tadd=gpara->Tadd;
+// 		module->params.s32TCatch=gpara->s32TCatch;
+// 		module->params.s32ThresholdMax=gpara->s32ThresholdMax;
+// 		module->params.s32ThresholdMin=gpara->s32ThresholdMin;
+// 		module->params.s32ThresholdUdpm=gpara->s32ThresholdUdpm;
+// 		module->params.s32ThresholdNoiseRatio=gpara->s32ThresholdNoiseRatio;
+// 		module->params.s32ThresholdUp2DwRatio=gpara->s32ThresholdUp2DwRatio;
+// 	}
+}
+
+IMP_S32 ipProcessCodebookOptimizedBgModel( IpBGCodeBookOptimizedModel *module )
+{
+	IMP_S32 j;
+	PEA_BG_MODEL_DATA_S *bgModelData = &module->bgModelData;
+//	IpForegroundRatioHistory *fgRatioHistory = &module->fgRatioHistory;
+	IpCodebookPara *mpara = &module->mpara;
+	PEA_RESULT_S *iresult = module->iresult;
+	IMP_S32 s32ImgW = iresult->s32Width;
+	IMP_S32 s32ImgH = iresult->s32Height;
+//	IMP_U32 u32FrmTimeCur = iresult->u32FrmTimeCur;
+	PEA_STATUS_S *istatus = &iresult->stSysStatus;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_in_gray_pre;// = &module->image_in_gray_pre;
+	GRAY_IMAGE_S *image_frm_diff = pstRgs->image_frm_diff;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+	GRAY_IMAGE16_S *image_in_edge_grad = pstRgs->image_in_edge_grad;
+	GRAY_IMAGE_S *image_in_edge_mag = pstRgs->image_in_edge_mag;
+	GRAY_IMAGE_S *image_in_edge = pstRgs->image_in_edge;
+	GRAY_IMAGE16_S *image_bg_edge_grad = pstRgs->image_bg_edge_grad;
+	GRAY_IMAGE_S *image_bg_edge_mag = pstRgs->image_bg_edge_mag;
+	GRAY_IMAGE_S *image_bg_edge = pstRgs->image_bg_edge;
+	GRAY_IMAGE_S *image_gradient = pstRgs->bg_in_diff_mag_image;
+
+	GRAY_IMAGE_S *image_fg_org = pstRgs->image_fg_org;
+	GRAY_IMAGE_S *image_fg_rgn = pstRgs->image_fg_rgn;
+	GRAY_IMAGE_S *image_mediate = pstRgs->image_mediate;
+	GRAY_IMAGE_S *image_foreground = &module->foreground;
+	GRAY_IMAGE_S *image_background = &module->background;
+	GRAY_IMAGE_S *image_D_image = &module->D_image;
+	GRAY_IMAGE_S *image_prev_Dimage = &module->prev_Dimage;
+
+	IpCodebookBgModelPara *cbpara=&module->paramsFastLi;//参数
+	IMP_U8 learn_rate=cbpara->u8LearnRate;
+// 	IMP_S32 theta_thld = bgModelData->detdata->theta_Icur * 2;
+	IMP_S32 theta_thld = 10 * 2;
+	IMP_U32 diff_time_pre = iresult->u32FrmTimeCur;
+	IMP_U8 *v0;
+#ifdef SUPPORT_CODEBOOK_FAST
+	IpBGCodeBookFastModel *pCodebookModel=module->pCodebook;
+	IpBGCodeBookFastElem *pCodebookElem;
+	IMP_U8 *p,*pfg;
+#endif
+	IMP_S32 threshold_back=module->paramsFastLi.s32ThresholdCur;
+	int *nframes=&module->nframes;
+	(*nframes)++;
+
+	if( !istatus->u32NotFirstFrm )
+	{
+		IMP_GrayImageClear(image_prev_Dimage);
+		IMP_GrayImageClear(image_D_image);
+		IMP_GrayImageClear(&module->foreground);
+		IMP_HistoryImageInit( &module->imghis, image_in_gray, iresult->u32FrmTimeCur );
+	}
+		if( iresult->u32FrmTimeCur >= (IMP_U32)mpara->frm_diff_dura )
+		diff_time_pre = iresult->u32FrmTimeCur - mpara->frm_diff_dura;
+	image_in_gray_pre = IMP_GetHistoryImage( &module->imghis, diff_time_pre );
+
+	if( bgModelData->s32ConstMvDetected )
+		ipBGModelImageTranslate( &module->codebookImage, &bgModelData->stEstimateMv );
+
+	// clear周边
+// 	clear_image_perimeter( s32ImgW, s32ImgH, image_in_gray->pu8Data );
+
+	// 差分图像
+// 	ipCalcDiffImage( s32ImgW, s32ImgH, threshold_back,
+// 					image_in_gray->pu8Data,
+// 					image_in_gray_pre->pu8Data,
+// 					image_frm_diff->pu8Data );
+
+	IMP_CalcMotionDiffImage( s32ImgW, s32ImgH, threshold_back,
+		image_in_gray->pu8Data,
+		image_in_gray_pre->pu8Data,
+		image_frm_diff->pu8Data );
+
+// 	// 边缘图像
+	ipCanny( image_in_gray->pu8Data,
+				(IMP_S8*)image_in_edge_grad->ps16Data,
+					image_in_edge_mag->pu8Data,
+					image_in_edge->pu8Data,
+					0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
+					threshold_back );
+
+
+
+	//计算亮度均值，得到差分的阈值
+	ipIlluminationThreshold(module,image_in_gray);
+
+
+	ipBackgroundMatch( module );
+
+#ifdef SUPPORT_CODEBOOK_FAST
+	if (*nframes<=30)
+	{
+		p=image_in_gray->pu8Data;
+		for(j = 0; j < s32ImgW*s32ImgH; j++)
+		{
+			pCodebookElem=pCodebookModel->codebookElems;
+			ipBGCodeBookUpdate(p,pCodebookElem);
+			pCodebookModel++;
+			p++;
+			pfg++;
+		}
+	}
+	else
+	{
+		pCodebookModel=module->pCodebook;
+		p=image_in_gray->pu8Data;
+		for(j = 0; j < s32ImgW*s32ImgH; j++)
+		{
+			pCodebookElem=pCodebookModel->codebookElems;
+			ipBGCodeBookUpdate(p,pCodebookElem);
+			pCodebookModel++;
+			p++;
+			pfg++;
+		}
+		ipBGCodeBookCacheUpdate(module);
+
+	}
+	ipBGCodeBookDiff(module,threshold_back);
+#endif
+
+	if (*nframes<60)
+	{
+		ipFastLiBgModel(module,threshold_back);
+	}
+	else
+	{
+		ipCanny( image_in_gray_pre->pu8Data,
+			(IMP_S8*)image_bg_edge_grad->ps16Data,
+			image_bg_edge_mag->pu8Data,
+			image_bg_edge->pu8Data,
+			0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,threshold_back );
+
+		ipCalcDiffImage( s32ImgW, s32ImgH, threshold_back,
+			image_bg_edge_mag->pu8Data,
+			image_in_edge_mag->pu8Data,
+			image_gradient->pu8Data );
+
+		ipAbsortFastLiBgModel(module,threshold_back);
+
+	}
+
+
+	ipMorphOpenImage( image_foreground, image_foreground, image_mediate, 1 );
+	ipMorphCloseImage( image_foreground, image_foreground, image_mediate, 1 );
+	//ipMorphCloseImage( image_foreground, image_foreground, image_mediate, 1 );
+
+	IMP_GrayImageClone(image_foreground,image_fg_org);
+	IMP_GrayImageClone( image_fg_org, image_fg_rgn );
+	IMP_GrayImageClone(image_D_image,image_prev_Dimage);
+
+
+	for(j = 0; j < s32ImgW*s32ImgH; j++)
+	{
+		v0 = image_D_image->pu8Data + j;//原始灰度图像
+		*v0=*v0*50;
+	}
+	return 0;
+}
+
+
+
+IMP_VOID ipPostProcessCodebookOptimizedBgModel( IpBGCodeBookOptimizedModel *module , IMP_S32 flag)
+{
+
+	IpForegroundRatioHistory *fgRatioHistory = &module->fgRatioHistory;
+	IpCodebookPara *mpara = &module->mpara;
+	PEA_RESULT_S *iresult = module->iresult;
+
+	IMP_U32 u32FrmTimeCur = iresult->u32FrmTimeCur;
+	PEA_STATUS_S *istatus = &iresult->stSysStatus;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *image_in_gray = pstRgs->image_in_gray;
+
+
+	// 吸收从其它模块获得反馈信息
+	//if (!g_peopel_in)
+	if (flag == IP_BACKGROUND_LONG)
+	{
+		ipAbsorbUplevelFeedback( module );
+	}
+
+	// 更新背景模型
+	istatus->u32BgIsUpdated = IMP_FALSE;
+
+	if (flag == IP_BACKGROUND_LONG)
+	{
+		// if( ((IMP_S32)(u32FrmTimeCur-fgRatioHistory->time_pre)>=mpara->Tad_period) || (0==fgRatioHistory->time_pre))
+		if( ((IMP_S32)(u32FrmTimeCur-fgRatioHistory->time_pre)>=25) || (0==fgRatioHistory->time_pre))
+
+		{
+			{
+				ipUpdateBackgroundModel( module ,flag);
+				fgRatioHistory->time_pre = u32FrmTimeCur;
+				istatus->u32BgIsUpdated = IMP_TRUE;
+			}
+		}
+	}
+	else
+	{
+	//	if( ((IMP_S32)(u32FrmTimeCur-fgRatioHistory->time_pre)>=mpara->Tad_period/3) || (0==fgRatioHistory->time_pre))
+		if( ((IMP_S32)(u32FrmTimeCur-fgRatioHistory->time_pre)>=25/3) || (0==fgRatioHistory->time_pre))
+
+		{
+			{
+				ipUpdateBackgroundModel( module ,flag);
+				fgRatioHistory->time_pre = u32FrmTimeCur;
+				istatus->u32BgIsUpdated = IMP_TRUE;
+			}
+		}
+	}
+
+
+	// 保存前一帧图像
+// 	GRAYIMAGE_clone2( image_in_gray, image_in_gray_pre );
+	IMP_SetHistoryImage( &module->imghis, image_in_gray, iresult->u32FrmTimeCur );
+}
+
+
+
+static IMP_VOID suppress_global_light_change( IpBGCodeBookOptimizedModel *module )
+{
+	PEA_BG_MODEL_DATA_S *bgModelData = &module->bgModelData;
+	IpForegroundRatioHistory *fgRatioHistory = &module->fgRatioHistory;
+	IpCodebookPara *mpara = &module->mpara;
+	PEA_RESULT_S *iresult = module->iresult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &iresult->stDRegionSet;
+	GRAY_IMAGE_S *img_fg = pstRgs->image_fg_org;
+	IMP_S32 *fgHistogram = module->fgHistogram;
+ 	IMP_S32 theta_Icur = bgModelData->pstDetectorData->s32ThCurrent;
+ 	IMP_S32 theta_max = mpara->suplit_theta_max;
+	IMP_S32 theta_thld = theta_Icur;
+	IMP_S32 fg_area, fg_ratio;
+	IMP_S32 num, num2;
+	IMP_S32 i, x, y, pix_num;
+	IMP_S32 s32ImgW, s32ImgH;
+	IMP_S8 *data;
+	IMP_S32 fgratio_hislen, fgratio_sum, fgratio_mean, fgnum_mean;
+
+	s32ImgW = img_fg->s32W;
+	s32ImgH = img_fg->s32H;
+	pix_num = s32ImgW*s32ImgH;
+
+	// 计算当前的前景比率
+	fg_area = pix_num;
+	fg_area -= fgHistogram[128];
+	for( i=1; i<theta_Icur; i++ )
+	{
+		num = fgHistogram[128+i] + fgHistogram[128-i];
+		fg_area -= num;
+	}
+	fg_ratio = ((fg_area*100)+(pix_num>>1))/pix_num;
+	bgModelData->u32FgRatio = fg_ratio;
+
+	// 计算最近的平均前景比率
+	fgratio_mean = 100;
+	fgratio_hislen = IMP_GA_CArrayGetLength( &fgRatioHistory->ratio );
+	if( fgratio_hislen > mpara->suplit_fgratio_hislen )
+	{
+		fgratio_hislen = mpara->suplit_fgratio_hislen;
+		fgratio_sum = 0;
+		for( i=0; i<fgratio_hislen; i++ )
+			fgratio_sum += IMP_GA_CArrayGetElem( &fgRatioHistory->ratio, -i );
+		fgratio_mean = (fgratio_sum+(fgratio_hislen>>1))/fgratio_hislen;
+	}
+
+	if( fg_ratio>=mpara->th_suplit_fg_ratio_l && fg_ratio>=(fgratio_mean+mpara->th_suplit_incr_ratio) )
+	{
+// 		theta_thld = theta_Icur;
+// 		for( i=theta_max-1; i>=theta_Icur; i-- )
+// 		{
+// 			num = fgHistogram[128+i] + fgHistogram[128-i];
+// 			if( num >= mpara->th_suplit_pix_num )
+// 			{
+// 				theta_thld = i+1;
+// 				break;
+// 			}
+// 		}
+//
+		fgnum_mean = (pix_num*fgratio_mean)/100;
+		num2 = 0;
+		theta_thld = theta_max;
+		for( i=theta_Icur; i<theta_max; i++ )
+		{
+			num = fgHistogram[128+i] + fgHistogram[128-i];
+			num2 += num;
+			if( (fg_area-num2) <= fgnum_mean )
+			{
+				if( num >= mpara->th_suplit_pix_num )
+					theta_thld = i+1;
+				else
+					theta_thld = i;
+				break;
+			}
+		}
+	}
+	else if( fg_ratio>=mpara->th_suplit_fg_ratio_h )
+	{
+		theta_thld = theta_max;
+	}
+
+	if( theta_thld > theta_Icur )
+	{
+		for( i=theta_Icur; i<theta_thld; i++ )
+		{
+			num = fgHistogram[128+i] + fgHistogram[128-i];
+			fg_area -= num;
+		}
+		fg_ratio = fg_area*100/pix_num;
+
+		num2 = 0;
+		data = (IMP_S8*)img_fg->pu8Data;
+		for( y=0; y<s32ImgH; y++ )
+		{
+#ifdef _TIDSP
+	#pragma MUST_ITERATE(32,,8);
+#endif
+			for( x=0; x<s32ImgW; x++ )
+			{
+				IMP_S32 val = data[x];
+				if( abs(val) < theta_thld )
+					data[x] = 0;
+				else
+					num2++;
+			}
+			data += s32ImgW;
+		}
+		IMP_ASSERT( num2 == fg_area );
+	}
+
+	bgModelData->u32FgRatio = fg_ratio;
+	bgModelData->pstDetectorData->s32Threshold = theta_thld;
+	IMP_GA_CArrayPushElem( &fgRatioHistory->ratio, fg_ratio );
+}
+
+// 匹配背景模型
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+

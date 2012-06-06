@@ -1,0 +1,25 @@
+include Makefile.param
+
+HI3520_SDK_PATH:=/home/zm/Workingarea/Hi3520_SDK_V1.0.6.0.c2
+MPP_PATH:=$(HI3520_SDK_PATH)/mpp_master
+MPP_INCLUDE_PATH:=-I$(MPP_PATH)/include -I$(HI3520_SDK_PATH)/extdrv
+INCLUDES:=$(INCLUDES) $(MPP_INCLUDE_PATH)
+MPP_LIBS_PATH:=$(MPP_PATH)/lib
+MPP_LIBS:= $(MPP_LIBS_PATH)/libmpi.a \
+	$(MPP_LIBS_PATH)/lib_VoiceEngine.a \
+ 	$(MPP_LIBS_PATH)/lib_amr_spc.a \
+	$(MPP_LIBS_PATH)/lib_amr_fipop.a \
+	$(MPP_LIBS_PATH)/lib_aec.a \
+	$(MPP_LIBS_PATH)/lib_aacdec.a \
+	$(MPP_LIBS_PATH)/lib_aacenc.a \
+	$(MPP_LIBS_PATH)/libresampler.a \
+	$(MPP_LIBS_PATH)/libloadbmp.a \
+	$(MPP_LIBS_PATH)/libtde.a
+objs:=main_pea.o imp_pea_thread.o imp_draw_osd.o sample_common.o
+PEA_EXE:$(objs)
+	$(CC) -lpthread -o PEA_EXE $(objs) -lm -lArmPEA $(MPP_LIBS) -L./ -L$(MPP_LIBS_PATH)
+
+$(objs):%.o:%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES) 2> hi
+
+

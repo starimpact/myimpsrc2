@@ -1,0 +1,1377 @@
+
+#include "imp_pea_detector.h"
+IMP_S32 ipCalcFgRation(GRAY_IMAGE_S *pstImgB)
+{
+	IMP_S32 s32ImgW = pstImgB->s32W;
+	IMP_S32 s32ImgH = pstImgB->s32H;
+	IMP_U8 *pu8Data = pstImgB->pu8Data;
+	IMP_S32 x, y;
+	IMP_S32 s32FgNum = 0;
+	IMP_S32 s32FgRatio = 0;
+	IMP_FLOAT fRatio = 0;
+	for( y = 0; y < s32ImgH; y++ )
+    {
+        for( x = 0; x < s32ImgW; x++ )
+		{
+			if (pu8Data[x])
+			{
+				s32FgNum++;
+			}
+		}
+		pu8Data += s32ImgW;
+	}
+
+	fRatio = (s32FgNum * 100.0);
+	fRatio = fRatio / (s32ImgW * s32ImgH);
+	s32FgRatio = (IMP_S32)(fRatio + 0.5);
+	return s32FgRatio;
+
+}
+IMP_VOID ipGetMagDiffImageCb(GRAY_IMAGE_S *pstImgInMag, GRAY_IMAGE_S *pstImgBgMag,GRAY_IMAGE_S *pstImgMagDiff,IMP_S32 s32DiffTh)
+{
+	IMP_S32 s32ImgW = pstImgInMag->s32W;
+	IMP_S32 s32ImgH = pstImgInMag->s32H;
+	IMP_S32 x,y;
+	IMP_U8 *pu8DatS1, *pu8DatS2;
+	IMP_U8 *pu8DatD1;
+
+	IMP_S32 val11, val12, val13;
+	IMP_S32 val21, val22, val23;
+	IMP_S32 val31, val32, val33;
+	IMP_S32 val41, val42, val43;
+
+	for( y = 0; y < s32ImgH; y++ )
+	{
+		pu8DatS1 = pstImgInMag->pu8Data + s32ImgW*y;
+		pu8DatS2 = pstImgBgMag->pu8Data + s32ImgW*y;
+
+		pu8DatD1 = pstImgMagDiff->pu8Data + s32ImgW*y;
+
+#ifdef _TIDSP
+#pragma MUST_ITERATE(64,,4);
+#endif
+		for( x = 0; x < s32ImgW; x += 4 )
+		{
+			val11 = pu8DatS1[0];
+			val12 = pu8DatS2[0];
+
+			val21 = pu8DatS1[1];
+			val22 = pu8DatS2[1];
+
+			val31 = pu8DatS1[2];
+			val32 = pu8DatS2[2];
+
+			val41 = pu8DatS1[3];
+			val42 = pu8DatS2[3];
+
+			val13 = abs(val12 - val11) > s32DiffTh ? 255 : 0;
+			val23 = abs(val22 - val21) > s32DiffTh ? 255 : 0;
+			val33 = abs(val32 - val31) > s32DiffTh ? 255 : 0;
+			val43 = abs(val42 - val41) > s32DiffTh ? 255 : 0;
+
+			pu8DatD1[0] = val13;
+			pu8DatD1[1] = val23;
+			pu8DatD1[2] = val33;
+			pu8DatD1[3] = val43;
+
+			pu8DatS1 += 4; pu8DatS2 += 4;
+			pu8DatD1 += 4;
+		}
+	}
+}
+
+
+
+IMP_VOID ipClearStaleEntries(IMP_S32 *t, codeBook *c, IMP_S32 staleThresh)
+{
+	code_element *cb;
+
+	cb = c->cb;
+
+	if(*t - cb[0].t_last_update > staleThresh)
+	{
+
+		cb[0].learnHigh = 0;
+		cb[0].learnLow = 0;
+		cb[0].max = 0;
+		cb[0].min = 0;
+
+		cb[0].t_last_update = *t;
+	}
+
+	if(*t - cb[1].t_last_update > staleThresh)
+	{
+
+		cb[1].learnHigh = 0;
+		cb[1].learnLow = 0;
+		cb[1].max = 0;
+		cb[1].min = 0;
+
+		cb[1].t_last_update = *t;
+	}
+}
+
+
+IMP_S32 ipUpdateCodebook(IMP_U8* p,
+			#ifdef USE_MAG_DIFF
+						 IMP_U8* pMagDiff,
+			#endif
+						 codeBook *c, IMP_U8 u8LearnRate, IMP_S32 *t, IMP_FLOAT learnRatio)
+{
+	IMP_U32 high, low;
+	IMP_S32 i, tmp;
+	IMP_S32 matchChannel;
+	code_element *cb;
+
+	cb = c->cb;
+	high = *(p) + CB_BOUNDS;
+	if(high > 255) high = 255;
+	low = *(p) - CB_BOUNDS;
+	if(low < 0) low = 0;
+
+	learnRatio = DEFAULT_LEARN_RATIO;
+
+
+	matchChannel = 0;
+
+	if(
+		(cb[0].learnLow <= *(p)) && (*(p) <= cb[0].learnHigh)
+
+      )
+
+	{
+		matchChannel = 1;
+		cb[0].t_last_update = (*t);
+
+		if(cb[0].max < *(p))
+		{
+			cb[0].max = *(p);
+			learnRatio *= 0.3;
+		}
+		else if(cb[0].min > *(p))
+		{
+			cb[0].min = *(p);
+			learnRatio *= 0.7;
+		}
+	}
+	else if(
+		    (cb[1].learnLow <= *(p)) && (*(p) <= cb[1].learnHigh)
+
+			)
+	{
+		matchChannel = 2;
+		cb[1].t_last_update = (*t);
+
+		if(cb[1].max < *(p))
+		{
+			cb[1].max = *(p);
+		}
+		else if(cb[1].min > *(p))
+		{
+			cb[1].min = *(p);
+		}
+	}
+
+
+	if(matchChannel == 0)
+	{
+		if (cb[0].learnHigh > 0 && cb[1].learnHigh > 0)
+		{
+
+			tmp = 0;
+			(((*t) - cb[0].t_last_update) > ((*t) - cb[1].t_last_update)) ? (tmp = 0) : (tmp = 1);
+
+			cb[tmp].learnHigh = high;
+			cb[tmp].learnLow = low;
+			cb[tmp].max = *(p);
+			cb[tmp].min = *(p);
+
+			cb[tmp].t_last_update = (*t);
+
+			i = tmp;
+			learnRatio *= 0.7;
+
+			matchChannel = tmp + 1;
+		}
+		else
+		{
+			tmp = 0;
+			if (cb[1].learnHigh  == 0) tmp = 1;
+			else if (cb[0].learnHigh  == 0) tmp = 0;
+
+			cb[tmp].learnHigh = high;
+			cb[tmp].learnLow = low;
+			cb[tmp].max = *(p);
+			cb[tmp].min = *(p);
+
+			cb[tmp].t_last_update = (*t);
+
+			matchChannel = tmp + 1;
+			learnRatio *= 0.4;
+		}
+
+	}
+
+
+	if(cb[matchChannel - 1].learnHigh < high) cb[matchChannel - 1].learnHigh += u8LearnRate;
+	if(cb[matchChannel - 1].learnLow > low) cb[matchChannel - 1].learnLow -=  u8LearnRate;
+	return(i);
+}
+
+
+IMP_VOID ipUpdateCodebookCache(IMP_PEA_MULTIMODEL_BGMODELING_S *pModule)
+{
+	IpCodeBookModel *cbModel;
+	IMP_U32 high, low;
+	IMP_S32  j, tmp;
+	IMP_S32 matchChannel;
+	IMP_S32 s32Height, s32Width;
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+
+	IMP_U8 u8LearnRate = pModule->stPara.u8LearnRate;
+	IMP_FLOAT learnRatio1,learnRatio2;
+
+	IMP_U8 *p;
+#ifdef USE_MAG_DIFF
+	IMP_U8 *pMagDiff;
+#endif
+	IMP_S32 s32Th = pModule->s32Th;
+	IMP_S32 s32TAdd = pModule->s32TAdd;
+	IMP_S32 s32TDel = pModule->s32TDel;
+	codeBook *cbBasic, *cbCache;
+	code_element *ce, *ceCache;
+	IMP_S32 *tBasic, *tCache;
+	s32Height = pstImgInGray->s32H;
+	s32Width = pstImgInGray->s32W;
+	p = pstImgInGray->pu8Data;
+#ifdef USE_MAG_DIFF
+	pMagDiff = pstRgs->pstImgBgInDiffMag->pu8Data;
+#endif
+	cbModel = pModule->cbModel;
+	pModule->tBasic++;
+	pModule->tCache++;
+	tBasic = &pModule->tBasic;
+	tCache = &pModule->tCache;
+
+	for(j = 0; j < s32Width * s32Height; j++)
+	{
+		cbBasic = &cbModel->codeBookBasic;
+		cbCache = &cbModel->codeBookCache;
+
+		ce = cbBasic->cb;
+	    ceCache = cbCache->cb;
+
+	    learnRatio1 = ce->learnRatio;
+        learnRatio2 = ceCache->learnRatio;
+
+		high = *(p) + CB_BOUNDS;
+		if(high > 255) high = 255;
+		low = *(p) - CB_BOUNDS;
+		if(low < 0) low = 0;
+
+		matchChannel = 0;
+
+		if(
+			(ce[0].learnLow <= *(p)) && (*(p) <= ce[0].learnHigh)
+
+		  )
+		{
+			matchChannel = 1;
+			ce[0].t_last_update = (*tBasic);
+
+			if(ce[0].max < *(p))
+			{
+				ce[0].max = *(p);
+				learnRatio1 *= 0.3;
+			}
+			else if(ce[0].min > *(p))
+			{
+				ce[0].min = *(p);
+				learnRatio1 *= 0.7;
+			}
+		}
+		else if(
+			     (ce[1].learnLow <= *(p)) && (*(p) <= ce[1].learnHigh)
+
+			   )
+		{
+			matchChannel = 2;
+			ce[1].t_last_update = (*tBasic);
+
+			if(ce[1].max < *(p))
+			{
+				ce[1].max = *(p);
+			}
+			else if(ce[1].min > *(p))
+			{
+				ce[1].min = *(p);
+			}
+		}
+
+
+		if(matchChannel == 0)
+		{
+
+			ipUpdateCodebook(p,
+						#ifdef USE_MAG_DIFF
+							 pMagDiff,
+                        #endif
+				             cbCache, u8LearnRate, tCache, learnRatio1);
+		}
+		else
+		{
+
+			if(ce[matchChannel - 1].learnHigh < high) ce[matchChannel - 1].learnHigh += u8LearnRate;
+			if(ce[matchChannel - 1].learnLow > low) ce[matchChannel - 1].learnLow -=  u8LearnRate;
+		}
+
+
+
+		if((*tCache) - ceCache[0].t_last_update > s32TAdd)
+		{
+			if (ce[0].learnHigh > 0 && ce[1].learnHigh > 0)
+			{
+				tmp = 0;
+				((*tBasic)- ce[0].t_last_update) > ((*tBasic)- ce[1].t_last_update)? (tmp = 0) : (tmp = 1);
+
+				ce[tmp].learnHigh = high;
+				ce[tmp].learnLow = low;
+				ce[tmp].max = *(p);
+				ce[tmp].min = *(p);
+
+				ce[tmp].t_last_update = (*tBasic);
+				matchChannel = tmp + 1;
+				learnRatio2 *= 0.7;
+			}
+			else
+			{
+				tmp = 0;
+				if (ce[1].learnHigh  == 0) tmp = 1;
+				else if (ce[0].learnHigh  == 0) tmp = 0;
+
+				ce[tmp].learnHigh = high;
+				ce[tmp].learnLow = low;
+				ce[tmp].max = *(p);
+				ce[tmp].min = *(p);
+
+				ce[tmp].t_last_update = (*tBasic);
+
+				matchChannel = tmp + 1;
+				learnRatio2 *= 0.3;
+			}
+			ceCache[0].learnHigh = 0;
+			ceCache[0].learnLow = 0;
+			ceCache[0].max = 0;
+			ceCache[0].min = 0;
+			ceCache[0].t_last_update = (*tCache);
+
+			if(ce[tmp].learnHigh < high) ce[tmp].learnHigh += u8LearnRate;
+			if(ce[tmp].learnLow > low) ce[tmp].learnLow -=  u8LearnRate;
+		}
+		if((*tCache) - ceCache[1].t_last_update > s32TAdd)
+		{
+			if (ce[0].learnHigh > 0 && ce[1].learnHigh > 0)
+			{
+				tmp = 0;
+				((*tBasic)- ce[0].t_last_update) > ((*tBasic)- ce[1].t_last_update)? (tmp = 0) : (tmp = 1);
+
+				ce[tmp].learnHigh = high;
+				ce[tmp].learnLow = low;
+				ce[tmp].max = *(p);
+				ce[tmp].min = *(p);
+
+				ce[tmp].t_last_update = (*tBasic);
+				matchChannel = tmp + 1;
+				learnRatio2 *= 0.7;
+			}
+			else
+			{
+				tmp = 0;
+				if (ce[1].learnHigh  == 0) tmp = 1;
+				else if (ce[0].learnHigh  == 0) tmp = 0;
+
+				ce[tmp].learnHigh = high;
+				ce[tmp].learnLow = low;
+				ce[tmp].max = *(p);
+				ce[tmp].min = *(p);
+
+				ce[tmp].t_last_update = (*tBasic);
+
+				matchChannel = tmp + 1;
+				learnRatio2 *= 0.3;
+			}
+			ceCache[1].learnHigh = 0;
+			ceCache[1].learnLow = 0;
+			ceCache[1].max = 0;
+			ceCache[1].min = 0;
+			ceCache[1].t_last_update = (*tCache);
+
+			if(ce[tmp].learnHigh < high) ce[tmp].learnHigh += u8LearnRate;
+			if(ce[tmp].learnLow > low) ce[tmp].learnLow -=  u8LearnRate;
+		}
+
+		ipClearStaleEntries(tBasic,cbBasic,TDEL);
+		cbModel++;
+		p++;
+	#ifdef USE_MAG_DIFF
+		pMagDiff++;
+    #endif
+	}
+	cbModel = NULL;
+}
+
+
+IMP_VOID ipFastLiBgModelForCB(IMP_PEA_MULTIMODEL_BGMODELING_S *pModule,IMP_S32 ps32ThresholdBack)
+{
+	IpCodebookBgModelPara *pstPara = &pModule->stPara;
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	IMP_S32 i;
+	IMP_S32 s32ImgW = pstResult->s32Width;
+	IMP_S32 s32ImgH = pstResult->s32Height;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+	GRAY_IMAGE_S *pstImgFrmDiff = pstRgs->pstImgFrmDiff;
+	GRAY_IMAGE_S *pstImgFgOrg = pstRgs->pstImgFgOrg;
+	IMP_U8 *p, pu8Val, *pbg, *pfg, *pDiffImage, *pDImage, *pPreDImage;
+
+	GRAY_IMAGE_S *pstImgFg = &pModule->stImgFg;
+	GRAY_IMAGE_S *pstImgBg = &pModule->stImgBg;
+	GRAY_IMAGE_S *pstImgD = &pModule->stImgD;
+	GRAY_IMAGE_S *pstImgDPre = &pModule->stImgDPre;
+
+
+	p = pstImgInGray->pu8Data;
+	pDiffImage = pstImgFrmDiff->pu8Data;
+	pDImage = pstImgD->pu8Data;
+	pPreDImage = pstImgDPre->pu8Data;
+	pbg = pstImgBg->pu8Data;
+	pfg = pstImgFg->pu8Data;
+
+
+	for ( i = 0; i < s32ImgH * s32ImgW; i++ )
+	{
+		if ((*pDiffImage) > ps32ThresholdBack * 2)
+		{
+			*pfg = 255;
+		}
+		else
+		{
+			*pfg = 0;
+		}
+		pfg++;
+		pDiffImage++;
+	}
+	pDiffImage = pstImgFrmDiff->pu8Data;
+	pfg = pstImgFg->pu8Data;
+	for (i = 0; i < s32ImgW * s32ImgH; i++)
+	{
+		if (*pfg)
+		{
+			*(pDImage) = 5;
+		}
+		else
+		{
+			if( (*pPreDImage) > 1 )
+			{
+				(*pDImage) = (*pPreDImage) - 1;
+			}
+			else
+			{
+				*pDImage = 0;
+			}
+		}
+
+		if(  *pDImage < 1  )
+		{
+			pu8Val=(IMP_S8)(((*pbg) * 3 + (*(p))) >> 2);
+			*pbg = pu8Val > 255 ? 255 : pu8Val;
+		}
+
+		if (abs((*p) - (*pbg)) >= (ps32ThresholdBack )|| (*pDiffImage) >= ps32ThresholdBack)
+		{
+			*pfg = 255;
+		}
+		else
+		{
+			*pfg = 0;
+		}
+
+		p++;
+		pDiffImage++;
+		pDImage++;
+		pPreDImage++;
+		pbg++;
+		pfg++;
+	}
+}
+
+
+IMP_VOID IMP_PEA_BackgroundDiff(IMP_PEA_MULTIMODEL_BGMODELING_S *pModule,
+					 IMP_S32 ps32ThresholdBack,
+					 IMP_S32 s32VideoAbnrmlStatus,
+					 IMP_S32 s32UpdateFlag
+					 )
+{
+	IMP_S32 s32Height, s32Width;
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	IpTrackedTargetSet *pstTTargetSet = &pstResult->stTrackedTargetSet;
+	IpTrackedTarget *pstTarget;
+    IMP_S32 s32Frame = pModule->s32Frames;
+	IMP_S32 s32Flag = 0;
+	GRAY_IMAGE_S *pstImgMediate = pstRgs->pstImgMediate;
+	GRAY_IMAGE_S *pstImgFrmDiff = pstRgs->pstImgFrmDiff;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+
+	GRAY_IMAGE_S *pstImgFg = &pModule->stImgFg;
+	GRAY_IMAGE_S *pstImgFgCb = &pModule->stImgFgCb;
+	GRAY_IMAGE_S *pstImgFgCbCache = &pModule->stImgFgCbCache;
+
+	GRAY_IMAGE_S *pstImgBg = &pModule->stImgBg;
+	GRAY_IMAGE_S *pstImgD = &pModule->stImgD;
+	GRAY_IMAGE_S *pstImgDPre = &pModule->stImgDPre;
+	GRAY_IMAGE_S *pstImgReAppearMap = &pModule->stImgReAppearMap;
+	IpCodebookBgModelPara *pstPara = &pModule->stPara;
+
+	IMP_U8* pIn = (IMP_U8*)pstImgInGray->pu8Data;
+	IMP_U8* pfgIn = (IMP_U8*)pstImgFg->pu8Data;
+	IMP_U8* pfgCodebookIn = (IMP_U8*)pstImgFgCb->pu8Data;
+	IMP_U8* pfgCodebookCacheIn = (IMP_U8*)pstImgFgCbCache->pu8Data;
+
+	IMP_U8* pbgIn = (IMP_U8*)pstImgBg->pu8Data;
+	IMP_U8* pDImageIn = (IMP_U8*)pstImgD->pu8Data;
+	IMP_U8* pPreDImageIn = (IMP_U8*)pstImgDPre->pu8Data;
+	IMP_U8* pDiffImageIn = (IMP_U8*)pstImgFrmDiff->pu8Data;
+	IMP_U8* pRpMap = (IMP_U8*)pstImgReAppearMap->pu8Data;
+	IpTargetPosition *pstPos0;
+	IMP_S32 j, w, h, t, tchange1, tchange2;
+	IMP_U8 u8Val;
+	IMP_S32 matchChannel;
+	IMP_FLOAT learnRatio1, learnRatio2;
+
+	IpCodeBookModel *cbModel;
+	codeBook *cbBasic, *cbCache;
+	code_element *ce, *ceCache;
+	IMP_U8 *p, *pfg, *pfgCodebook, *pbg, *pDImage, *pPreDImage, *pDiffImage;
+	IMP_U8* pfgCodebookCache;
+
+	s32Width = pstImgInGray->s32W;
+	s32Height = pstImgInGray->s32H;
+
+	t = pstPara->s32TCatch;
+	((s32Frame % 50) == 0) ? (s32Flag = 1) : (s32Flag = 0);
+	s32Flag = 1;
+
+	p = pIn;
+	pfgCodebookCache = pfgCodebookCacheIn;
+
+	cbModel = pModule->cbModel;
+	for(j = 0; j < s32Width * s32Height; j++)
+	{
+
+		cbCache = &cbModel->codeBookCache;
+		ceCache = cbCache->cb;
+		learnRatio1 = ceCache->learnRatio;
+
+		matchChannel = 0;
+
+		if(learnRatio1 * 10.0 > MAX_LEARN_RATIO)
+		   learnRatio1 = DEFAULT_LEARN_RATIO;
+		if((ceCache[0].min - MIN_MOD <= *(p)) && (*(p) <= ceCache[0].max + MAX_MOD))
+		{
+			matchChannel = 1;
+		}
+		if((ceCache[1].min - MIN_MOD <= *(p)) && (*(p) <= ceCache[1].max + MAX_MOD))
+		{
+			matchChannel = 2;
+		}
+
+		if(matchChannel == 0)
+		{
+			*pfgCodebookCache = 0;
+		}
+		else
+		{
+			*pfgCodebookCache = 255;
+		}
+		cbModel++;
+		p++;
+		pfgCodebookCache++;
+	}
+
+
+	p = pIn;
+	pfg = pfgIn;
+	pfgCodebook = pfgCodebookIn;
+	pbg = pbgIn;
+	pDImage = pDImageIn;
+	pPreDImage = pPreDImageIn;//Dimage
+	pDiffImage = pDiffImageIn;//Dimage
+
+	for( j = 0; j < IMP_MAX_TGT_CNT; j++ )
+	{
+		pstTarget = &pstTTargetSet->astTargets[j];
+		if( ipTrackedTargetIsActiveMeasuredMtrend( pstTarget ) )
+		{
+			pstPos0 = ipTargetTrajectoryGetPosition( &pstTarget->stTrajectory, 0 );
+			for(h = pstPos0->stRg.s16Y1; h < pstPos0->stRg.s16Y2; h++)
+			{
+				for(w = pstPos0->stRg.s16X1; w < pstPos0->stRg.s16X2; w++)
+				{
+					*(pDImage + h * s32Width + w) = pstPara->u8UpdateSpeedMax; //keep the object area?
+				}
+
+			}
+
+		}
+	}
+
+#if 0
+	ipShowGrayImage(s32Width, s32Height, pDImageIn, "pDImageIn");
+	ipShowGrayImage(s32Width, s32Height, pIn, "pIn");
+	ipShowGrayImage(s32Width, s32Height, pfgIn, "pfgIn");
+	ipShowGrayImage(s32Width, s32Height, pbgIn, "pbgIn");
+	ipShowGrayImage(s32Width, s32Height, pPreDImageIn, "pPreDImageIn");
+	ipShowGrayImage(s32Width, s32Height, pDiffImageIn, "pDiffImageIn");
+	ipShowGrayImage(s32Width, s32Height, pfgCodebookIn, "pfgCodebookIn");
+#endif
+
+	cbModel = pModule->cbModel;
+	for(j = 0; j < s32Width * s32Height; j++)
+	{
+
+		cbBasic = &cbModel->codeBookBasic;
+		cbCache = &cbModel->codeBookCache;
+		ce = cbBasic->cb;
+		learnRatio2 = ce->learnRatio;
+		if(learnRatio1 / 10.0 < MIN_LEARN_RATIO)
+		   learnRatio1 = DEFAULT_LEARN_RATIO;
+		matchChannel = 0;
+		if((ce[0].min - MIN_MOD <= *(p)) && (*(p) <= ce[0].max + MAX_MOD))
+		{
+			matchChannel = 1;
+		}
+		if((ce[1].min - MIN_MOD <= *(p)) && (*(p) <= ce[1].max + MAX_MOD))
+		{
+			matchChannel = 2;
+		}
+
+		if (s32Flag)
+		{
+			if(matchChannel == 0)
+			{
+				*pfgCodebook = 255;
+
+
+			}
+			else
+			{
+				*pfgCodebook = 0;
+
+			}
+		}
+		else
+		{
+			if(matchChannel == 0)
+			{
+				*pfgCodebook = 255;
+			}
+			else
+			{
+				*pfgCodebook = 0;
+			}
+		}
+		if (*pfgCodebook || *pDiffImage)
+		{
+			*(pDImage) = pstPara->u8UpdateSpeedMax;
+		}
+		else
+		{
+			if( (*pPreDImage) > 1 )
+			{
+				(*pDImage) = (*pPreDImage) - 1;
+			}
+			else
+			{
+				*pDImage = 0;
+			}
+		}
+
+		if(  *pDImage < 1  )
+		{
+		//	u8Val=(IMP_U8)(((*pbg) * 90 + (*(p) * 38 )) >> 7);
+			u8Val=(IMP_U8)(((*pbg) * (128-6) + (*(p) * 6 )) >> 7); //changed by mzhang
+
+			*pbg = u8Val > 255 ? 255 : u8Val;
+		}
+
+
+	//	if (abs((*p) - (*pbg)) >= ( ps32ThresholdBack * 2.0 / 3.0  )
+		if (abs((*p) - (*pbg)) >= ps32ThresholdBack //changed by mzhang
+		    )
+		{
+			*pfg = 255;
+		}
+		else
+		{
+			*pfg = 0;
+		}
+		cbModel++;
+		p++;
+		pfg++;
+		pfgCodebook++;
+
+		pbg++;
+		pDImage++;
+		pPreDImage++;
+		pDiffImage++;
+		pRpMap++;
+
+	}
+
+	cbBasic = NULL;
+	cbCache = NULL;
+	cbModel = NULL;
+	ce = NULL;
+	ceCache = NULL;
+	pfgCodebookCache = NULL;
+	p = NULL;
+	pfg = NULL;
+	pfgCodebook = NULL;
+	pbg = NULL;
+	pDImage = NULL;
+	pPreDImage = NULL;
+	pDiffImage = NULL;
+
+
+}
+//////////////////////////////////////////////////////////////////////////
+IMP_VOID ipCreateCodebookBgModel( IMP_PEA_MULTIMODEL_BGMODELING_S *pModule, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )
+{
+	IMP_S32 s32ImgH, s32ImgW;
+	MEM_MGR_ARRAY_S *mem_mgr;
+	memset( pModule, 0, sizeof(IMP_PEA_MULTIMODEL_BGMODELING_S) );
+	pModule->pstHwResource = pstHwResource;
+	pModule->pstResult = pstResult;
+	mem_mgr = &pstHwResource->stMemMgr;
+	s32ImgH = pstResult->s32Height;
+	s32ImgW = pstResult->s32Width;
+	IMP_GrayImageCreate( &pModule->stImgBg, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &pModule->stImgFg, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &pModule->stImgFgCb, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &pModule->stImgFgCbCache, s32ImgW, s32ImgH, mem_mgr );
+
+	IMP_GrayImageCreate( &pModule->stImgD, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &pModule->stImgDPre, s32ImgW, s32ImgH, mem_mgr );
+    IMP_GrayImageCreate( &pModule->stImgGradReAppearFq, s32ImgW, s32ImgH, mem_mgr );
+	IMP_GrayImageCreate( &pModule->stImgReAppearMap, s32ImgW, s32ImgH, mem_mgr );
+
+	IMP_HistoryImageCreate( &pModule->stImgHist, s32ImgW, s32ImgH, mem_mgr );
+	pModule->s32Frames=0;
+	pModule->s32NoiseArea=0;
+	pModule->s32NoiseAdjustThCnt=0;
+	pModule->s32FrmCnt=0;
+	pModule->s32UdpmTimePre=0;
+
+	pModule->cbModel = (IpCodeBookModel*)IMP_MMAlloc(mem_mgr, IMP_MEMBLK_TYPE_SLOW,(s32ImgW*s32ImgH)*sizeof(IpCodeBookModel));
+
+	memset(pModule->cbModel, 0 ,sizeof((s32ImgW*s32ImgH)*sizeof(IpCodeBookModel)));
+	pModule->tBasic = 0;
+	pModule->tCache = 0;
+}
+IMP_VOID ipReleaseCodebookBgModel( IMP_PEA_MULTIMODEL_BGMODELING_S *pModule)
+{
+	MEM_MGR_ARRAY_S *mem_mgr = &pModule->pstHwResource->stMemMgr;
+
+	IpCodeBookModel *cbModel = pModule->cbModel;
+	IMP_MMFree( mem_mgr, IMP_MEMBLK_TYPE_SLOW, cbModel);
+	cbModel = NULL;
+	IMP_GrayImageDestroy( &pModule->stImgBg, mem_mgr );
+	IMP_GrayImageDestroy( &pModule->stImgFg, mem_mgr );
+	IMP_GrayImageDestroy( &pModule->stImgFgCb, mem_mgr );
+	IMP_GrayImageDestroy( &pModule->stImgFgCbCache, mem_mgr );
+
+	IMP_GrayImageDestroy( &pModule->stImgD, mem_mgr );
+	IMP_GrayImageDestroy( &pModule->stImgDPre, mem_mgr );
+	IMP_GrayImageDestroy( &pModule->stImgGradReAppearFq, mem_mgr );
+	IMP_GrayImageDestroy( &pModule->stImgReAppearMap, mem_mgr );
+	IMP_HistoryImageDestroy( &pModule->stImgHist, mem_mgr );
+}
+
+IMP_VOID ipConfigCodebookBgModel( IMP_PEA_MULTIMODEL_BGMODELING_S *pModule, IpCodebookBgModelPara *pstPara )
+{
+	IpCodebookBgModelPara *params=&pModule->stPara;
+	// if( pstPara == NULL )
+    {
+		pModule->stPara.s32ThresholdCur = DEFAULT_LI_BGFG_MOG_SUBTRACTION_THRESHOLD_H;
+		pModule->stPara.dGradientPointScale=DEFAULT_LI_BFFG_MOG_GRADIENT_POINT_SCALE;
+		//pModule->stPara.dLumiThreshold=DEFAULT_LI_BGFG_MOG_LUMINANCE_LOW_THRESHOLD;
+		pModule->stPara.u8UpdateSpeedMax=UPDATE_SPEED;
+		pModule->stPara.u8LearnRate=LEARN_RATE;
+		pModule->stPara.s32TAdd=TADD;
+		pModule->stPara.s32TCatch=3;
+
+		pModule->stPara.s32ThresholdMax=15;
+		pModule->stPara.s32ThresholdMin=8;
+		pModule->stPara.s32ThresholdUdpm=10;
+		pModule->stPara.s32ThresholdNoiseRatio=10;
+		pModule->stPara.s32ThresholdUp2DwRatio=10;
+	}
+
+ 	pModule->s32TAdd=pModule->stPara.s32TAdd;
+	pModule->s32TDel=TDEL;
+}
+
+static IMP_S32 ipCalcNoiseArea( IMP_PEA_MULTIMODEL_BGMODELING_S *pModule )
+{
+#define IMP_NOISE_COLS	4
+#define IMP_NOISE_ROWS	4
+#define IMP_NOISE_STEP	1
+#define IMP_NREGION_CNT	(IMP_NOISE_COLS * IMP_NOISE_ROWS)
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	IpCodebookBgModelPara *pstPara = &pModule->stPara;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgFrmDiff = pstRgs->pstImgFrmDiff;
+	IMP_S32 s32ImgW = pstResult->s32Width;
+	IMP_S32 s32ImgH = pstResult->s32Height;
+	IMP_S32 s32Width = s32ImgW / IMP_NOISE_COLS;
+	IMP_S32 s32Height = s32ImgH / IMP_NOISE_ROWS;
+	IMP_S32 s32Width2 = s32Width / 2;
+	IMP_S32 s32Height2 = s32Height / 2;
+	IMP_S32 s32OfsX = (s32Width - s32Width2) / 2;
+	IMP_S32 s32OfsY = (s32Height - s32Height2) / 2;
+	IMP_S32 s32SmpRatio = (s32Width * s32Height) / (s32Width2 * s32Height2);
+	IMP_S32 as32NoiseRgnAreas[IMP_NREGION_CNT];
+	IMP_S32 s32ImgNoiseArea;
+	IMP_S32 s32Row, s32Col;
+	IMP_S32 i, j, k;
+	IMP_S32 s32ThresholdCur = pstPara->s32ThresholdCur;
+	IMP_S32 s32ThresholdMax = pstPara->s32ThresholdMax;
+
+	for( s32Row = 0; s32Row < IMP_NOISE_ROWS; s32Row++ )
+		for( s32Col = 0; s32Col < IMP_NOISE_COLS; s32Col++ )
+		{
+			IMP_S32 ys = s32Row * s32Height + s32OfsY;
+			IMP_S32 xs = s32Col * s32Width + s32OfsX;
+			IMP_S8 *pu8Data = (IMP_S8*)pstImgFrmDiff->pu8Data + ys * s32ImgW + xs;
+			IMP_S32 s32NoiseArea = 0;
+			IMP_S32 yy, xx;
+			for( yy = 0; yy < s32Height2; yy += IMP_NOISE_STEP )
+			{
+#ifdef _TIDSP
+#pragma MUST_ITERATE(32,,4);
+#endif
+				for( xx = 0; xx < s32Width2; xx += IMP_NOISE_STEP )
+				{
+					IMP_S32 val = abs(pu8Data[xx]);
+					if( val && val <= s32ThresholdMax )
+						s32NoiseArea++;
+				}
+				pu8Data += s32ImgW;
+			}
+
+			s32NoiseArea *= (IMP_NOISE_STEP * IMP_NOISE_STEP * s32SmpRatio);
+			as32NoiseRgnAreas[s32Row * IMP_NOISE_COLS + s32Col] = s32NoiseArea;
+		}
+
+		for( i = 0; i < IMP_NREGION_CNT; i++ )
+		{
+			k = i;
+			for( j = i + 1; j < IMP_NREGION_CNT; j++ )
+			{
+				if( as32NoiseRgnAreas[k] > as32NoiseRgnAreas[j] )
+					k = j;
+			}
+			if( k!=i )
+			{
+				IMP_S32 temp = as32NoiseRgnAreas[k];
+				as32NoiseRgnAreas[k] = as32NoiseRgnAreas[i];
+				as32NoiseRgnAreas[i] = temp;
+			}
+		}
+
+		s32ImgNoiseArea = 0;
+		for( i = (IMP_NREGION_CNT / 4); i < (IMP_NREGION_CNT * 3 / 4); i++ )
+		{
+			s32ImgNoiseArea += as32NoiseRgnAreas[i];
+		}
+		s32ImgNoiseArea *= 2;
+
+		return s32ImgNoiseArea;
+}
+
+#ifdef USE_MAG_DIFF
+IMP_VOID ipGradImageUpdateForCodebookModel(IMP_PEA_MULTIMODEL_BGMODELING_S *pModule,GRAY_IMAGE_S *pstImgMediate)
+{
+	IMP_S32 i,j,k,s32Height, s32Width;
+	IMP_RECT_S stRc;
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+	GRAY_IMAGE_S *pstImgGradient = pstRgs->pstImgBgInDiffMag;
+    GRAY_IMAGE_S *pstImgFrmDiff = pstRgs->pstImgFrmDiff;
+	IMP_S32 s32ImgW = pstImgMediate->s32W;
+	IMP_S32 s32ImgH = pstImgMediate->s32H;
+	IMP_DOUBLE dGrayValueAvg;
+	IMP_S32 s32MatchPtNum = 0;
+	IMP_DOUBLE dMatchPtNum;
+	IpCodebookBgModelPara *pstPara=&pModule->stPara;
+	IMP_U8 *pu8Data, *v1, *v2;
+
+	for( k = 1; k < IMP_MAX_TGT_CNT - 1; k++ )
+	{
+		if( pstRgs->astDrg[k].u8Used )
+		{
+			stRc.s16X1 = pstRgs->astDrg[k].stRect.s16X1;
+			stRc.s16X2 = pstRgs->astDrg[k].stRect.s16X2;
+			stRc.s16Y1 = pstRgs->astDrg[k].stRect.s16Y1;
+			stRc.s16Y2 = pstRgs->astDrg[k].stRect.s16Y2;
+
+
+			s32Height = stRc.s16Y2 - stRc.s16Y1 + 1;
+			s32Width = stRc.s16X2 - stRc.s16X1 + 1;
+
+
+			{
+				s32MatchPtNum = 0;
+				dGrayValueAvg = 0;
+				for (i = stRc.s16Y1; i <= stRc.s16Y2; i++)
+				{
+					for (j = stRc.s16X1; j <= stRc.s16X2; j++)
+					{
+						pu8Data = pstImgGradient->pu8Data + s32ImgW * i + j;
+						v2   = pstImgFrmDiff->pu8Data + s32ImgW * i + j;
+						if (*(pu8Data) > 0 || *(v2))
+						{
+							s32MatchPtNum++;
+						}
+						v1 = pstImgInGray->pu8Data + s32ImgW * i + j;
+						dGrayValueAvg += *v1;
+					}
+				}
+
+				dGrayValueAvg=dGrayValueAvg / (s32Height * s32Width);
+				dMatchPtNum=(IMP_DOUBLE)(s32MatchPtNum) / (s32Height * s32Width);
+
+				if (dMatchPtNum < pstPara->dGradientPointScale && dGrayValueAvg > pstPara->dLumiThreshold)
+				{
+
+
+					for (i = stRc.s16Y1; i <= stRc.s16Y2; i++)
+					{
+						for (j = stRc.s16X1; j <= stRc.s16X2; j++)
+						{
+							v2 = pstImgMediate->pu8Data + s32ImgW * i + j;
+							*v2 = 255;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+#endif
+
+IMP_VOID ipDiffImageUpdateForCodebookModel(IMP_PEA_MULTIMODEL_BGMODELING_S *pModule)
+{
+	IMP_S32 i,j,k,s32Height,s32Width;
+	IMP_RECT_S stRc;
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgMediate = pstRgs->pstImgMediate;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+	GRAY_IMAGE_S *pstImgFrmDiff = pstRgs->pstImgFrmDiff;
+	IMP_S32 s32ImgW = pstImgMediate->s32W;
+	IMP_S32 s32ImgH = pstImgMediate->s32H;
+	IMP_S32 s32MatchPtNum = 0;
+	IMP_DOUBLE dMatchPtNum;
+	IpCodebookBgModelPara *pstPara = &pModule->stPara;
+	IMP_U8 *pu8Data;
+
+	for( k = 1; k < IMP_MAX_TGT_CNT - 1; k++ )
+	{
+		if( pstRgs->astDrg[k].u8Used )
+		{
+			stRc.s16X1 = pstRgs->astDrg[k].stRect.s16X1;
+			stRc.s16X2 = pstRgs->astDrg[k].stRect.s16X2;
+			stRc.s16Y1 = pstRgs->astDrg[k].stRect.s16Y1;
+			stRc.s16Y2 = pstRgs->astDrg[k].stRect.s16Y2;
+
+			s32Height=stRc.s16Y2-stRc.s16Y1 + 1;
+			s32Width=stRc.s16X2-stRc.s16X1 + 1;
+
+
+			{
+				s32MatchPtNum=0;
+				for (i = stRc.s16Y1; i<= stRc.s16Y2; i++)
+				{
+					for (j = stRc.s16X1; j<= stRc.s16X2; j++)
+					{
+						pu8Data  = pstImgFrmDiff->pu8Data + s32ImgW * i + j;
+						if (*(pu8Data) > 0 )
+						{
+							s32MatchPtNum++;
+						}
+					}
+				}
+
+				dMatchPtNum=(IMP_DOUBLE)(s32MatchPtNum) / (s32Height * s32Width);
+
+				if (dMatchPtNum < pstPara->dGradientPointScale )
+				{
+					for (i = stRc.s16Y1; i <= stRc.s16Y2; i++)
+					{
+						for (j = stRc.s16X1; j <= stRc.s16X2; j++)
+						{
+							pu8Data = pstImgMediate->pu8Data + s32ImgW *i + j;
+							*pu8Data = 255;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+extern IMP_S32 ipCalcFgRation(GRAY_IMAGE_S *pstImgB);
+
+
+
+
+IMP_S32 ipProcessMultiModelBgModeling(IMP_PEA_MULTIMODEL_BGMODELING_S *pModule)
+{
+    #ifdef TIME_TEST
+    //timer
+    struct timeval start;
+    struct timeval end;
+    float timeuse;
+    int timestart,timeend,timeuseCalcMotionDiffImage,timeuseipCanny1,timeuseipGradImageHistory,timeuseipUpdateCodebookCache,timeuseIlluminationThreshold;
+    int timeuseBackgroundDiff,timeuseipCanny2,timeuseCalcFgRation,timeuseOpenImage,timeuseCloseImage;
+#endif
+	IMP_S32 j, s32Height, s32Width, s32UpdateFlag;
+	IpTrackedTarget *pstTarget;
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImageFgOrg = pstRgs->pstImgFgOrg;
+	GRAY_IMAGE_S *pstImgFgRgn = pstRgs->pstImgFgRgn;
+	GRAY_IMAGE_S *pstImgMediate = pstRgs->pstImgMediate;
+	GRAY_IMAGE_S *pstImgInGrayPre;
+	GRAY_IMAGE_S *pstImageFrameDiff = pstRgs->pstImgFrmDiff;
+	GRAY_IMAGE_S *pstImageInputGray = pstRgs->pstImgInGray;
+	GRAY_IMAGE16_S *pstImageEdgeGrad = pstRgs->pstImgInEdgeGrad;
+	GRAY_IMAGE_S *pstImageEdgeMag = pstRgs->pstImgInEdgeMag;
+	GRAY_IMAGE_S *pstImageEdgeMagPre = pstRgs->pstImgInEdgeMagPre;
+	GRAY_IMAGE_S *pstImageEdge = pstRgs->pstImgInEdge;
+	GRAY_IMAGE_S *pstImgContour = pstRgs->pstImgContour;
+	GRAY_IMAGE16_S *pstImageBgEdgeGrad = pstRgs->pstImgBgEdgeGrad;
+	GRAY_IMAGE_S *pstImgGradReAppearFq = &pModule->stImgGradReAppearFq;
+	GRAY_IMAGE_S *pstImgReAppearMap = &pModule->stImgReAppearMap;
+	GRAY_IMAGE_S *pstImgBgEdgeMag = pstRgs->pstImgBgEdgeMag;
+	GRAY_IMAGE_S *pstImgBgEdge = pstRgs->pstImgBgEdge;
+#ifdef USE_MAG_DIFF
+	GRAY_IMAGE_S *pstImgBgInDiffMag = pstRgs->pstImgBgInDiffMag;
+#endif
+	GRAY_IMAGE_S *pstImageForeground = &pModule->stImgFg;
+	GRAY_IMAGE_S *pstImgFgCb = &pModule->stImgFgCb;
+	GRAY_IMAGE_S *pstImgFgCbCache = &pModule->stImgFgCbCache;
+	GRAY_IMAGE_S *pstImageBackground = &pModule->stImgBg;
+	GRAY_IMAGE_S *pstImgD = &pModule->stImgD;
+	GRAY_IMAGE_S *pstImgDPre = &pModule->stImgDPre;
+
+
+	IpCodebookBgModelPara *pstPara=&pModule->stPara;
+	IMP_U8 u8LearnRate=pstPara->u8LearnRate;
+	IMP_S32 s32ThetaTh = 5;
+	IMP_U32 u32DiffTimePre = pstResult->u32FrmTimeCur;
+	IMP_S32 s32ImgW = pstImageEdge->s32W;
+	IMP_S32 s32ImgH = pstImageEdge->s32H;
+
+	IMP_S32 s32Th = pModule->s32Th;
+	IMP_S32 s32TAdd = pModule->s32TAdd;
+	IMP_S32 s32TDel = pModule->s32TDel;
+	IMP_S32 s32VideoAbnrmlStatus = pModule->pstResult->s32VideoAbnrmlStatus;
+	IMP_S32 s32Cnt;
+	IMP_S32 s32Channels = 1;
+
+    IMP_S32 *ps32ThresholdBack = &pModule->stPara.s32ThresholdCur;
+	IMP_U8 *v0;
+#ifdef USE_MAG_DIFF
+	IMP_U8 *pMagDiff;
+#endif
+	IMP_S32 * tBasic;
+
+    IMP_S32 s32FgRatio = 0;
+
+    IMP_FLOAT learnRatio = DEFAULT_LEARN_RATIO;
+
+	IpCodeBookModel *cbModel = pModule->cbModel;
+	IMP_S32 *s32Frames = &pModule->s32Frames;
+	(*s32Frames)++;
+	s32Height =  pstImageInputGray->s32H;
+	s32Width = pstImageInputGray->s32W;
+	pstTarget = pstResult->stTrackedTargetSet.astTargets;
+	s32Cnt = pstResult->stTrackedTargetSet.s32UsedTotal;
+	s32UpdateFlag = 0;
+	pstImgInGrayPre = IMP_GetHistoryImage( &pModule->stImgHist, u32DiffTimePre );
+#ifdef TIME_TEST
+        gettimeofday(&start,NULL);
+#endif
+	IMP_CalcMotionDiffImage( s32ImgW, s32ImgH, *ps32ThresholdBack,
+		pstImageInputGray->pu8Data,
+		pstImgInGrayPre->pu8Data,
+		pstImageFrameDiff->pu8Data );
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseCalcMotionDiffImage=timeend-timestart;
+
+        gettimeofday(&start,NULL);//start timer
+#endif
+
+	ipCanny( pstImageInputGray->pu8Data,
+			(IMP_S8*)pstImageEdgeGrad->ps16Data,
+			pstImageEdgeMag->pu8Data,
+			pstImageEdge->pu8Data,
+			0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
+			s32ThetaTh );
+
+
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseipCanny1=timeend-timestart;
+
+        gettimeofday(&start,NULL);//start timer
+#endif
+	if (*s32Frames == 1)
+	{
+		IMP_HistoryImageInit( &pModule->stImgHist, pstImageInputGray, pstResult->u32FrmTimeCur );
+		IMP_GrayImageClear(pstImgDPre);
+		IMP_GrayImageClear(pstImgD);
+	#ifdef USE_MAG_DIFF
+		IMP_GrayImageClear(pstImgBgInDiffMag);
+    #endif
+		IMP_GrayImageClear(pstImageForeground);
+		IMP_GrayImageClear(pstImgFgCb);
+		IMP_GrayImageClear(pstImgFgCbCache);
+		IMP_GrayImageClear(pstImageFgOrg);
+		IMP_GrayImageClear(pstImgGradReAppearFq);
+		IMP_GrayImageClear(pstImgReAppearMap);
+
+		IMP_GrayImageClone(pstImageInputGray,pstImageBackground);
+		memset(pModule->cbModel, 0 ,sizeof((s32ImgW*s32ImgH)*sizeof(IpCodeBookModel)));
+        pModule->tBasic = 0;
+        pModule->tCache = 0;
+
+		pModule->s32NoiseArea = 0;
+		pModule->s32NoiseAdjustThCnt = 0;
+		pModule->s32FrmCnt = 0;
+		pModule->s32UdpmTimePre = 0;
+
+		return 1;
+	}
+
+
+	if (*s32Frames <= 30)
+	{
+		cbModel = pModule->cbModel;
+		v0 = (IMP_U8*)pstImageInputGray->pu8Data;
+
+
+		pModule->tBasic++;
+		tBasic = &pModule->tBasic;
+		for(j = 0; j < s32Width * s32Height; j++)
+		{
+
+			ipUpdateCodebook(v0,
+			              #ifdef USE_MAG_DIFF
+				             pMagDiff,
+                          #endif
+							 &cbModel->codeBookBasic, u8LearnRate, tBasic, learnRatio);
+			cbModel++;
+			v0++;
+		#ifdef USE_MAG_DIFF
+			pMagDiff++;
+        #endif
+		}
+		ipUpdateCodebookCache(pModule);
+		ipFastLiBgModelForCB(pModule,(*ps32ThresholdBack));
+	}
+	else
+	{
+		s32UpdateFlag = 0;
+
+		ipUpdateCodebookCache(pModule);
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseipUpdateCodebookCache=timeend-timestart;
+
+        gettimeofday(&start,NULL);
+#endif
+
+	    s32UpdateFlag = 1;
+
+
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseIlluminationThreshold=timeend-timestart;
+        gettimeofday(&start,NULL);//start timer
+#endif
+		if (*s32Frames >= 30)
+		{
+			IMP_PEA_BackgroundDiff(pModule,*ps32ThresholdBack, s32VideoAbnrmlStatus , s32UpdateFlag);
+		}
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseBackgroundDiff=timeend-timestart;
+        //printf("IMP_PEA_BackgroundDiff:time used:%d us\n",timeuseBackgroundDiff);
+        gettimeofday(&start,NULL);//start timer
+#endif
+
+		ipCanny( pModule->stImgBg.pu8Data,
+			(IMP_S8*)pstImageBgEdgeGrad->ps16Data,
+			pstImgBgEdgeMag->pu8Data,
+			pstImgBgEdge->pu8Data,
+			0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
+						s32ThetaTh );
+
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseipCanny2=timeend-timestart;
+        //printf("ipCanny2:time used:%d us\n",timeuseipCanny2);
+        gettimeofday(&start,NULL);//start timer
+#endif
+
+#ifdef USE_MAG_DIFF
+		ipGetMagDiffImageCb(pstImageEdgeMag,pstImgBgEdgeMag,pstImgBgInDiffMag,10/*(*ps32ThresholdBack)*/);
+	//	ipGetMagDiffImageCb(pstImageEdgeMag,pstImageEdgeMagPre,pstImgBgInDiffMag,5);//用来判断光影
+#endif
+	}
+    //if(1)
+    {
+        static IMP_U32 u32SceneChgCnt = 0;
+        s32FgRatio = ipCalcFgRation(pstImageForeground);
+
+
+		if (s32FgRatio > IMP_DETECTOR_METHOD_RADIO)
+		{
+			pModule->pstResult->stSysStatus.u32DetectorMethod =  IMP_FAST_METHOD;
+		}
+		else
+		{
+			pModule->pstResult->stSysStatus.u32DetectorMethod =  IMP_CODEBOOK_METHOD;
+		}
+
+		if(s32FgRatio > IMP_SCENE_CHANGE_RADIO)
+        {
+            u32SceneChgCnt++;
+        }
+        else
+        {
+            u32SceneChgCnt = 0;
+        }
+        if(u32SceneChgCnt > IMP_SCENE_CHANGE_CNT)
+        {
+            pModule->s32Frames = 0;
+            u32SceneChgCnt = 0;
+			ipConfigCodebookBgModel(pModule,NULL);
+        }
+    }
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseCalcFgRation=timeend-timestart;
+
+        gettimeofday(&start,NULL);//start timer
+#endif
+
+	ipImageSub(pstImageEdge->pu8Data,s32ImgW,pstImgBgEdge->pu8Data,s32ImgW,pstImgContour->pu8Data,s32ImgW,s32ImgW,s32ImgH);
+
+	ipMorphOpenImage( pstImageForeground, pstImageForeground, pstImgMediate, 1 );
+	ipMorphCloseImage( pstImageForeground, pstImageForeground, pstImgMediate, 1 );
+
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseOpenImage=timeend-timestart;
+       // printf("ipMorphOpenImage:time used:%d us\n",timeuseOpenImage);
+        gettimeofday(&start,NULL);//start timer
+#endif
+
+	//ipMorphCloseImage( pstImgFgCb, pstImgFgCb, pstImgMediate, 1 );
+
+#ifdef TIME_TEST
+        gettimeofday(&end,NULL);
+        timestart=1000000*start.tv_sec+start.tv_usec;
+        timeend=1000000*end.tv_sec+end.tv_usec;
+        timeuseCloseImage=timeend-timestart;
+        //printf("ipMorphCloseImage:time used:%d us\n",timeuseCloseImage);
+        gettimeofday(&start,NULL);//start timer
+#endif
+
+
+
+	//IMP_GrayImageClone(pstImageForeground,pstImageFgOrg);
+	IMP_GrayImageClone(pstImageForeground,pstImageFgOrg);
+	IMP_GrayImageCloneb( pstImageFgOrg, pstImgFgRgn );
+	IMP_GrayImageClone(pstImgD,pstImgDPre);
+#ifdef USE_MAG_DIFF
+	IMP_GrayImageClone(pstImageEdgeMag,pstImageEdgeMagPre);
+#endif
+
+#ifdef TIME_TEST
+    timeuse = 0.0;
+    timeuse = timeuseCalcMotionDiffImage+timeuseipCanny1+timeuseipGradImageHistory+timeuseipUpdateCodebookCache+timeuseIlluminationThreshold;
+    timeuse += timeuseBackgroundDiff+timeuseipCanny2+timeuseCalcFgRation+timeuseOpenImage+timeuseCloseImage;
+
+#if defined(IMP_DEBUG_PRINT)
+    printf("use:%f,DfImg=%d, Canny1 =%d,GradImgHis=%d,UpdateCbCache=%d,IlluTh/=%d,BgDiff=%d,Canny2=%d,CalcFgR=%d,Open=%d,Close=%d\n",
+                                             timeuse,
+                                             timeuseCalcMotionDiffImage,
+                                             timeuseipCanny1,
+                                             timeuseipGradImageHistory,
+                                             timeuseipUpdateCodebookCache,
+                                             timeuseIlluminationThreshold,
+                                             timeuseBackgroundDiff,
+                                             timeuseipCanny2,
+                                             timeuseCalcFgRation,
+                                             timeuseOpenImage,
+                                             timeuseCloseImage
+                                             );
+#endif
+
+  #endif
+	return 1;
+}
+
+
+IMP_VOID ipPostProcessCodebookBgModel( IMP_PEA_MULTIMODEL_BGMODELING_S *pModule )
+{
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	IMP_U32 u32FrmTimeCur = pstResult->u32FrmTimeCur;
+	PEA_STATUS_S *pstStatus = &pstResult->stSysStatus;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+	IMP_SetHistoryImage( &pModule->stImgHist, pstImgInGray, pstResult->u32FrmTimeCur );
+}

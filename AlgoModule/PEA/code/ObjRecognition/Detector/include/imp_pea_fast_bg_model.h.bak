@@ -1,0 +1,69 @@
+
+#ifndef _IMP_PEA_FAST_BG_MODEL_H_
+#define _IMP_PEA_FAST_BG_MODEL_H_
+
+#define DEFAULT_LI_FAST_BGFG_MOG_INTERFRAME            3
+#define DEFAULT_LI_FAST_BGFG_MOG_WINDOW_SIZE           200
+#define DEFAULT_LI_FAST_BGFG_MOG_MOTION_THRESHOLD	  10
+#define DEFAULT_LI_FAST_BGFG_MOG_SUBTRACTION_THRESHOLD_H 15 //bkg and frg subtruction threshold
+#define DEFAULT_LI_FAST_BGFG_MOG_SUBTRACTION_THRESHOLD_M 9
+#define DEFAULT_LI_FAST_BGFG_MOG_SUBTRACTION_THRESHOLD_L 5
+
+#ifdef SUPPORT_OSC
+#define DEFAULT_LI_FAST_BGFG_MOG_TIME_UPDATE_LENGTH    200 //5, max is 255, this is key. if for OSC it should be big, if for pea it should be small.
+#else
+#define DEFAULT_LI_FAST_BGFG_MOG_TIME_UPDATE_LENGTH    5
+#endif
+
+#define DEFAULT_LI_FAST_BGFG_MOG_SCALE_OF_UPDATING     25
+#define DEFAULT_LI_BFFG_MOG_GRADIENT_POINT_SCALE 0.1
+#define DEFAULT_LI_FAST_BGFG_MOG_LUMINANCE_LOW_THRESHOLD   70
+#define DEFAULT_LI_FAST_BGFG_MOG_LUMINANCE_HIGH_THRESHOLD  160
+
+#define DEFAULT_LI_FAST_BGFG_MOG_T
+
+typedef struct IpLiFastBgModelPara
+{
+	IMP_U8 u8TimeUpdateLength;           
+    IMP_S32 s32InterFrame;               
+	IMP_S32 s32DiffMotionTh;             
+	IMP_S32 s32BackForeTh;               
+	IMP_S32 s32ScaleOfBgUpdating;        
+	IMP_S32 s32LumiTh;                   
+
+	IMP_S32 s32ThCur;                    
+	IMP_S32 s32ThMin;                    
+	IMP_S32 s32ThMax;                    
+    IMP_S32 s32ThUdpm;                   
+	IMP_S32 s32ThNoiseRatio;             
+    IMP_S32 s32ThUp2DwRatio;             
+	IMP_U8  u8UpdateSpeedMax;            
+}IpLiFastBgModelPara;
+
+typedef struct IpLiFastBgModel
+{
+    GA_HARDWARE_RS_S  *pHwResource;           
+	PEA_RESULT_S      *pstResult;             
+	GRAY_IMAGE_S      stImgBg;                
+	GRAY_IMAGE_S      stImgFg;                
+	GRAY_IMAGE_S      stImgD;                 
+	GRAY_IMAGE_S      stImgDPre;              
+	GRAY_IMAGE_S      stImgBgPre;             
+	GRAY_IMAGE_S      stImgGrayPre;           
+    IpLiFastBgModelPara   stPara;             
+    IMP_S32           s32FrmCnt;              
+	IMP_S32           s32FrmCntLocal;         
+	IMP_S32			  s32UpdateTimePre;       
+	IMP_S32           s32NoiseArea;           
+	IMP_S32           s32NoiseAreaAvg;        
+	IMP_S32           s32NoiseAdjustThCnt;    
+}IpLiFastBgModel;
+
+
+IMP_VOID ipCreateLiFastBgModel( IpLiFastBgModel *pstModule, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResource );
+IMP_VOID ipReleaseLiFastBgModel( IpLiFastBgModel *pstModule );
+IMP_VOID ipConfigLiFastBgModel( IpLiFastBgModel *pstModule, IpLiFastBgModelPara *pstPara );
+IMP_S32 ipProcessLiFastBgModel( IpLiFastBgModel *pstModule);
+IMP_VOID ipPostProcessLiFastBgModel( IpLiFastBgModel *pstModule );
+
+#endif 

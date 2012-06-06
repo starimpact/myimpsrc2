@@ -1,0 +1,26 @@
+#CC = arm-hisiv100-linux-gcc
+pc1:=1
+ifdef pc1
+	CC = gcc
+	AR = ar
+	CFLAGS = -g -DIMP_ARM_PEA
+else
+	CC = arm-hismall-linux-gcc
+	AR = arm-hismall-linux-ar
+#	CC = arm-hisiv100-linux-gcc
+#	AR = arm-hisiv100-linux-ar
+	CFLAGS =  -O2 -DUSE_TIME_LICENSE_LIMIT -DIMP_ARM_PEA -Os
+endif
+
+#CFLAGS =  -O2 -g -DUSE_TIME_LICENSE_LIMIT -DIMP_ARM_PEA -Os
+#CFLAGS =  -O2 -g -DUSE_WATERMARK_DETECOTR -DTD_LICENSE_CHECK  -Os
+
+#CFLAGS = -g
+ALGODIR := /home/zm/Workingarea/imp_src/AlgoModule
+OPENCV_INCLUDES:=-I/usr/local/include/opencv -I/usr/local/include
+INCLUDES := -I/home/zm/Workingarea/imp_src/Interface/include -I$(ALGODIR)/GA/CommonAlgo/Common/include -I$(ALGODIR)/ALGO_PARA/Para/include -I$(ALGODIR)/GA/CommonAlgo/ImageAlgo/include $(OPENCV_INCLUDES)
+
+
+
+
+

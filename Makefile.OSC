@@ -1,0 +1,16 @@
+include Makefile.param
+
+HI3520_SDK_PATH:=/home/zm/Workingarea/Hi3520_SDK_V1.0.6.0.c2
+MPP_PATH:=$(HI3520_SDK_PATH)/mpp_master
+MPP_INCLUDE_PATH:=-I$(MPP_PATH)/include -I$(HI3520_SDK_PATH)/extdrv
+INCLUDES:=$(INCLUDES) $(MPP_INCLUDE_PATH) 
+MPP_LIBS_PATH:=$(MPP_PATH)/lib
+MPP_LIBS := -lmpi -l_VoiceEngine -l_amr_spc	-l_amr_fipop -l_aec -l_aacdec -l_aacenc -lresampler -lloadbmp -ltde
+
+objs:=main_osc.o imp_osc_thread.o imp_draw_osd.o sample_common.o
+OSC_EXE:$(objs)
+	$(CC) -lpthread -o OSC_EXE $(objs) -lArmPEA $(MPP_LIBS) -L./ -L$(MPP_LIBS_PATH)
+
+$(objs):%.o:%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES) 2> hi
+

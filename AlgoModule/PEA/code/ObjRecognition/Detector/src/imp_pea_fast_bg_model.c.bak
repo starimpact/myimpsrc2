@@ -1,0 +1,292 @@
+#include "imp_pea_detector.h"
+//////////////////////////////////////////////////////////////////////////
+
+IMP_VOID ipCreateLiFastBgModel( IpLiFastBgModel *pstModule, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResource )
+{
+	IMP_S32 s32Height, s32Width;
+	MEM_MGR_ARRAY_S *pstMemMgr;
+
+	memset( pstModule, 0, sizeof(IpLiFastBgModel) );
+	pstModule->pHwResource = pHwResource;
+	pstModule->pstResult = pstResult;
+
+	pstMemMgr = &pHwResource->stMemMgr;
+	s32Height = pstResult->s32Height;
+	s32Width = pstResult->s32Width;
+ 	 	
+	pstModule->s32FrmCnt=0;
+	pstModule->s32NoiseArea=0;
+	pstModule->s32NoiseAdjustThCnt=0;
+	pstModule->s32FrmCntLocal=0;
+	pstModule->s32UpdateTimePre=0;
+
+	IMP_GrayImageCreate( &pstModule->stImgBg, s32Width, s32Height, pstMemMgr );
+	IMP_GrayImageCreate( &pstModule->stImgFg, s32Width, s32Height, pstMemMgr );
+	IMP_GrayImageCreate( &pstModule->stImgD, s32Width, s32Height, pstMemMgr );
+	IMP_GrayImageCreate( &pstModule->stImgDPre, s32Width, s32Height, pstMemMgr );
+	IMP_GrayImageCreate( &pstModule->stImgBgPre, s32Width, s32Height, pstMemMgr );
+	IMP_GrayImageCreate( &pstModule->stImgGrayPre, s32Width, s32Height, pstMemMgr );
+}
+
+IMP_VOID ipReleaseLiFastBgModel( IpLiFastBgModel *pstModule )
+{
+	MEM_MGR_ARRAY_S *pstMemMgr = &pstModule->pHwResource->stMemMgr;
+	IMP_GrayImageDestroy( &pstModule->stImgBg, pstMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stImgFg, pstMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stImgD, pstMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stImgDPre, pstMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stImgBgPre, pstMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stImgGrayPre, pstMemMgr );
+}
+
+IMP_VOID ipConfigLiFastBgModel( IpLiFastBgModel *pstModule, IpLiFastBgModelPara *pstPara )
+{
+	IpLiFastBgModelPara *pstParam = &pstModule->stPara;
+	if( pstPara == NULL )
+    {
+		pstModule->stPara.s32InterFrame = DEFAULT_LI_FAST_BGFG_MOG_INTERFRAME;
+        pstModule->stPara.s32DiffMotionTh = DEFAULT_LI_FAST_BGFG_MOG_MOTION_THRESHOLD;
+        pstModule->stPara.s32BackForeTh = DEFAULT_LI_FAST_BGFG_MOG_SUBTRACTION_THRESHOLD_M;
+        pstModule->stPara.u8TimeUpdateLength = DEFAULT_LI_FAST_BGFG_MOG_TIME_UPDATE_LENGTH;
+        pstModule->stPara.s32ScaleOfBgUpdating = DEFAULT_LI_FAST_BGFG_MOG_SCALE_OF_UPDATING;
+		pstModule->stPara.s32LumiTh=DEFAULT_LI_FAST_BGFG_MOG_LUMINANCE_LOW_THRESHOLD;
+
+		pstModule->stPara.s32ThCur = DEFAULT_LI_FAST_BGFG_MOG_SUBTRACTION_THRESHOLD_H;
+		pstModule->stPara.s32LumiTh=DEFAULT_LI_FAST_BGFG_MOG_LUMINANCE_LOW_THRESHOLD;
+		pstModule->stPara.s32ThMax = 20;
+		pstModule->stPara.s32ThMin = 8;
+		pstModule->stPara.s32ThUdpm = 10;
+		pstModule->stPara.s32ThNoiseRatio = 10;
+		pstModule->stPara.s32ThUp2DwRatio = 10;
+	}
+	else
+	{
+		pstModule->stPara.s32InterFrame = pstPara->s32InterFrame;
+        pstModule->stPara.s32DiffMotionTh = pstPara->s32DiffMotionTh;
+        pstModule->stPara.s32BackForeTh = pstPara->s32BackForeTh;
+        pstModule->stPara.u8TimeUpdateLength = pstPara->u8TimeUpdateLength;
+        pstModule->stPara.s32ScaleOfBgUpdating = pstPara->s32ScaleOfBgUpdating ;
+		pstModule->stPara.s32LumiTh = pstPara->s32LumiTh;
+
+		pstModule->stPara.s32ThCur = pstPara->s32ThCur;
+		pstModule->stPara.u8UpdateSpeedMax = pstPara->u8UpdateSpeedMax;
+		pstModule->stPara.s32ThMax = pstPara->s32ThMax;
+		pstModule->stPara.s32ThMin = pstPara->s32ThMin;
+		pstModule->stPara.s32ThUdpm = pstPara->s32ThUdpm;
+		pstModule->stPara.s32ThNoiseRatio = pstPara->s32ThNoiseRatio;
+		pstModule->stPara.s32ThUp2DwRatio = pstPara->s32ThUp2DwRatio;
+	}
+}
+
+
+IMP_S32 ipProcessLiFastBgModel(IpLiFastBgModel *pstModule)
+{
+	IMP_S32 i,w,h;
+	PEA_RESULT_S *pstResult = pstModule->pstResult;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	IpTrackedTargetSet *pstTTargetSet = &pstResult->stTrackedTargetSet;
+	IpTrackedTarget *pstTarget;
+	GRAY_IMAGE_S *pstImgMediate = pstRgs->pstImgMediate;
+	GRAY_IMAGE_S *pstImgFrmDiff = pstRgs->pstImgFrmDiff;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+
+	IMP_U32 u32DiffTimePre = pstResult->u32FrmTimeCur;
+	IMP_S32 s32Width = pstImgInGray->s32W;
+	IMP_S32 s32Height = pstImgInGray->s32H;
+
+
+	IMP_U8 *data,*pGray,*pPrevDimage,*pDimage,*pBackImage,*pForeImage,*pPrevBackimage,*pImgFrmDiff;
+
+	GRAY_IMAGE_S *pstImgFg = &pstModule->stImgFg;
+	GRAY_IMAGE_S *pstImgD = &pstModule->stImgD;
+	GRAY_IMAGE_S *pstImgDPre = &pstModule->stImgDPre;
+	GRAY_IMAGE_S *pstImgGrayPre = &pstModule->stImgGrayPre;
+
+	GRAY_IMAGE_S *pstImgBg = &pstModule->stImgBg;
+
+	GRAY_IMAGE_S *pstImgBgPre = &pstModule->stImgBgPre;
+	GRAY_IMAGE_S *pstImgFgRgn = pstRgs->pstImgFgRgn;
+	GRAY_IMAGE_S *pstImgFgOrg = pstRgs->pstImgFgOrg;
+
+#if 0
+	ipShowGrayImage(s32Width, s32Height, pstResult->stImgInGray.pu8Data, "pstResult->stImgInGray.pu8Data");
+#endif
+
+	IpLiFastBgModelPara *pstPara = &pstModule->stPara;
+	IMP_U8 t = pstPara->u8TimeUpdateLength;
+	IMP_S32 s32ScaleA = pstPara->s32ScaleOfBgUpdating;
+	IMP_S32 s32DiffMotionTh = pstPara->s32DiffMotionTh;      //  u32Threshold used for subtraction
+	IMP_S32  s32ThBack = pstModule->stPara.s32ThCur;      //  u32Threshold used for subtraction
+	IpTargetPosition *pstPos0;
+	IMP_U32 u32Threshold = 10;
+	IMP_U32 u32ThresholdLevel = 8;
+	pstModule->s32FrmCnt++;
+	if (pstModule->s32FrmCnt == 1)
+	{
+
+		IMP_GrayImageClone(pstImgInGray,pstImgBgPre);
+		IMP_GrayImageClone(pstImgInGray,pstImgBg); //added by mzhang
+		IMP_GrayImageClear(pstImgDPre);
+		IMP_GrayImageClear(pstImgD);
+		IMP_GrayImageClear(pstImgFg);
+		IMP_GrayImageClone(pstImgFg,pstImgFgRgn);
+
+		return 1;
+	}
+	
+#ifndef SUPPORT_OSC	
+	//use pstImgFrmDiff as temporary memory
+	ipNoiseEstimateByBox(pstImgInGray, pstImgFrmDiff, &s32ThBack);
+	pstResult->s32Noise = s32ThBack;
+#endif
+
+	IMP_CalcMotionDiffImage( s32Width, s32Height, s32ThBack, //it will be used for the static object detection.
+		pstImgInGray->pu8Data,
+		pstImgGrayPre->pu8Data,
+		pstImgFrmDiff->pu8Data );
+	
+	pForeImage = pstImgFg->pu8Data; //²î·Ö
+	data = pstImgFrmDiff->pu8Data; //²î·Ö
+#if 0
+	ipShowBinImage(s32Width, s32Height, pstImgFrmDiff->pu8Data, "pstImgFrmDiff->pu8Data");
+#endif
+	for ( i = 0; i < s32Height * s32Width; i++ )
+	{
+	//	if ((*data) > s32ThBack)
+		if ((*data))
+		{
+			*pForeImage=255;
+		}
+		else
+		{
+			*pForeImage=0;
+		}
+		pForeImage++;
+		data++;
+	}
+#if 0
+	ipShowGrayImage(s32Width, s32Height, pstImgGrayPre->pu8Data, "pstImgGrayPre->pu8Data");
+	ipShowGrayImage(s32Width, s32Height, pstImgInGray->pu8Data, "pstImgInGray->pu8Data");
+//	ipShowGrayImage(s32Width, s32Height, pstImgBg->pu8Data, "pstImgBg->pu8Data 0");
+//	ipShowGrayImage(s32Width, s32Height, pstImgBgPre->pu8Data, "pstImgBgPre->pu8Data 0");
+	ipShowBinImage(s32Width, s32Height, pstImgFg->pu8Data, "pstImgFg->pu8Data");
+#endif
+	pGray = pstImgInGray->pu8Data;
+	pPrevDimage = pstImgDPre->pu8Data;
+	pDimage = pstImgD->pu8Data;
+	pBackImage = pstImgBg->pu8Data;
+	pForeImage = pstImgFg->pu8Data;
+	pPrevBackimage = pstImgBgPre->pu8Data;
+	pImgFrmDiff=pstImgFrmDiff->pu8Data;
+
+	for ( i = 0; i < s32Height * s32Width; i++ )
+	{
+#ifdef SUPPORT_OSC	
+		int val = ((*pGray) * 10 + (*pPrevBackimage) * (128 - 10) + 128 / 2) >> 7; //10 can adapt the OSC environment
+#else
+		int val = ((*pGray) * 20 + (*pPrevBackimage) * (128 - 20) + 128 / 2) >> 7; //20 can adapt the illuminance change
+#endif
+
+		if (val > 255) val = 255;
+		*pPrevBackimage = val;
+	//	if( *pForeImage == 255)   // whether the pixel is in motion
+		if (abs(*pPrevBackimage - *pGray) > s32ThBack)
+		{
+			*(pDimage) = t;
+		}
+		else
+		{
+			if( *pPrevDimage > 1 )
+			{
+				*pDimage = *pPrevDimage - 1;
+			}
+			else
+			{
+				*pDimage = 0;
+			//	if (abs(*pPrevBackimage - *pGray) <= 10)
+				{
+					*pBackImage = *pPrevBackimage;
+				}
+			}
+		}
+		
+		if(*pDimage < 1)   // whether the pixel need update
+		{
+		//	*pBackImage = (*pGray >> 2) + 3 * ((*pPrevBackimage) >> 2);
+			
+		}
+		else
+		{
+		//	*pBackImage = *pPrevBackimage;
+		}
+   	//	if (abs(*pBackImage - *pGray) * 2 > 3 * s32ThBack ||(*pImgFrmDiff) >= 1)
+	   	if (abs(*pBackImage - *pGray) > s32ThBack)
+	//	if (abs(*pBackImage - *pGray) > 4)
+		{
+			*pForeImage = 255;
+		}
+		else
+		{
+			val = ((*pBackImage) * (128 - 10) + (*pGray) * 10 + 128 / 2) >> 7;
+			if (val > 255) val = 255;
+			*pBackImage = val;
+			*pForeImage = 0;
+		}
+		pGray++;
+		pPrevDimage++;
+		pDimage++;
+		pBackImage++;
+		pForeImage++;
+		pPrevBackimage++;
+		pImgFrmDiff++;
+	}
+	
+//	ipRemoveShadow(pstImgInGray, pstImgBg, pstImgFg, 0);
+//	ipRemoveShadowByNCC(pstImgInGray, pstImgBg, pstImgFg, 0);
+	
+//	ipMorphCloseImage( pstImgFg, pstImgFg, pstImgMediate, 1 );
+//	ipMorphOpenImage( pstImgFg, pstImgFg, pstImgMediate, 1 );
+	
+	IMP_GrayImageClone(pstImgFg,pstImgFgRgn);
+	IMP_GrayImageClone(pstImgFgRgn,pstImgFgOrg);
+	IMP_GrayImageClone(pstImgInGray,pstImgGrayPre);
+
+	IMP_GrayImageClone(pstImgD,pstImgDPre);
+	
+	
+	
+	//update the back when the foreground is too big.
+	{//added by mzhang
+		int dwFNum = 0;
+		for ( i = 0; i < s32Height * s32Width; i++ )
+		{
+			if (pstImgFg->pu8Data[i]) dwFNum++;
+		}
+		if (dwFNum * 100 > s32Height * s32Width * 80)
+		{
+			IMP_GrayImageClone(pstImgInGray,pstImgBg);
+			IMP_GrayImageClone(pstImgInGray,pstImgBgPre);
+		}
+	}
+//	IMP_GrayImageClone(pstImgBg,pstImgBgPre);
+
+
+#if 0
+//	ipShowGrayImage(s32Width, s32Height, pstImgBg->pu8Data, "pstImgBg->pu8Data");
+	ipShowGrayImage(s32Width, s32Height, pstImgBgPre->pu8Data, "pstImgBgPre->pu8Data");
+	ipShowBinImage(s32Width, s32Height, pstImgDPre->pu8Data, "pstImgDPre->pu8Data");
+#endif
+	return 1;
+}
+
+
+
+
+IMP_VOID ipPostProcessLiFastBgModel( IpLiFastBgModel *pstModule )
+{
+	PEA_RESULT_S *pstResult = pstModule->pstResult;
+	IMP_U32 u32FrmTimeCur = pstResult->u32FrmTimeCur;
+	PEA_STATUS_S *pstStatus = &pstResult->stSysStatus;
+	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSet;
+	GRAY_IMAGE_S *pstImgInGray = pstRgs->pstImgInGray;
+}

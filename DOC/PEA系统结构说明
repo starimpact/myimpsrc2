@@ -1,0 +1,84 @@
+PEA系统结构说明
+
+1.PEA文件结构说明
+imp_src:总目录
+--Makefile.param:公共编译参数
+--makefile:生成库
+--Makefile.OPENCV.PEA:生成PEA的PC端DEMO.
+--Makefile.PEA:生成PEA的板端DEMO.
+
+--main_pea.c＋imp_pea_thread.c:板上测试DEMO
+--main_opencv_pea.c:PC端测试DEMO
+--imp_draw_osd.c:板端画图程序
+
+--DOC: 里面一些文档
+
+--Interface/include: 应用层开发人员可见的头文件
+----imp_algo_interface.h 接口函数
+----imp_algo_type.h 基本数据类型
+----imp_algo_urp_param.h 用户进行规则配置需要的结构体
+
+--AlgoModule 
+----PEA/code
+------System:组织各大子模块,提供对外总接口.
+--------imp_osc_system.c:提供OSC独立接口.
+--------imp_pea_system.c:提供PEA独立接口.
+------ObjRecognition:包括目标检测，跟踪，分类
+--------imp_pea_obj_recognition.c:组织分类,检测,跟踪三个模块.
+--------Classify:分类（由于耗时太大，效果不明显，目前不在用）
+--------Detector:运动检测，连通区域检测，还含有一个简单分类函数
+----------imp_vibe_bgmodel.c:目前正在用的背景建模算法
+----------imp_pea_region_extract.c+imp_pea_regionset_label.c＋imp_pea_regionset_type.c:连通区域检测，并对静止区域类型进行判断（停下静止，鬼影）用于以后的OSC。
+--------Tracker:目标跟踪，包括普通目标跟踪和静态目标跟踪。
+----------imp_pea_tracker_motion.c:运动目标跟踪.
+----------imp_pea_tracker_static.c:静止目标跟踪.
+------PEACommon:各模块都需要的结构体和函数,比较重要的是PEA_RESULT_S结构体、噪声估计函数、用于调试的显示图像的几个便捷函数。
+------BVA:规则判断
+--------imp_pea_multripwire.c:双绊线规则判断
+--------imp_pea_perimeter.c:周界规则判断
+--------imp_pea_tripwire.c:单绊线规则判断
+--------imp_pea_osc.c:OSC规则判断
+
+----GA
+------CommonAlgo:内存管理函数和图像算法函数.
+--------Common:内存管理,图像操作,基本算法
+--------ImageAlgo:图像算法
+------EventManager:
+------LiscenseManager:
+------WaterMark:
+
+2.PEA系统接口说明
+--PEA系统总接口
+----IMP_GetAlgoLibInfo:得到库的相关信息,如版本信息.
+----IMP_GetMemReq:需要的内存量.
+----IMP_MemsAlloc:申请内存资源.
+----IMP_Create:给系统内各个模块分配资源.
+----IMP_ConfigArmPeaParameter:配置规则信息.
+----IMP_ProcessImage:算法系统处理主过程.
+----IMP_GetResults:得到算法处理结果.
+----IMP_Release:释放算法系统资源.
+----IMP_MemsFree:释放内存资源.
+
+--OSC系统总接口
+----IMP_GetAlgoLibInfo, IMP_GetMemReq, IMP_MemsAlloc, IMP_MemsFree
+----IMP_OSC_Create
+----IMP_OSC_ConfigArmPeaParameter
+----IMP_OSC_ProcessImage
+----IMP_OSC_GetResults
+----IMP_OSC_Release
+
+--各子模块接口
+----每个子模块接口都有:create, release, config, process.
+----start, stop, post这类接口没什么作用. 不调用也行.
+----PEA_RESULT_S:包括了各个子模块间交流的信息.
+
+
+
+
+
+
+
+
+
+
+
