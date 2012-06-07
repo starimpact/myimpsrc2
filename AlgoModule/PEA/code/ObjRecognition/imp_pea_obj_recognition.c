@@ -55,7 +55,8 @@ IMP_S32 IMP_PEA_ProcessObjRecognition( IMP_MODULE_HANDLE hModule )
 {
 #define POR_TIME 0
 	PEA_ModuleObjRecognition *pModule = (PEA_ModuleObjRecognition*)hModule;
-
+	PEA_RESULT_S *pstResult = pModule->pstResult;
+	
 #if POR_TIME
 struct timeval t1, t2;
 #endif
@@ -72,6 +73,9 @@ printf("ProcessDetector:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 	
 
+if (pstResult->s32ModuleSwitch & 1)
+{
+
 #if POR_TIME
 gettimeofday(&t1, NULL);
 #endif
@@ -85,6 +89,7 @@ printf("ProcessTracker:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 
 	
 	IMP_PEA_TemperaryClassify(pModule->pstResult->stTrackedTargetSet.astTargets);
+}
 
 	return 1;
 }

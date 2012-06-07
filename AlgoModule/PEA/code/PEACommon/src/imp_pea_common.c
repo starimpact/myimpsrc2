@@ -424,6 +424,43 @@ int InsidePolygon(Point *polygon,int N,Point p)
 
 
 
+//check if the point inside the Polygon
+int impInsidePolygon(IMP_POINT_S *polygon, int N, IMP_POINT_S p)
+{
+  int counter = 0;
+  int i;
+  double xinters;
+  IMP_POINT_S p1,p2;
+  p1 = polygon[0];
+
+  for (i=1; i <= N; i++)
+  {
+	  p2 = polygon[i % N];
+	  if (p.s16Y > MIN(p1.s16Y, p2.s16Y))
+	  {
+		  if (p.s16Y <= MAX(p1.s16Y, p2.s16Y))
+		  {
+			  if (p.s16X <= MAX(p1.s16X, p2.s16X))
+			  {
+				  if (p1.s16Y != p2.s16Y)
+				  {
+					  xinters = (p.s16Y - p1.s16Y) * (p2.s16X - p1.s16X) / (p2.s16Y - p1.s16Y) + p1.s16X;
+					  if (p1.s16X == p2.s16X || p.s16X <= xinters)
+						counter++;
+				  }
+			  }
+		  }
+	  }
+	  p1 = p2;
+  }
+  
+  if (counter % 2 == 0)
+	  return(OUTSIDE);
+  else
+	  return(INSIDE);
+}
+
+
 //remove shadow based on texture similarity
 IMP_S32 ipRemoveShadow(GRAY_IMAGE_S *pimgNow, GRAY_IMAGE_S *pimgBkg, GRAY_IMAGE_S *pimgBin, IMP_S32 dwNoiseValue)
 {

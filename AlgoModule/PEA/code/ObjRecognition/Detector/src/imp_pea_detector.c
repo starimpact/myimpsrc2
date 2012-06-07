@@ -353,39 +353,8 @@ printf("IMP_ProcessOSCD:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
 
-if (pstResult->s32ModuleSwitch & 2) //pig, disable it if using PEA
+if (pstResult->s32ModuleSwitch & 1)
 {
-	//calc edge information for the background image and incoming image
-	
-//	ipShowGrayImage(s32ImgW, s32ImgH, pstRegionSet->pstImgFrmDiff->pu8Data, "pstImgFrmDiff");
-	
-#if PTDI_TIME || 0
-gettimeofday(&t1, NULL);
-#endif
-	ipCanny( pstTargetDetector->stImgBgGray.pu8Data,
-			(IMP_S8*)pstTargetDetector->stImgBgEdgeGrad.ps16Data,
-			pstTargetDetector->stImgBgEdgeMag.pu8Data,
-			pstTargetDetector->stImgBgEdge.pu8Data,
-			0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
-						5 );
-	
-	ipCanny( pstResult->stImgInGray.pu8Data,
-			(IMP_S8*)pstTargetDetector->stImgInEdgeGrad.ps16Data,
-			pstTargetDetector->stImgInEdgeMag.pu8Data,
-			pstTargetDetector->stImgInEdge.pu8Data,
-			0, 0, s32ImgW, s32ImgH, s32ImgW, s32ImgH,
-			5 );
-			
-//	ipShowGrayImage(s32ImgW, s32ImgH, pstTargetDetector->stImgBgEdge.pu8Data, "stImgBgEdge");
-//	ipShowGrayImage(s32ImgW, s32ImgH, pstTargetDetector->stImgInEdge.pu8Data, "stImgInEdge");
-#if PTDI_TIME || 0
-gettimeofday(&t2, NULL);
-printf("ipCanny:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
-#endif
-
-} //pig
-
-
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
@@ -396,7 +365,7 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("ipProcessRegionExtract:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
-
+}
 //printf("ipProcessTargetDetectorInternal:8\n");
 	return 1;
 }

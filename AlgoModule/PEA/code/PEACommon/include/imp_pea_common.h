@@ -59,6 +59,8 @@ IMP_S32 ipRemoveShadowByNCC(GRAY_IMAGE_S *pimgNow, GRAY_IMAGE_S *pimgBkg, GRAY_I
 //check if the point inside the Polygon
 int InsidePolygon(Point *polygon,int N,Point p);
 
+//check if the point inside the Polygon
+int impInsidePolygon(IMP_POINT_S *polygon, int N, IMP_POINT_S p);
 
 
 typedef enum impFUNC_E

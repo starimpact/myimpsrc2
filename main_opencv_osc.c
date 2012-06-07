@@ -399,7 +399,7 @@ void ShowPeaRule(URP_PARA_S *pstURPpara,IplImage *img)
 		//added by mzhang
 		if (1 && pstURPpara->stRuleSet.astRule[s32RuleIndex].u32Mode & IMP_FUNC_OSC)
 		{
-			URP_OSC_SPECL_REGIONS_S *psr = &pstURPpara->stRuleSet.astRule[s32RuleIndex].stPara.stOscRulePara.astSpclRgs[1];
+			URP_OSC_SPECL_REGIONS_S *psr = &pstURPpara->stRuleSet.astRule[s32RuleIndex].stPara.stOscRulePara.astSpclRgs[0];
 			IMP_DrawOneRule(img, CV_RGB(255, 0, 0), &psr->stOscRg);
 //printf("DRAW:stSpclRgA:%d %d\n", psr->stSpclRgA.s32Valid, psr->stSpclRgA.s32PointNum);
 			IMP_DrawOneRule(img, CV_RGB(0, 255, 0), &psr->astSubRgA);
@@ -437,11 +437,11 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             {
                 EVT_DATA_TARGET_S *pOSC = 0;
                 zone=result->stEventSet.astEvents[i].u32Zone;
-                printf("Target:zone:%d, id:%d AlarmOsc start \n", zone,result->stEventSet.astEvents[i].u32Id);
+            //    printf("Target:zone:%d, id:%d AlarmOsc start \n", zone,result->stEventSet.astEvents[i].u32Id);
                 pOSC=(EVT_DATA_TARGET_S*)(result->stEventSet.astEvents[i].au8Data);
-                printf("pOSC->u32TId:%d\n", pOSC->u32TId);
+            //    printf("pOSC->u32TId:%d\n", pOSC->u32TId);
 			    //Send VCA Alarm Msg
-		        printf("Hello OSC!!! [%d %d %d %d]\n", pOSC->stRect.s16X1, pOSC->stRect.s16Y1, pOSC->stRect.s16X2, pOSC->stRect.s16Y2);
+		    //    printf("Hello OSC!!! [%d %d %d %d]\n", pOSC->stRect.s16X1, pOSC->stRect.s16Y1, pOSC->stRect.s16X2, pOSC->stRect.s16Y2);
 		        cvRectangle(img, cvPoint(pOSC->stRect.s16X1, pOSC->stRect.s16Y1),
                         cvPoint(pOSC->stRect.s16X2, pOSC->stRect.s16Y2), CV_RGB(0, 255, 0), 3, 8, 0);
              //   cvWaitKey(0);
@@ -451,11 +451,11 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             {
                 EVT_DATA_TARGET_S *pOSC = 0;
                 zone=result->stEventSet.astEvents[i].u32Zone;
-                printf("Target:%d AlarmOsc start \n",result->stEventSet.astEvents[i].u32Id);
+            //    printf("Target:%d AlarmOsc start \n",result->stEventSet.astEvents[i].u32Id);
                 pOSC=(EVT_DATA_TARGET_S*)(result->stEventSet.astEvents[i].au8Data);
-                printf("pOSC->u32TId:%d\n", pOSC->u32TId);
+            //    printf("pOSC->u32TId:%d\n", pOSC->u32TId);
 			    //Send VCA Alarm Msg
-		        printf("Hello OSC_R!!! [%d %d %d %d]\n", pOSC->stRect.s16X1, pOSC->stRect.s16Y1, pOSC->stRect.s16X2, pOSC->stRect.s16Y2);
+		    //    printf("Hello OSC_R!!! [%d %d %d %d]\n", pOSC->stRect.s16X1, pOSC->stRect.s16Y1, pOSC->stRect.s16X2, pOSC->stRect.s16Y2);
 		        cvRectangle(img, cvPoint(pOSC->stRect.s16X1, pOSC->stRect.s16Y1),
                         cvPoint(pOSC->stRect.s16X2, pOSC->stRect.s16Y2), CV_RGB(255, 255, 0), 3, 8, 0);
              //   cvWaitKey(0);
@@ -486,15 +486,21 @@ SubC: PolyValid(0),PointNum(0)
 
 */
 
+
+short gawRMVRect[8][2];
+int gadwRMVPntNum = 0;
+
+
 #define PAR_SRC_FILE 0
 #define MAX_RULE_DATA_SIZE 64*1024
 static void IMP_OSC_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32 s32ImgH )
 {
 short awPos1[4][4][2]={{215,102, 300,102, 295,159, 222,165}, {222,105, 262,106, 262,137, 223,138}, {272,108, 287,108, 287,117, 271,119}};
 short awPank0203[4][4][2]={181,130, 331,125, 344,188, 184,210};
-short awCar1[4][4][2]={157,195, 159,238, 205,232, 192,187};
-short awCar2[4][4][2]={60,34, 50,266, 276,259, 177,40};
+short awCar1[4][4][2]={157,195, 159,238, 245,232, 192,187};
+short awCar2[4][4][2]={60,34, 50,266, 286,259, 177,40};
 short awCar3[4][4][2]={81,93, 88,168, 205,166, 188,93};
+short awCar4[4][6][2]={89,101, 114,100, 129,110, 139,140, 110,144, 85,120};
 short awPos[4][4][2];
 
 memcpy(awPos, awCar2, 4 * 2 * 2);
@@ -516,23 +522,52 @@ int dwI;
         stURPpara.stAdvancePara.s32TargetMinHeight = -1;
         stURPpara.stAdvancePara.s32TargetMaxWidth = -1;
         stURPpara.stAdvancePara.s32TargetMaxHeight = -1;
-//        stURPpara.stAdvancePara.f32TargetMinWHRatio = -1;
-//        stURPpara.stAdvancePara.f32TargetMaxWHRatio = -1;
+//      stURPpara.stAdvancePara.f32TargetMinWHRatio = -1;
+//      stURPpara.stAdvancePara.f32TargetMaxWHRatio = -1;
         stURPpara.stAdvancePara.s32TargetMinSpeed = -1;
         stURPpara.stAdvancePara.s32TargetMaxSpeed = -1;
 
-		IMP_S32 s32RuleID = 2;
-		stURPpara.stRuleSet.astRule[s32RuleID].u32Enable = 1;
-		stURPpara.stRuleSet.astRule[s32RuleID].u32Valid = 1;
-		stURPpara.stRuleSet.astRule[s32RuleID].u32Mode = IMP_URP_FUNC_OSC; //设定为OSC算法
 
-		stURPpara.stRuleSet.astRule[s32RuleID].stPara.stOscRulePara.s32SceneType = IMP_URP_INDOOR;
-		stURPpara.stRuleSet.astRule[s32RuleID].stPara.stOscRulePara.s32CameraType = IMP_URP_COMMON_CAMERA;
-		stURPpara.stRuleSet.astRule[s32RuleID].stPara.stOscRulePara.stOscPara.s32TimeMin = 40;
-		stURPpara.stRuleSet.astRule[s32RuleID].stPara.stOscRulePara.stOscPara.s32SizeMin = 100;
-		stURPpara.stRuleSet.astRule[s32RuleID].stPara.stOscRulePara.stOscPara.s32SizeMax = 10000;
+#if 1
+		stURPpara.stRuleSet.astRule[1].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[1].u32Valid = 1;
+		stURPpara.stRuleSet.astRule[1].u32Mode = IMP_URP_FUNC_OSC_R; //设定为OSC算法
 
-		psr = &stURPpara.stRuleSet.astRule[s32RuleID].stPara.stOscRulePara.astSpclRgs[1];
+		stURPpara.stRuleSet.astRule[1].stPara.stOscRulePara.s32SceneType = IMP_URP_INDOOR;
+		stURPpara.stRuleSet.astRule[1].stPara.stOscRulePara.s32CameraType = IMP_URP_COMMON_CAMERA;
+		stURPpara.stRuleSet.astRule[1].stPara.stOscRulePara.stOscPara.s32TimeMin = 10;
+		stURPpara.stRuleSet.astRule[1].stPara.stOscRulePara.stOscPara.s32SizeMin = 10;
+		stURPpara.stRuleSet.astRule[1].stPara.stOscRulePara.stOscPara.s32SizeMax = 100000;
+		
+		psr = &stURPpara.stRuleSet.astRule[1].stPara.stOscRulePara.astSpclRgs[0];
+		psr->s32Valid = 1;
+//		{
+	//		IMP_S8 *pbyBufName = "HelloOSC";
+	//		memcpy(stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.astSpclRgs[0].as8Name, pbyBufName, sizeof(pbyBufName));
+//		}
+		
+        //定义检测区域
+		psr->stOscRg.s32Valid = 1;
+		psr->stOscRg.s32PointNum = gadwRMVPntNum;
+        IMP_POINT_S *pstPoint = psr->stOscRg.astPoint;
+        for(dwI = 0; dwI < gadwRMVPntNum; dwI++)
+        {
+            psr->stOscRg.astPoint[dwI].s16X = gawRMVRect[dwI][0];
+            psr->stOscRg.astPoint[dwI].s16Y = gawRMVRect[dwI][1];
+        }
+#endif
+
+		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
+		stURPpara.stRuleSet.astRule[0].u32Mode = IMP_URP_FUNC_OSC; //设定为OSC算法
+
+		stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.s32SceneType = IMP_URP_INDOOR;
+		stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.s32CameraType = IMP_URP_COMMON_CAMERA;
+		stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.stOscPara.s32TimeMin = 20;
+		stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.stOscPara.s32SizeMin = 10;
+		stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.stOscPara.s32SizeMax = 10000;
+		
+		psr = &stURPpara.stRuleSet.astRule[0].stPara.stOscRulePara.astSpclRgs[0];
 		psr->s32Valid = 1;
 //		{
 	//		IMP_S8 *pbyBufName = "HelloOSC";
@@ -547,8 +582,16 @@ int dwI;
             psr->stOscRg.astPoint[dwI].s16X = awPos[0][dwI][0];
             psr->stOscRg.astPoint[dwI].s16Y = awPos[0][dwI][1];
         }
+#if 0
+		psr->stOscRg.s32PointNum = 6;
+        for(dwI = 0; dwI < 6; dwI++)
+        {
+            psr->stOscRg.astPoint[dwI].s16X = awCar4[0][dwI][0];
+            psr->stOscRg.astPoint[dwI].s16Y = awCar4[0][dwI][1];
+        }
+#endif
 //        printf("%d,%d;\n", psr->stOscRg.astPoint[0].s16X, psr->stOscRg.astPoint[0].s16Y);
-#if 1
+#if 0
         //定义无效子区域
 		psr->astSubRgA.s32Valid = 0;
 		psr->astSubRgA.s32PointNum = 4;
@@ -559,7 +602,7 @@ int dwI;
         }
 #endif
 
-#if 1
+#if 0
         //定义无效子区域
 		psr->astSubRgB.s32Valid = 0;
 		psr->astSubRgB.s32PointNum = 4;
@@ -576,12 +619,35 @@ int dwI;
 }
 
 
+IplImage *gpstImgRMV = NULL, *gpstImgRMV2 = NULL;
+IMP_S32 gs32RMV_SET_OVER = 0;
+
 void on_mouse(int event, int x, int y, int flags, void* param)
 {
+	if (gs32RMV_SET_OVER)
+	{
+		return;
+	}
 	switch(event)
 	{
 	case CV_EVENT_LBUTTONDOWN:
-		printf("%d,%d, ", x, y);
+		cvCvtColor(gpstImgRMV, gpstImgRMV2, CV_GRAY2BGR);	
+		if (gadwRMVPntNum < 8)
+		{
+			gawRMVRect[gadwRMVPntNum][0] = x;
+			gawRMVRect[gadwRMVPntNum][1] = y;
+			gadwRMVPntNum++;
+		}
+		int dwPI;
+		for (dwPI = 0; dwPI < gadwRMVPntNum - 1; dwPI++)
+		{
+			cvLine(gpstImgRMV2, cvPoint(gawRMVRect[dwPI][0], gawRMVRect[dwPI][1]), cvPoint(gawRMVRect[dwPI + 1][0], gawRMVRect[dwPI + 1][1]), CV_RGB(0, 255 , 0), 1, CV_AA, 0);
+		}
+		if (gadwRMVPntNum > 1)
+		{
+			cvLine(gpstImgRMV2, cvPoint(gawRMVRect[gadwRMVPntNum - 1][0], gawRMVRect[gadwRMVPntNum - 1][1]), cvPoint(gawRMVRect[0][0], gawRMVRect[0][1]), CV_RGB(100, 0 , 0), 1, CV_AA, 0);
+		}
+		cvShowImage("DrawRMV", gpstImgRMV2);
 		break;
 	case CV_EVENT_RBUTTONDOWN:
 		printf("\n\n");
@@ -675,9 +741,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
     pBkImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
     color_dst_blob = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
     color_dst_trajectory = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
-
+	
 	imageDst = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
-
+	
+	gpstImgRMV = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 1);
+	gpstImgRMV2 = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3);
+	
 	Y_space = (IMP_U8 *)malloc(s32ImgW * s32ImgH);
 	U_space = (IMP_U8 *)malloc(s32ImgW / 2  * s32ImgH /2);
 	V_space = (IMP_U8 *)malloc(s32ImgW / 2  * s32ImgH /2);
@@ -695,10 +764,6 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
     if(IMP_OSC_Create( hIMP, &stMems ) != IMP_STATUS_OK)
 		exit(0);
 	
-
-	IMP_OSC_PARA_Config(hIMP,s32Width,s32Height);
-
-
     if(enVideoSource == IMP_AVI)
     {
         stImage.u32Time = 0;
@@ -706,11 +771,11 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
         if( pCapture == NULL )
         {
-            printf("failed to open avi file!/n");
+            printf("failed to open avi file!\n");
             pCapture = cvCaptureFromCAM(0);
             if( pCapture == NULL )
    		    {
-               printf("failed to open Camera!/n");
+               printf("failed to open Camera!\n");
          	   return 0;
             }
         }
@@ -720,7 +785,9 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         origin += (s32ImgW * s32ImgH + (s32ImgW >> 1) * (s32ImgH >> 1) + (s32ImgW >> 1) * (s32ImgH >> 1)) * 1500;
         stImage.u32Time = 0;
     }
-
+    
+    IMP_OSC_PARA_Config(hIMP,s32Width,s32Height);
+    gs32RMV_SET_OVER = 0;
     while(1)
     {
         nFrmNum++;
@@ -730,11 +797,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         if(enVideoSource == IMP_AVI)
         {
             frame = cvQueryFrame( pCapture );   // acquire a frame
+            
             if( !frame )
 				break;
 			
-		//	 if (nFrmNum < 1245) continue;
-      //      if(nFrmNum % s32SubSampleT != 0) continue;
+			if (nFrmNum < 10) continue;
+      	    if(nFrmNum % s32SubSampleT != 0) continue;
             if (!imageSrc)
             {
                 imageSrc = cvCreateImage( cvSize(frame->width, frame->height), IPL_DEPTH_8U, 1 );
@@ -747,13 +815,32 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
             {
                 cvCopyImage(frame, imageSrc);
             }
-
+			
 			//抽样
 			cvResize(imageSrc, imageDst, CV_INTER_LINEAR);	//缩放源图像到目标图像
         //    cvShowImage("Hello", imageDst);
           //  cvWaitKey(0);
 			cvCopy(imageDst, pImgGray, NULL);
+			cvCopy(imageDst, gpstImgRMV, NULL);
 			memcpy(stImage.pu8Y,imageDst->imageData,s32ImgW * s32ImgH);
+			
+			if (0 && frame && !gadwRMVPntNum)
+  			{
+  				char byKey;
+    			cvShowImage("DrawRMV", pImgGray);
+    			cvSetMouseCallback("DrawRMV", on_mouse, 0);
+		    	byKey = cvWaitKey(0);
+				if (byKey == 'c')
+		    	{
+		    		exit(0);
+		    	}
+		    	else if (byKey == 's')
+		    	{
+		    		IMP_OSC_PARA_Config(hIMP, s32Width, s32Height);
+		    		gs32RMV_SET_OVER = 1;
+		    		printf("RMV Object is configured!\n");
+		    	}
+		    }
         }
         else
         {
@@ -774,7 +861,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
 		memcpy(pFrImg->imageData,pResult->stDRegionSet.pstImgFgRgn->pu8Data,s32ImgW*s32ImgH);
 		memcpy(pBkImg->imageData,pResult->stDRegionSet.pstImgBgGray->pu8Data,s32ImgW*s32ImgH);
-     
+     	
 		cvCvtColor( pImgGray, color_dst_blob, CV_GRAY2BGR );
 		cvCvtColor( pImgGray, color_dst_trajectory, CV_GRAY2BGR );
 
@@ -790,7 +877,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         ShowPeaRule(&stURPpara,color_dst_blob);
 #endif
 	    cvShowImage("videoBlob", color_dst_blob);
-	    cvSetMouseCallback("videoBlob", on_mouse, 0);
+	    
         cvShowImage("videoTrajectory", color_dst_trajectory);
         cvShowImage("background", pBkImg);
 		
@@ -802,13 +889,20 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		
         cvShowImage("foreground", pFrImg);
      //   printf("HI\n");
-        key = cvWaitKey(20);
+     
+     	if (nFrmNum == 1033)
+     	{
+        	key = cvWaitKey(0);
+        }
+        else
+        {
+        	key = cvWaitKey(10);
+        }
 		
         if (stResult.stEventSet.s32EventNum > 0)
         {
           //  key = cvWaitKey(10);
         }
-        
 		
         //time increase
         stImage.u32Time += s32SubSampleT;
@@ -847,6 +941,8 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	cvReleaseImage(&pBkImg);
 	cvReleaseImage(&imageSrc);
 	cvReleaseImage(&imageDst);
+	cvReleaseImage(&gpstImgRMV);
+	cvReleaseImage(&gpstImgRMV2);
 	cvReleaseCapture(&pCapture);
 	
  	free(Y_space);
@@ -877,22 +973,47 @@ int main(int argc,char *argv[])
 
 #ifdef cif
 //	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
-    IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-混合.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体丢失.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体丢失.mp4";
+	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体丢失.mp4";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
-    IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
+	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体遗留光线干扰.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留灯光干扰.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/低对比度小物体遗留.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/大物体遗留灯光干扰.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体遗留光线干扰.mp4";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
 #endif
 
-	m_interFrame = 1;
+	m_interFrame = 2;
 
 	IMP_OpencvExample(fileName,IMP_AVI,m_frame_width,m_frame_height,m_interFrame,videoFormat);
 
     return 0;
 }
+
+
+

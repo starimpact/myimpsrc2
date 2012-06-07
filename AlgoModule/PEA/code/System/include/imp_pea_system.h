@@ -26,9 +26,9 @@ extern "C"
 #define SLOW_RAM_MEM_SIZE	(1024 * 1024 * 7)
 #elif defined(IMP_ARM_PEA)
 
-#define SLOW_RAM_MEM_SIZE	(1024 * 1024 * 7) //30
+#define SLOW_RAM_MEM_SIZE	(1024 * 1024 * 9) //30
 #else
-#define SLOW_RAM_MEM_SIZE	(1024 * 1024 * 7)
+#define SLOW_RAM_MEM_SIZE	(1024 * 1024 * 9)
 #endif
 
 
