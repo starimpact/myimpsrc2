@@ -1,9 +1,10 @@
 
 #include "imp_pea_common.h"
 
-#if 0
+#if IMP_DBG_USE_OPENCV
 #include "cv.h"
 #include "highgui.h"
+
 
 void ipShowGrayImage(int width, int height, char *pbyImage, char *pbyName)
 {

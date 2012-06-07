@@ -20,12 +20,18 @@ extern "C"
 #define INSIDE 0
 #define OUTSIDE 1
 
-#if 0
+#define IMP_DBG_USE_OPENCV 0
+#if IMP_DBG_USE_OPENCV
+
+#include "cv.h"
+#include "highgui.h"
+
 //function for debug start
 void ipShowGrayImage(int width, int height, char *pbyImage, char *pbyName);
 void ipShowBinImage(int width, int height, char *pbyImage, char *pbyName);
 void ipShowBinImageBit(int width, int height, char *pbyImage, char ubyBit, char *pbyName);
 void ipShowBinImageLargerVal(int width, int height, char *pbyImage, char ubyVal, char *pbyName);
+void ipShowBinImageLargerVal_L7(int width, int height, char *pbyImage, char ubyVal, char *pbyName);
 //function for debug end
 #endif
 

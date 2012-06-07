@@ -1,0 +1,95 @@
+
+#ifndef _IMP_OSC_DETECT_H_
+#define _IMP_OSC_DETECT_H_
+
+
+#include "imp_pea_common.h"
+
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
+
+//算法配置参数
+typedef struct impOSCDPara_S
+{
+	RULE_S *pstRule; //规则配置信息,主要是需要里面的ＯＳＣ的规则.
+}IMP_OSCDPara_S;
+
+
+/***************************************************
+name:IMP_GetMemSizeOSCD
+do:得到算法所需要的内存大小
+input:
+	pstResult:系统公共数据
+output:算法需要的内存大小
+history:
+****************************************************/
+IMP_S32 IMP_GetMemSizeOSCD(PEA_RESULT_S *pstResult);
+
+
+/***************************************************
+name:IMP_CreateOSCD
+do:审请算法内存并始化算法参数
+input:
+	pstResult:系统公共数据
+	pHwResource:系统硬件资源
+output:
+	0:失败
+	非0:句柄
+history:
+****************************************************/
+IMP_MODULE_HANDLE IMP_CreateOSCD(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource);
+
+
+/***************************************************
+name:IMP_ReleaseOSCD
+do:释放算法内存
+input:
+	hModule:算法模块句柄
+output:
+	0:成功
+	非0:失败
+history:
+****************************************************/
+IMP_S32 IMP_ReleaseOSCD(IMP_MODULE_HANDLE hModule);
+
+
+/***************************************************
+name:IMP_ConfigOSCD
+do:配置算法参数
+input:
+	hModule:算法模块句柄
+	pstPara:参数配置结构体
+output:
+	0:成功
+	非0:失败
+history:
+****************************************************/
+IMP_S32 IMP_ConfigOSCD(IMP_MODULE_HANDLE hModule, IMP_OSCDPara_S *pstPara);
+
+
+/***************************************************
+name:IMP_ProcessOSCD
+do:算法主过程
+input:
+	hModule:算法模块句柄
+output:
+	0:成功
+	非0:失败
+history:
+****************************************************/
+IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+
+
+

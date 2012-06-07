@@ -24,6 +24,8 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 
 	//create and init ViBe model
 	pstTargetDetector->hViBeModel = IMP_CreateViBe( pstResult, pHwResouce );
+	
+	pstTargetDetector->hOSCDModel = IMP_CreateOSCD( pstResult, pHwResouce );
 
 #ifdef USE_WATERMARK_DETECOTR
 	ipCreateWaterMarkDetector(&pstTargetDetector->stWaterMarkDetector,pstResult,pHwResouce);
@@ -177,6 +179,8 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	//release image
 	IMP_ReleaseViBe(pstTargetDetector->hViBeModel);
 	
+	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
+	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
 
@@ -185,7 +189,11 @@ IMP_VOID ipConfigTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	IMP_S32 s32FrmDura = pstPara->s32FrmDura;
 	PEA_DETECTOR_PARA_S *pstDetPara = &pstTargetDetector->stPara;
 	PEA_DETECTOR_DATA_S *pstDetData = &pstTargetDetector->stData;
-
+	IMP_OSCDPara_S stOSCDPara;
+	
+	stOSCDPara.pstRule = pstPara->pstRule;
+	
+	IMP_ConfigOSCD(pstTargetDetector->hOSCDModel, &stOSCDPara);
 	
 	memcpy( pstDetPara, pstPara, sizeof(PEA_DETECTOR_PARA_S) );
 	{
@@ -333,6 +341,16 @@ printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
 #endif //VIBE
+
+
+#if PTDI_TIME || 0
+gettimeofday(&t1, NULL);
+#endif
+	IMP_ProcessOSCD(pstTargetDetector->hOSCDModel);
+#if PTDI_TIME || 0
+gettimeofday(&t2, NULL);
+printf("IMP_ProcessOSCD:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+#endif
 
 
 if (pstResult->s32ModuleSwitch & 2) //pig, disable it if using PEA

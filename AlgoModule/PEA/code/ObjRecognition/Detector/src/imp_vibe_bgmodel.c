@@ -427,8 +427,10 @@ printf("vibe-pixel:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
 //	printf("%.2f%%\n", abs(s32NowPixelNum - s32PrePixelNum) * 100.f / (s32Width * s32Height));
+	pstResult->stSysStatus.u32NeedReInit = 0;
 	if (abs(s32NowPixelNum - s32PrePixelNum) * 100 > s32Width * s32Height * 20)
 	{
+		pstResult->stSysStatus.u32NeedReInit = 1;
 		s32PrePixelNum = 0;
 		s32NowPixelNum = 0;
 		for (s32RI = 1; s32RI < s32Height - 1; s32RI++)
