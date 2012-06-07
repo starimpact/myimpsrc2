@@ -1,22 +1,3 @@
-/**
-* \defgroup ½Ó¿Ú
-* ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-
-
-/**
-* \defgroup PEA½Ó¿Ú
-* PEA½Ó¿Ú
-* @ingroup ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
 #ifndef _IMP_ALGO_INTERFACE_H_
 #define _IMP_ALGO_INTERFACE_H_
 
@@ -29,341 +10,543 @@ extern "C"
 {
 #endif
 
-/**
-* »ñÈ¡°æ±¾ºÅºÍ¹¦ÄÜÂë
-* @param hModule Ä£¿é¾ä±ú
-* @param pstLibInfo ·µ»Ø¿âÏà¹ØĞÅÏ¢
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+/***************************************************
+name:
+do:
+input:
+	hModule:
+output:
+return:
+history:
+****************************************************/
+
+/***************************************************
+name:IMP_GetAlgoLibInfo
+do:ç®—æ³•ä¸»è¿‡ç¨‹
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+	pstLibInfo:åº“ä¿¡æ¯
+return:
+	0:æˆåŠŸ
+	é0:å¤±è´¥
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_GetAlgoLibInfo( IMP_HANDLE hModule, LIB_INFO_S *pstLibInfo );
-/**
-* ·ÖÅäÄÚ´æ
-* @param hModule Ä£¿é¾ä±ú
-* @param pstMems ·ÖÅäµÄÄÚ´æ
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_GetMemReq
+do:è·å–å†…å­˜ä¿¡æ¯
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+	pstMems:å†…å­˜ä¿¡æ¯
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_GetMemReq( IMP_HANDLE hModule, MEM_SET_S *pstMems );
 
-/**
-* ´´½¨¸÷¸öÄ£¿é²¢³õÊ¼»¯
-* @param hModule Ä£¿é¾ä±ú
-* @param pstMems ³õÊ¼»¯µÄÄÚ´æÇøÓò
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+/***************************************************
+name:IMP_Create
+do:ä¸ºç®—æ³•åˆ†é…å†…å­˜å¹¶åšåˆå§‹åŒ–
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstMems:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems );
-/**
-* ÖÕÖ¹¸÷¸öÄ£¿é²¢ÊÍ·ÅÄÚ´æ
-* @param hModule Ä£¿é¾ä±ú
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_Release
+do:é‡Šæ”¾ç®—æ³•èµ„æº
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_Release( IMP_HANDLE hModule );
-/**
-* ÅäÖÃArm PEAµÄ²ÎÊı
-* @param hModule Ä£¿é¾ä±ú
-* @param pstParaE Íâ²¿²ÎÊı
-* @param pstParaURP ÓÃ»§¸ß¼¶²ÎÊı
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_ConfigArmPeaParameter
+do:é…ç½®ç®—æ³•å‚æ•°
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstParaE:0
+	pstParaURP:URPè§„åˆ™å‚æ•°
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_ConfigArmPeaParameter( IMP_HANDLE hModule, EXTERNAL_PARA_S *pstParaE ,URP_PARA_S *pstParaURP);
-/**
-* ÅäÖÃ²ÎÊı
-* @param hModule Ä£¿é¾ä±ú
-* @param pstParaE Íâ²¿²ÎÊı
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_ConfigParameter
+do:é…ç½®è§„åˆ™å‚æ•°
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstParaE:è§„åˆ™å‚æ•°
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_ConfigParameter( IMP_HANDLE hModule, EXTERNAL_PARA_S *pstParaE );
-/**
-* ¿ªÊ¼Ö´ĞĞËã·¨
-* @param hModule Ä£¿é¾ä±ú
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_Start
+do:å¯åŠ¨ç®—æ³•
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_Start( IMP_HANDLE hModule );
-/**
-* Í£Ö¹Ö´ĞĞËã·¨
-* @param hModule Ä£¿é¾ä±ú
-* @param pstResult ´¦Àí½á¹û
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_Stop
+do:åœæ­¢ç®—æ³•
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+	pstResult:ç»“æœ
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_Stop( IMP_HANDLE hModule, RESULT_S *pstResult );
-/**
-* ´¦ÀíÒ»·ùÍ¼Ïñ
-* @param hModule Ä£¿é¾ä±ú
-* @param pstImage Í¼ÏñÖ¸Õë
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_ProcessImage
+do:ç®—æ³•ä¸»è¿‡ç¨‹
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstImage:YUVå›¾åƒ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage );
-/**
-* »ñÈ¡´¦Àí½á¹û
-* @param hModule Ä£¿é¾ä±ú
-* @param pstResult Í¼ÏñÖ¸Õë
-* @return STATUS_E ´¦Àí½á¹û
-*/
+
+
+/***************************************************
+name:IMP_GetResults
+do:
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstResult:ç®—æ³•ç»“æœ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_GetResults( IMP_HANDLE hModule, RESULT_S *pstResult );
-/*@}*/
 
 
-//OSC ½Ó¿Ú
-/**
-* ´´½¨¸÷¸öÄ£¿é²¢³õÊ¼»¯
-* @param hModule Ä£¿é¾ä±ú
-* @param pstMems ³õÊ¼»¯µÄÄÚ´æÇøÓò
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+/***************************************************
+name:IMP_OSC_Create
+do:ä¸ºOSCç®—æ³•åˆ†é…å†…å­˜å’Œåˆå§‹åŒ–
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstMems:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_OSC_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems );
-/**
-* ÖÕÖ¹¸÷¸öÄ£¿é²¢ÊÍ·ÅÄÚ´æ
-* @param hModule Ä£¿é¾ä±ú
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_OSC_Release
+do:é‡Šæ”¾ç®—æ³•èµ„æº
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_OSC_Release( IMP_HANDLE hModule );
-/**
-* ÅäÖÃArm PEAµÄ²ÎÊı
-* @param hModule Ä£¿é¾ä±ú
-* @param pstParaE Íâ²¿²ÎÊı
-* @param pstParaURP ÓÃ»§¸ß¼¶²ÎÊı
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_OSC_ConfigArmPeaParameter
+do:é…ç½®ï¼¯ï¼³ï¼£ç®—æ³•è§„åˆ™å‚æ•°
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstParaE:0
+	pstParaURP:URPè§„åˆ™å‚æ•°
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_OSC_ConfigArmPeaParameter( IMP_HANDLE hModule, EXTERNAL_PARA_S *pstParaE ,URP_PARA_S *pstParaURP);
-/**
-* ÅäÖÃ²ÎÊı
-* @param hModule Ä£¿é¾ä±ú
-* @param pstParaE Íâ²¿²ÎÊı
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+
+/***************************************************
+name:IMP_OSC_ConfigParameter
+do:é…ç½®ï¼¯ï¼³ï¼£ç®—æ³•è§„åˆ™å‚æ•°
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstParaE:è§„åˆ™å‚æ•°
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_OSC_ConfigParameter( IMP_HANDLE hModule, EXTERNAL_PARA_S *pstParaE );
 
-/**
-* ´¦ÀíÒ»·ùÍ¼Ïñ
-* @param hModule Ä£¿é¾ä±ú
-* @param pstImage Í¼ÏñÖ¸Õë
-* @return STATUS_E ²Ù×÷×´Ì¬
-*/
+
+/***************************************************
+name:IMP_OSC_ProcessImage
+do:OSCç®—æ³•ä¸»è¿‡ç¨‹
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstImage:YUVå›¾åƒ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_OSC_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage );
-/**
-* »ñÈ¡´¦Àí½á¹û
-* @param hModule Ä£¿é¾ä±ú
-* @param pstResult Í¼ÏñÖ¸Õë
-* @return STATUS_E ´¦Àí½á¹û
-*/
+
+
+/***************************************************
+name:IMP_OSC_GetResults
+do:è·å–ç®—æ³•ç»“æœ
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstResult:ç®—æ³•ç»“æœ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS STATUS_E IMP_OSC_GetResults( IMP_HANDLE hModule, RESULT_S *pstResult );
 
 
-
-/**
-* \defgroup AVD½Ó¿Ú
-* AVD½Ó¿Ú
-* @ingroup ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-/**
-* ´´½¨AVD
-* @param s32Width ¿í¶È
-* @param s32Height ¸ß¶È
-* @return IMP_HANDLE Ëã·¨¾ä±ú
-*/
+/***************************************************
+name:IMP_AVD_Create
+do:åˆ›å»ºAVD
+input:
+	s32Width:å›¾åƒå®½
+	s32Height:å›¾åƒé«˜
+output:
+return:
+	ç®—æ³•å¥æŸ„
+history:
+****************************************************/
 IMP_EXPORTS IMP_HANDLE IMP_AVD_Create(IMP_S32 s32Width, IMP_S32 s32Height);
-/**
-* ÊÍ·ÅAVD
-* @param hModule Ä£¿é¾ä±ú
-*/
+
+
+/***************************************************
+name:IMP_AVD_Release
+do:é‡Šæ”¾AVD
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_AVD_Release(IMP_HANDLE hModule);
-/**
-* ´¦ÀíAVD
-* @param hModule Ä£¿é¾ä±ú
-* @param pstImage ÊäÈëÍ¼Ïñ
-* @param pstExtTriggers Íâ²¿´¥·¢Æ÷Ö¸Õë
-*/
+
+
+/***************************************************
+name:IMP_AVD_Process
+do:AVDä¸»è¿‡ç¨‹
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstImage:YUVå›¾åƒ
+	pstExtTriggers:å¤–éƒ¨è§¦å‘å™¨æŒ‡é’ˆ
+output:
+return:
+history:
+****************************************************/
 IMP_BOOL IMP_AVD_Process(IMP_HANDLE hModule, YUV_IMAGE420_S *pstImage, EXT_TRIGGERS_S *pstExtTriggers );
-/**
-* »ñÈ¡AVD´¦Àí½á¹û
-* @param hModule Ä£¿é¾ä±ú
-* @param pstAvdResult AVD´¦Àí½á¹û
-*/
+
+
+/***************************************************
+name:IMP_AVD_GetResult
+do:è·å–AVDç»“æœ
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+	pstAvdResult:AVDç»“æœ
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_AVD_GetResult(IMP_HANDLE hModule, AVD_RESULT_S *pstAvdResult);
 
-/**
-* »ñÈ¡AVD´¦Àí½á¹û
-* @param hModule Ä£¿é¾ä±ú
-* @param pstAvdParaSrc AVD
-*/
+
+/***************************************************
+name:IMP_AVD_ConfigParameter
+do:é…ç½®AVDå‚æ•°
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstAvdParaSrc:å‚æ•°
+output:
+return:
+history:
+****************************************************/
 IMP_BOOL IMP_AVD_ConfigParameter(IMP_HANDLE hModule, IMP_AVD_PARA_S *pstAvdParaSrc);
-/*@}*/
 
-/**
-* \defgroup VFD½Ó¿Ú
-* VFD½Ó¿Ú
-* @ingroup ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-/**
-* ´´½¨VFD
-* @return IMP_HANDLE Ëã·¨¾ä±ú
-*/
+
+/***************************************************
+name:IMP_VFD_Create
+do:åˆ›å»ºVFD
+input:
+	s32Width:å›¾åƒå®½
+	s32Height:å›¾åƒé«˜
+output:
+return:
+	ç®—æ³•å¥æŸ„
+history:
+****************************************************/
 IMP_EXPORTS IMP_HANDLE IMP_VFD_Create(IMP_S32 s32ImgW, IMP_S32 s32ImgH);
-/**
-* ÊÍ·ÅVFD
-* @param hModule Ä£¿é¾ä±ú
-* @return IMP_VOID ¿Õ
-*/
-IMP_EXPORTS IMP_VOID IMP_VFD_Release(IMP_HANDLE hModule);
-/**
-* ÅäÖÃVFD
-* @param hModule Ä£¿é¾ä±ú
-* @param pstVfdParaSrc  ÊäÈë²ÎÊı
-* @return IMP_BOOL ²Ù×÷×´Ì¬
-*/
-IMP_EXPORTS IMP_BOOL IMP_VFD_ConfigParameter(IMP_HANDLE hModule, IMP_VFD_PARA_S *pstVfdParaSrc);
-/**
-* ´¦ÀíVFD
-* @param hModule Ä£¿é¾ä±ú
-* @param pYRaw8  ÊäÈëµÄ»Ò¶ÈÍ¼Ïñ
-* @param u32Width  ÊäÈëÍ¼ÏñµÄ¿í¶È
-* @param u32Height ÊäÈëÍ¼ÏñµÄ¸ß¶È
-* @return IMP_BOOL ²Ù×÷×´Ì¬
-*/
-IMP_EXPORTS IMP_BOOL IMP_VFD_Process(IMP_HANDLE hModule, GRAY_IMAGE_S *pstImage);
-/**
-* »ñÈ¡VFD´¦Àí½á¹û
-* @param hModule Ä£¿é¾ä±ú
-* @param pstVfdResult VFD´¦Àí½á¹û
-* @return IMP_VOID ¿Õ
-*/
-IMP_EXPORTS IMP_VOID IMP_VFD_GetResult(IMP_HANDLE hModule, VFD_RESULT_S *pstVfdResult);
-/*@}*/
 
-/**
-* \defgroup YUV422Í¼Ïñ¹ÜÀí
-* YUV422Í¼Ïñ¹ÜÀí
-* @ingroup ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-/**
-* ´´½¨YUV422Í¼Ïñ
-* @param pstImg YUV422Í¼ÏñÖ¸Õë
-* @param s32W Í¼Ïñ¿í¶È
-* @param s32H Í¼Ïñ¸ß¶È
-* @param pMmgr ÄÚ´æ¹ÜÀíÆ÷Ö¸Õë
-*/
+
+/***************************************************
+name:IMP_VFD_Release
+do:é‡Šæ”¾VFD
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+return:
+history:
+****************************************************/
+IMP_EXPORTS IMP_VOID IMP_VFD_Release(IMP_HANDLE hModule);
+
+
+/***************************************************
+name:IMP_VFD_ConfigParameter
+do:é…ç½®VFDå‚æ•°
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstVfdParaSrc:å‚æ•°
+output:
+return:
+history:
+****************************************************/
+IMP_EXPORTS IMP_BOOL IMP_VFD_ConfigParameter(IMP_HANDLE hModule, IMP_VFD_PARA_S *pstVfdParaSrc);
+
+
+/***************************************************
+name:IMP_VFD_Process
+do:VFDä¸»è¿‡ç¨‹
+input:
+	hModule:ç®—æ³•å¥æŸ„
+	pstImage:GRAYå›¾åƒ
+output:
+return:
+history:
+****************************************************/
+IMP_EXPORTS IMP_BOOL IMP_VFD_Process(IMP_HANDLE hModule, GRAY_IMAGE_S *pstImage);
+
+
+/***************************************************
+name:IMP_VFD_GetResult
+do:è·å–VFDç»“æœ
+input:
+	hModule:ç®—æ³•å¥æŸ„
+output:
+	pstVfdResult:VFDç»“æœ
+return:
+history:
+****************************************************/
+IMP_EXPORTS IMP_VOID IMP_VFD_GetResult(IMP_HANDLE hModule, VFD_RESULT_S *pstVfdResult);
+
+
+/***************************************************
+name:IMP_YUVImage422Create
+do:åˆ›å»ºYUV422å›¾åƒ
+input:
+	pstImg:å›¾åƒæŒ‡é’ˆ
+	s32W:å›¾åƒå®½
+	s32H:å›¾åƒé«˜
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage422Create( YUV_IMAGE422_S *pstImg, IMP_S32 s32W, IMP_S32 s32H, IMP_VOID *pMmgr );
-/**
-* Ïú»ÙYUV422Í¼Ïñ
-* @param pstImg YUV422Í¼ÏñÖ¸Õë
-* @param pMmgr ÄÚ´æ¹ÜÀíÆ÷Ö¸Õë
-*/
+
+
+/***************************************************
+name:IMP_YUVImage422Destroy
+do:é”€æ¯YUV422å›¾åƒ
+input:
+	pstImg:å›¾åƒæŒ‡é’ˆ
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage422Destroy( YUV_IMAGE422_S *pstImg, IMP_VOID *pMmgr );
-/**
-* Çå¿ÕYUV422Í¼Ïñ
-* @param pstImg YUV422Í¼ÏñÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_YUVImage422Clear
+do:æ¸…ç©ºYUV422å›¾åƒå†…å®¹
+input:
+	pstImg:å›¾åƒæŒ‡é’ˆ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage422Clear( YUV_IMAGE422_S *pstImg );
-/**
-* ¸´ÖÆYUV422Í¼Ïñ
-* @param pstSrc Ô´YUV422Í¼ÏñÖ¸Õë
-* @param pstDst Ä¿µÄYUV422Í¼ÏñÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_YUVImage422Clone
+do:å¤åˆ¶YUV422å›¾åƒå†…å®¹
+input:
+	pstSrc:æºå›¾åƒ
+	pstDst:ç›®æ ‡å›¾åƒ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage422Clone( YUV_IMAGE422_S *pstSrc, YUV_IMAGE422_S *pstDst );
 
 
-/**
-* ´´½¨YUV420Í¼Ïñ
-* @param pstImg YUV420Í¼ÏñÖ¸Õë
-* @param s32W Í¼Ïñ¿í¶È
-* @param s32H Í¼Ïñ¸ß¶È
-* @param pMmgr ÄÚ´æ¹ÜÀíÆ÷Ö¸Õë
-*/
+/***************************************************
+name:IMP_YUVImage420Create
+do:åˆ›å»ºYUV420å›¾åƒ
+input:
+	pstImg:å›¾åƒæŒ‡é’ˆ
+	s32W:å›¾åƒå®½
+	s32H:å›¾åƒé«˜
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage420Create( YUV_IMAGE420_S *pstImg, IMP_S32 s32W, IMP_S32 s32H, IMP_VOID *pMmgr );
-/**
-* Ïú»ÙYUV420Í¼Ïñ
-* @param pstImg YUV420Í¼ÏñÖ¸Õë
-* @param pMmgr ÄÚ´æ¹ÜÀíÆ÷Ö¸Õë
-*/
+
+
+/***************************************************
+name:IMP_YUVImage420Destroy
+do:é”€æ¯YUV420å›¾åƒ
+input:
+	pstImg:å›¾åƒæŒ‡é’ˆ
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage420Destroy( YUV_IMAGE420_S *pstImg, IMP_VOID *pMmgr );
-/**
-* Çå¿ÕYUV420Í¼Ïñ
-* @param pstImg YUV420Í¼ÏñÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_YUVImage420Clear
+do:æ¸…ç©ºYUV420å›¾åƒå†…å®¹
+input:
+	pstImg:å›¾åƒæŒ‡é’ˆ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage420Clear( YUV_IMAGE420_S *pstImg );
-/**
-* ¸´ÖÆYUV420Í¼Ïñ
-* @param pstSrc Ô´YUV420Í¼ÏñÖ¸Õë
-* @param pstDst Ä¿µÄYUV420Í¼ÏñÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_YUVImage420Clone
+do:å¤åˆ¶YUV420å›¾åƒå†…å®¹
+input:
+	pstSrc:æºå›¾åƒ
+	pstDst:ç›®æ ‡å›¾åƒ
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_YUVImage420Clone( YUV_IMAGE420_S *pstSrc, YUV_IMAGE422_S *pstDst );
-/*@}*/
 
-/**
-* \defgroup ÄÚ´æ·ÖÅäÓëÊÍ·Å
-* ÄÚ´æ·ÖÅäÓëÊÍ·Å
-* @ingroup ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-/**
-* ·ÖÅäÄÚ´æ
-* @param pstMems ÄÚ´æÖ¸Õë
-*/
+
+/***************************************************
+name:IMP_MemsAlloc
+do:å®¡è¯·å†…å­˜
+input:
+	pstMems:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_MemsAlloc( MEM_SET_S *pstMems );
-/**
-* ÊÍ·ÅÄÚ´æ
-* @param pstMems ÄÚ´æÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_MemsFree
+do:é‡Šæ”¾å†…å­˜
+input:
+	pstMems:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_MemsFree( MEM_SET_S *pstMems );
-/*@}*/
 
 
-/**
-* \defgroup Íâ²¿²ÎÊıÅäÖÃ
-* Íâ²¿²ÎÊıÅäÖÃ
-* @ingroup ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-
-/**
-* ·ÖÅäÍâ²¿ÅäÖÃ²ÎÊı»º³åÇø
-* @param s32VanaBufLen vana»º³åÇø´óĞ¡
-* @param s32AdvBufNum ¸ß¼¶²ÎÊıÊıÁ¿
-* @param s32AdvBufLen ¸ß¼¶²ÎÊı»º³åÇø´óĞ¡
-* @param pMmgr ÄÚ´æÖ¸Õë
-* @return EXTERNAL_PARA_S Íâ²¿²ÎÊıÖ¸Õë
-*/
+/***************************************************
+name:IMP_PARA_Alloc
+do:åˆ†é…å¤–éƒ¨é…ç½®å‚æ•°ç¼“å†²åŒº
+input:
+	s32VanaBufLen:vanaç¼“å†²åŒºå¤§å°
+	s32AdvBufNum:é«˜çº§å‚æ•°æ•°é‡
+	s32AdvBufLen:é«˜çº§å‚æ•°ç¼“å†²åŒºå¤§å°
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+	å¤–éƒ¨å‚æ•°æŒ‡é’ˆ
+history:
+****************************************************/
 IMP_EXPORTS EXTERNAL_PARA_S* IMP_PARA_Alloc( IMP_S32 s32VanaBufLen,IMP_S32 s32AdvBufNum, IMP_S32 s32AdvBufLen, IMP_VOID *pMmgr );
-/**
-* ÊÍ·ÅÍâ²¿ÅäÖÃ²ÎÊı»º³åÇø
-* @param pstPara Íâ²¿²ÎÊı»º³åÇøÖ¸Õë
-* @param s32AdvBufNum ¸ß¼¶²ÎÊıÊıÁ¿
-* @param s32AdvBufLen ¸ß¼¶²ÎÊı»º³åÇø´óĞ¡
-* @param pMmgr ÄÚ´æÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_PARA_Free
+do:é‡Šæ”¾å¤–éƒ¨é…ç½®å‚æ•°ç¼“å†²åŒº
+input:
+	pstPara:å¤–éƒ¨å‚æ•°ç¼“å†²åŒºæŒ‡é’ˆ
+	s32AdvBufNum:é«˜çº§å‚æ•°æ•°é‡
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_PARA_Free( EXTERNAL_PARA_S *pstPara, IMP_S32 s32AdvBufNum, IMP_VOID *pMmgr );
-/**
-* Çå¿ÕÍâ²¿ÅäÖÃ²ÎÊı»º³åÇø
-* @param pstPara Íâ²¿²ÎÊı»º³åÇøÖ¸Õë
-* @param s32AdvBufNum ¸ß¼¶²ÎÊıÊıÁ¿
-*/
+
+
+/***************************************************
+name:IMP_PARA_Clear
+do:æ¸…ç©ºå¤–éƒ¨é…ç½®å‚æ•°ç¼“å†²åŒº
+input:
+	pstPara:å¤–éƒ¨å‚æ•°ç¼“å†²åŒºæŒ‡é’ˆ
+	s32AdvBufNum:é«˜çº§å‚æ•°æ•°é‡
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_PARA_Clear( EXTERNAL_PARA_S *pstPara, IMP_S32 s32AdvBufNum );
-/**
-* ³õÊ¼»¯Í¼Ïñ´¦Àí¹æÔò²ÎÊı£¬´ÓÍâ²¿ÎÄ¼ş¶ÁÈ¡Êı¾İ
-* @param pstPara Íâ²¿²ÎÊı
-* @param pstScnFil ³¡¾°ÎÄ¼ş
-* @param pstAdvFil ¸ß¼¶²ÎÊıÎÄ¼ş
-* @param s32ImgW Í¼Ïñ¿í¶È
-* @param s32ImgH Í¼Ïñ¸ß¶È
-* @param pMmgr ÄÚ´æÖ¸Õë
-*/
+
+
+/***************************************************
+name:IMP_PARA_Init
+do:åˆå§‹åŒ–å›¾åƒå¤„ç†è§„åˆ™å‚æ•°ï¼Œä»å¤–éƒ¨æ–‡ä»¶è¯»å–æ•°æ®
+input:
+	pstPara:å¤–éƒ¨å‚æ•°
+	pstScnFil:åœºæ™¯æ–‡ä»¶
+	pstAdvFil:é«˜çº§å‚æ•°æ–‡ä»¶
+	s32ImgW:å›¾åƒå®½åº¦
+	s32ImgH:å›¾åƒé«˜åº¦
+	pMmgr:å†…å­˜ä¿¡æ¯
+output:
+return:
+history:
+****************************************************/
 IMP_EXPORTS IMP_VOID IMP_PARA_Init( EXTERNAL_PARA_S *pstPara, STR_ARRAY_PARA_S *pstScnFil,
 									  STR_ARRAY_PARA_S *pstAdvFil, IMP_S32 s32ImgW, IMP_S32 s32ImgH, IMP_VOID *pMmgr );
 

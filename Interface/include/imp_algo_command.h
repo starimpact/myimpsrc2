@@ -1,21 +1,3 @@
-/** 
-* \defgroup ½Ó¿Ú
-* ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-
-/** 
-* \defgroup ÃüÁîÏà¹ØÊı¾İÀàĞÍ
-* ÃüÁîÏà¹ØÊı¾İÀàĞÍ
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-
 #ifndef _IMP_ALGO_COMMAND_H_
 #define _IMP_ALGO_COMMAND_H_
 
@@ -26,31 +8,31 @@ extern "C"
 {
 #endif
 
-/** ÃüÁî×î´ó¸öÊı */
+/** å‘½ä»¤æœ€å¤§ä¸ªæ•° */
 #define IMP_MAX_CMD_CNT			4
 
 typedef enum impCMD_TYPE_E
 {
-	IMP_CMD_TYPE_UNKNOWN	= 0x00000000	/**< Î´ÖªÀàĞÍ */
+	IMP_CMD_TYPE_UNKNOWN	= 0x00000000	/**< æœªçŸ¥ç±»å‹ */
 }CMD_TYPE_E;
 
-/** ÃüÁî»º´æ¸öÊı */
+/** å‘½ä»¤ç¼“å­˜ä¸ªæ•° */
 #define IMP_BUFLEN_CMD_ITEM		64
-/** ÃüÁî»º´æÊı¾İ³¤¶È */
+/** å‘½ä»¤ç¼“å­˜æ•°æ®é•¿åº¦ */
 #define IMP_BUFLEN_CMD_DATA		(IMP_BUFLEN_CMD_ITEM-sizeof(IMP_U32) * 1)
 
-/** ÃüÁîÏî½á¹¹ */
+/** å‘½ä»¤é¡¹ç»“æ„ */
 typedef struct impCMD_ITEM_S
 {
-	IMP_U32	u32Type;						/**< ÃüÁîÀàĞÍ */
-	IMP_U8	au8Data[IMP_BUFLEN_CMD_DATA];	/**< ÃüÁîÊı¾İ*/
+	IMP_U32	u32Type;						/**< å‘½ä»¤ç±»å‹ */
+	IMP_U8	au8Data[IMP_BUFLEN_CMD_DATA];	/**< å‘½ä»¤æ•°æ®*/
 } CMD_ITEM_S;
 
-/** ÃüÁî¼¯½á¹¹ */
+/** å‘½ä»¤é›†ç»“æ„ */
 typedef struct impCMD_SET_S 
 {
-	IMP_S32	    s32CmdNum;					/**< ÃüÁîÊıÄ¿ */
-	CMD_ITEM_S	astCmds[IMP_MAX_CMD_CNT];	/**< ÃüÁîÊı¾İ */
+	IMP_S32	    s32CmdNum;					/**< å‘½ä»¤æ•°ç›® */
+	CMD_ITEM_S	astCmds[IMP_MAX_CMD_CNT];	/**< å‘½ä»¤æ•°æ® */
 } CMD_SET_S;
 
 #ifdef __cplusplus

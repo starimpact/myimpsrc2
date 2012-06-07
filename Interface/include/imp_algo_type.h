@@ -1,20 +1,4 @@
-/**
-* \defgroup ½Ó¿Ú
-* ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
 
-/**
-* \defgroup ½á¹¹ÀàĞÍ¶¨Òå
-* Ëã·¨Êı¾İÀàĞÍ¶¨Òå
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
 #ifndef _IMP_ALGO_TYPE_H_
 #define _IMP_ALGO_TYPE_H_
 
@@ -98,62 +82,62 @@ typedef enum
 
 
 
-/** Ëã·¨Ä£¿é */
+/** ç®—æ³•æ¨¡å— */
 typedef enum impALGO_MODULE_E
 {
-	IMP_NONE_AGLO_MODULE= 0x00000000,		/**< Ëã·¨Ä£¿é */
-	IMP_PEA_AGLO_MODULE = 0x00000001,		/**< PEAËã·¨Ä£¿é */
-	IMP_AVD_AGLO_MODULE = 0x00000002,		/**< AVDËã·¨Ä£¿é */
-	IMP_VFD_AGLO_MODULE = 0x00000004,		/**< VFDËã·¨Ä£¿é */
-	IMP_AAI_AGLO_MODULE = 0x00000008		/**< AAIËã·¨Ä£¿é */
+	IMP_NONE_AGLO_MODULE= 0x00000000,		/**< ç®—æ³•æ¨¡å— */
+	IMP_PEA_AGLO_MODULE = 0x00000001,		/**< PEAç®—æ³•æ¨¡å— */
+	IMP_AVD_AGLO_MODULE = 0x00000002,		/**< AVDç®—æ³•æ¨¡å— */
+	IMP_VFD_AGLO_MODULE = 0x00000004,		/**< VFDç®—æ³•æ¨¡å— */
+	IMP_AAI_AGLO_MODULE = 0x00000008		/**< AAIç®—æ³•æ¨¡å— */
 }ALGO_MODULE_E;
 
-/** Ëã·¨Ä£¿é */
+/** ç®—æ³•æ¨¡å— */
 typedef enum impALGO_STATUS_E
 {
-	IMP_AGLO_STATUS_ARM 	= 0,	/**< Ëã·¨²¼·À×´Ì¬ */
-	IMP_AGLO_STATUS_DISARM 	= 1		/**< Ëã·¨³··À×´Ì¬ */
+	IMP_AGLO_STATUS_ARM 	= 0,	/**< ç®—æ³•å¸ƒé˜²çŠ¶æ€ */
+	IMP_AGLO_STATUS_DISARM 	= 1		/**< ç®—æ³•æ’¤é˜²çŠ¶æ€ */
 }ALGO_STATUS_E;
 
-/** ¿âÏà¹ØĞÅÏ¢ */
+/** åº“ç›¸å…³ä¿¡æ¯ */
 typedef struct impLIB_INFO_S
 {
-	IMP_U32 pu32Version;         /**< °æ±¾ºÅ */
-	IMP_U32 pu32FuncAuthorized;  /**< ÊÚÈ¨¹¦ÄÜ */
+	IMP_U32 pu32Version;         /**< ç‰ˆæœ¬å· */
+	IMP_U32 pu32FuncAuthorized;  /**< æˆæƒåŠŸèƒ½ */
 } LIB_INFO_S;
 
 /*
-//°æ±¾ĞÅÏ¢
+//ç‰ˆæœ¬ä¿¡æ¯
 typedef struct impLIB_VERSION_S
 {
-	IMP_U32 u32MajorV;		//Ö÷°æ±¾ºÅ:
-	IMP_U32 u32MinorV;		//×Ó°æ±¾ºÅ:Ôö¼ÓÁË¹¦ÄÜÊ±ĞŞ¸Ä
-	IMP_U32 u32RevisionV;	//ĞŞÕı°æ±¾ºÅ:ĞŞÕıÁËBUGÊ±ĞŞ¸Ä
+	IMP_U32 u32MajorV;		//ä¸»ç‰ˆæœ¬å·:
+	IMP_U32 u32MinorV;		//å­ç‰ˆæœ¬å·:å¢åŠ äº†åŠŸèƒ½æ—¶ä¿®æ”¹
+	IMP_U32 u32RevisionV;	//ä¿®æ­£ç‰ˆæœ¬å·:ä¿®æ­£äº†BUGæ—¶ä¿®æ”¹
 }LIB_VERSION_S;
 */
 
-/** µã½á¹¹¶¨Òå */
+/** ç‚¹ç»“æ„å®šä¹‰ */
 typedef struct impIMP_POINT_S
 {
 	IMP_S16 s16X;/**< x */
 	IMP_S16 s16Y;/**< y */
 }IMP_POINT_S;
 
-/** µã½á¹¹¶¨Òå */
+/** ç‚¹ç»“æ„å®šä¹‰ */
 typedef struct impIMP_POINT32S_S
 {
 	IMP_S32 s32X;/**< x */
 	IMP_S32 s32Y;/**< y */
 }IMP_POINT32S_S;
 
-/** µã½á¹¹¶¨Òå */
+/** ç‚¹ç»“æ„å®šä¹‰ */
 typedef struct impIMP_POINT32F_S
 {
 	IMP_FLOAT f32X;/**< x */
 	IMP_FLOAT f32Y;/**< y */
 }IMP_POINT32F_S;
 
-/** 3Î¬µã½á¹¹¶¨Òå */
+/** 3ç»´ç‚¹ç»“æ„å®šä¹‰ */
 typedef struct impPOINT3D_S
 {
 	IMP_S32 s32X;/**< x */
@@ -161,247 +145,247 @@ typedef struct impPOINT3D_S
 	IMP_S32 s32Z;/**< z */
 } POINT3D_S;
 
-/** Ïß¶Î½á¹¹¶¨Òå */
+/** çº¿æ®µç»“æ„å®šä¹‰ */
 typedef struct impLINE_S
 {
-	IMP_POINT_S stPs; /**< ÆğÊ¼µã */
-	IMP_POINT_S stPe; /**< ½áÊøµã */
+	IMP_POINT_S stPs; /**< èµ·å§‹ç‚¹ */
+	IMP_POINT_S stPe; /**< ç»“æŸç‚¹ */
 } LINE_S;
 
-/** ¾ØĞÎ½á¹¹¶¨Òå */
+/** çŸ©å½¢ç»“æ„å®šä¹‰ */
 typedef struct impIMP_RECT_S
 {
-	IMP_S16 s16X1;  /**< ×óÉÏ½Çx×ø±ê */
-	IMP_S16 s16Y1;  /**< ×óÉÏ½Çy×ø±ê */
-	IMP_S16 s16X2;  /**< ÓÒÏÂ½Çx×ø±ê */
-	IMP_S16 s16Y2;  /**< ÓÒÏÂ½Çy×ø±ê */
+	IMP_S16 s16X1;  /**< å·¦ä¸Šè§’xåæ ‡ */
+	IMP_S16 s16Y1;  /**< å·¦ä¸Šè§’yåæ ‡ */
+	IMP_S16 s16X2;  /**< å³ä¸‹è§’xåæ ‡ */
+	IMP_S16 s16Y2;  /**< å³ä¸‹è§’yåæ ‡ */
 } IMP_RECT_S;
 
-/** ×´Ì¬¶¨Òå */
+/** çŠ¶æ€å®šä¹‰ */
 typedef enum impSTATUS_E
 {
-	IMP_STATUS_CHECK_LICENSE_TIMEOUT =-3, /**< ÑéÖ¤licenseÊ§°Ü */
-	IMP_STATUS_CHECK_LICENSE_FAILED =-2,  /**< ÑéÖ¤licenseÊ§°Ü */
-	IMP_STATUS_READ_MAC_FAILED = -1,      /**< ¶ÁÈ¡MACÊ§°Ü */
-	IMP_STATUS_OK = 1,                    /**< ³É¹¦ */
-	IMP_STATUS_SKIP,                      /**< Ìø¹ı */
-	IMP_STATUS_FALSE,                     /**< ²»Ö§³Ö */
+	IMP_STATUS_CHECK_LICENSE_TIMEOUT =-3, /**< éªŒè¯licenseå¤±è´¥ */
+	IMP_STATUS_CHECK_LICENSE_FAILED =-2,  /**< éªŒè¯licenseå¤±è´¥ */
+	IMP_STATUS_READ_MAC_FAILED = -1,      /**< è¯»å–MACå¤±è´¥ */
+	IMP_STATUS_OK = 1,                    /**< æˆåŠŸ */
+	IMP_STATUS_SKIP,                      /**< è·³è¿‡ */
+	IMP_STATUS_FALSE,                     /**< ä¸æ”¯æŒ */
 	IMP_STATUS_UNSUPPORT
 } STATUS_E;
 
 
-/** ¾ä±ú¶¨Òå */
+/** å¥æŸ„å®šä¹‰ */
 typedef void *IMP_HANDLE;
 
-/** Ä£¿éÊı¾İ³¤¶È¶¨Òå */
+/** æ¨¡å—æ•°æ®é•¿åº¦å®šä¹‰ */
 #define IMP_MODULE_DATLEN	256
 
-/** IMPÄ¿±ê¶¨Òå */
+/** IMPç›®æ ‡å®šä¹‰ */
 typedef struct impOBJ_S
 {
-	IMP_U8 au8Buffer[IMP_MODULE_DATLEN];  /**< BUFFER¶¨Òå */
+	IMP_U8 au8Buffer[IMP_MODULE_DATLEN];  /**< BUFFERå®šä¹‰ */
 } OBJ_S;
 
-/** ÄÚ´æ¹ÜÀí¶¨Òå*/
+/** å†…å­˜ç®¡ç†å®šä¹‰*/
 #define IMP_MEM_ITEM_CNT	4
 
-/** ÄÚ´æÀàĞÍ¶¨Òå*/
+/** å†…å­˜ç±»å‹å®šä¹‰*/
 typedef enum impMEM_TYPE_E
 {
-	IMP_MEM_TYPE_IRAM = 0, /**< ÄÚ²¿Ram */
-	IMP_MEM_TYPE_ERAM	   /**< Íâ²¿Ram */
+	IMP_MEM_TYPE_IRAM = 0, /**< å†…éƒ¨Ram */
+	IMP_MEM_TYPE_ERAM	   /**< å¤–éƒ¨Ram */
 } MEM_TYPE_E;
 
-/** ÄÚ´æµ¥Ôª½á¹¹¶¨Òå */
+/** å†…å­˜å•å…ƒç»“æ„å®šä¹‰ */
 typedef struct impMEM_ITEM_S
 {
-	IMP_U32 u32Size;		/**< ´óĞ¡ */
-	IMP_U32 u32Type;		/**< ÀàĞÍ */
-	IMP_VOID *pMem;			/**< Êı¾İÖ¸Õë */
+	IMP_U32 u32Size;		/**< å¤§å° */
+	IMP_U32 u32Type;		/**< ç±»å‹ */
+	IMP_VOID *pMem;			/**< æ•°æ®æŒ‡é’ˆ */
 } MEM_ITEM_S;
 
-/** ÄÚ´æ½á¹¹¶¨Òå*/
+/** å†…å­˜ç»“æ„å®šä¹‰*/
 typedef struct impMEM_SET_S
 {
-	IMP_U32 u32ImgW;                      /**< ¿í¶È */
-	IMP_U32 u32ImgH;                      /**< ¸ß¶È */
-	IMP_U32 u32MemNum;                    /**< ÊıÁ¿ */
-	MEM_ITEM_S stMems[IMP_MEM_ITEM_CNT];  /**< Êı×é */
+	IMP_U32 u32ImgW;                      /**< å®½åº¦ */
+	IMP_U32 u32ImgH;                      /**< é«˜åº¦ */
+	IMP_U32 u32MemNum;                    /**< æ•°é‡ */
+	MEM_ITEM_S stMems[IMP_MEM_ITEM_CNT];  /**< æ•°ç»„ */
 } MEM_SET_S;
 
-/** Êı¾İ»º´æ½á¹¹¶¨Òå */
+/** æ•°æ®ç¼“å­˜ç»“æ„å®šä¹‰ */
 typedef struct impDATA_BUF_S
 {
-	IMP_S32 s32BufLen;       /**< »º´æ³¤¶È */
-	IMP_S32 s32DatLen;       /**< Êı¾İ³¤¶È */
-	IMP_U8 *pu8Buf;          /**< Ö¸Õë */
+	IMP_S32 s32BufLen;       /**< ç¼“å­˜é•¿åº¦ */
+	IMP_S32 s32DatLen;       /**< æ•°æ®é•¿åº¦ */
+	IMP_U8 *pu8Buf;          /**< æŒ‡é’ˆ */
 } DATA_BUF_S;
 
-/** È«¾Ö²ÎÊı */
+/** å…¨å±€å‚æ•° */
 typedef struct impGLOBAL_PARA_S
 {
-	IMP_S32 s32TimeUnit;	/**<  Í¼ÏñÊ±¼äµ¥Î» */
-	IMP_S32 s32FuncCode;	/**<  ¹¦ÄÜÂë */
+	IMP_S32 s32TimeUnit;	/**<  å›¾åƒæ—¶é—´å•ä½ */
+	IMP_S32 s32FuncCode;	/**<  åŠŸèƒ½ç  */
 } GLOBAL_PARA_S;
 
-/** ¹æÔò²ÎÊı */
+/** è§„åˆ™å‚æ•° */
 #define IMP_PARA_RULE_BUFLEN		(1024 * 64)
 
-/** ¹æÔò²ÎÊıÊı¾İ */
+/** è§„åˆ™å‚æ•°æ•°æ® */
 typedef struct impRULE_PARA_DATA_S
 {
-	DATA_BUF_S stVanaData;    /**<  Êı¾İ */
+	DATA_BUF_S stVanaData;    /**<  æ•°æ® */
 } RULE_PARA_DATA_S;
 
-/** ¸ß¼¶²ÎÊıcount */
+/** é«˜çº§å‚æ•°count */
 #define IMP_PARA_ADVBUF_BUFCNT	16
-/** ¸ß¼¶²ÎÊılength */
+/** é«˜çº§å‚æ•°length */
 #define IMP_PARA_ADVBUF_BUFLEN	(1024 * 8)
 
-/** ¸ß¼¶²ÎÊıÊı¾İ */
+/** é«˜çº§å‚æ•°æ•°æ® */
 typedef struct impADVANCE_PARA_S
 {
-	DATA_BUF_S astAdvDats[IMP_PARA_ADVBUF_BUFCNT];  /** ¸ß¼¶²ÎÊıÊı¾İÊı×é */
+	DATA_BUF_S astAdvDats[IMP_PARA_ADVBUF_BUFCNT];  /** é«˜çº§å‚æ•°æ•°æ®æ•°ç»„ */
 } ADVANCE_PARA_S;
 
-/** Íâ²¿²ÎÊı½á¹¹¶¨Òå */
+/** å¤–éƒ¨å‚æ•°ç»“æ„å®šä¹‰ */
 typedef struct impEXTERNAL_PARA_S
 {
-	IMP_U32         u32Type;            /**<  ÀàĞÍ */
-	GLOBAL_PARA_S	stGlobal;			/**<  È«¾Ö²ÎÊı */
-	RULE_PARA_DATA_S    stRule;		    /**<  ³¡¾°Êı¾İ */
-	ADVANCE_PARA_S	stAdvance;			/**< ¸ß¼¶²ÎÊı£¨½ö¿ª·¢ÈËÔ±¿ÉÉèÖÃ£© */
+	IMP_U32         u32Type;            /**<  ç±»å‹ */
+	GLOBAL_PARA_S	stGlobal;			/**<  å…¨å±€å‚æ•° */
+	RULE_PARA_DATA_S    stRule;		    /**<  åœºæ™¯æ•°æ® */
+	ADVANCE_PARA_S	stAdvance;			/**< é«˜çº§å‚æ•°ï¼ˆä»…å¼€å‘äººå‘˜å¯è®¾ç½®ï¼‰ */
 } EXTERNAL_PARA_S;
 
-/** ÄÚ²¿²ÎÊı½á¹¹¶¨Òå */
+/** å†…éƒ¨å‚æ•°ç»“æ„å®šä¹‰ */
 typedef struct impINNER_PARA_S
 {
-	IMP_VOID		*pRule;				/**<  ³¡¾°²ÎÊı */
-	GLOBAL_PARA_S	stGlobal;			/**<  È«¾Ö²ÎÊı */
-	ADVANCE_PARA_S	stAdvance;			/**<  ¸ß¼¶²ÎÊı£¨½ö¿ª·¢ÈËÔ±¿ÉÉèÖÃ£©*/
+	IMP_VOID		*pRule;				/**<  åœºæ™¯å‚æ•° */
+	GLOBAL_PARA_S	stGlobal;			/**<  å…¨å±€å‚æ•° */
+	ADVANCE_PARA_S	stAdvance;			/**<  é«˜çº§å‚æ•°ï¼ˆä»…å¼€å‘äººå‘˜å¯è®¾ç½®ï¼‰*/
 } INNER_PARA_S;
 
-/** ²ÎÊı×Ö·û´®ÔªËØ×î´ó¸öÊı */
+/** å‚æ•°å­—ç¬¦ä¸²å…ƒç´ æœ€å¤§ä¸ªæ•° */
 #define IMP_PARA_STRARRAY_ELEMCNT	16
 
-/** ²ÎÊı×Ö·û´®Êı¾İ */
+/** å‚æ•°å­—ç¬¦ä¸²æ•°æ® */
 typedef struct impSTR_ARRAY_PARA_S
 {
-	IMP_S8 *pStrings[IMP_PARA_STRARRAY_ELEMCNT];  /**<  ²ÎÊı×Ö·û´®Êı×é */
+	IMP_S8 *pStrings[IMP_PARA_STRARRAY_ELEMCNT];  /**<  å‚æ•°å­—ç¬¦ä¸²æ•°ç»„ */
 }STR_ARRAY_PARA_S;
 
-/** ¹æÔòÀàĞÍ¶¨Òå */
+/** è§„åˆ™ç±»å‹å®šä¹‰ */
 typedef enum impRULE_TYPE_E
 {
-	IMP_RULE_SET_TYPE = 0,  /**<  ¹æÔò¼¯ÀàĞÍ¶¨Òå */
+	IMP_RULE_SET_TYPE = 0,  /**<  è§„åˆ™é›†ç±»å‹å®šä¹‰ */
 } RULE_TYPE_E;
 
-/** ¹æÔò¼ì²é¶¨Òå */
+/** è§„åˆ™æ£€æŸ¥å®šä¹‰ */
 typedef struct impRULE_CHECK_S
 {
-	IMP_U32     u32Type;     /**<  ÀàĞÍ */
-	DATA_BUF_S	stScnDat;    /**<  ³¡¾°Êı¾İ */
-	IMP_U32	    u32EnaCode;  /**<  Ê¹ÄÜÂë */
+	IMP_U32     u32Type;     /**<  ç±»å‹ */
+	DATA_BUF_S	stScnDat;    /**<  åœºæ™¯æ•°æ® */
+	IMP_U32	    u32EnaCode;  /**<  ä½¿èƒ½ç  */
 } RULE_CHECK_S;
 
-/** RGBÏñËØ½á¹¹¶¨Òå */
+/** RGBåƒç´ ç»“æ„å®šä¹‰ */
 typedef struct impPIXEL_S
 {
-	IMP_U8 u8B;    /**< blueÍ¨µÀ */
-	IMP_U8 u8G;    /**< greenÍ¨µÀ */
-	IMP_U8 u8R;    /**< redÍ¨µÀ */
+	IMP_U8 u8B;    /**< blueé€šé“ */
+	IMP_U8 u8G;    /**< greené€šé“ */
+	IMP_U8 u8R;    /**< redé€šé“ */
 } PIXEL_S;
 
-/** HSVÏñËØ½á¹¹¶¨Òå*/
+/** HSVåƒç´ ç»“æ„å®šä¹‰*/
 typedef struct impHSV_PIXEL_S
 {
-	IMP_FLOAT f32H;    /**< blueÍ¨µÀ */
-	IMP_FLOAT f32S;    /**< greenÍ¨µÀ */
-	IMP_FLOAT f32V;    /**< redÍ¨µÀ */
+	IMP_FLOAT f32H;    /**< blueé€šé“ */
+	IMP_FLOAT f32S;    /**< greené€šé“ */
+	IMP_FLOAT f32V;    /**< redé€šé“ */
 } HSV_PIXEL_S;
 
-/** HSLÏñËØ½á¹¹¶¨Òå */
+/** HSLåƒç´ ç»“æ„å®šä¹‰ */
 typedef struct impHSL_PIXEL_S
 {
-	IMP_FLOAT f32H;    /**< hueÍ¨µÀ */
-	IMP_FLOAT f32S;    /**< saturationÍ¨µÀ */
-	IMP_FLOAT f32L;    /**< luminanceÍ¨µÀ */
+	IMP_FLOAT f32H;    /**< hueé€šé“ */
+	IMP_FLOAT f32S;    /**< saturationé€šé“ */
+	IMP_FLOAT f32L;    /**< luminanceé€šé“ */
 } HSL_PIXEL_S;
 
-/** RGBÍ¼Ïñ½á¹¹¶¨Òå */
+/** RGBå›¾åƒç»“æ„å®šä¹‰ */
 typedef struct impRGB_IMAGE_S
 {
-	IMP_S32 s32W;      /**< Í¼Ïñ¿í¶È */
-	IMP_S32 s32H;      /**< Í¼Ïñ¸ß¶È */
-	IMP_U8 *pu8Data;    /**< Í¼ÏñÊı¾İÖ¸Õë */
-	IMP_U32 u32Time;   /**< Ê±¼ä */
+	IMP_S32 s32W;      /**< å›¾åƒå®½åº¦ */
+	IMP_S32 s32H;      /**< å›¾åƒé«˜åº¦ */
+	IMP_U8 *pu8Data;    /**< å›¾åƒæ•°æ®æŒ‡é’ˆ */
+	IMP_U32 u32Time;   /**< æ—¶é—´ */
 } RGB_IMAGE_S;
 
 
-/** HSVÍ¼Ïñ½á¹¹¶¨Òå */
+/** HSVå›¾åƒç»“æ„å®šä¹‰ */
 typedef struct impHSV_IMAGE_S
 {
-	IMP_S32   s32W;           /**< Í¼Ïñ¿í¶È */
-	IMP_S32   s32H;           /**< Í¼Ïñ¸ß¶È */
-	IMP_FLOAT *pf32Data;      /**< Í¼ÏñÊı¾İÖ¸Õë */
-	IMP_U32   u32Time;        /**< Ê±¼ä */
+	IMP_S32   s32W;           /**< å›¾åƒå®½åº¦ */
+	IMP_S32   s32H;           /**< å›¾åƒé«˜åº¦ */
+	IMP_FLOAT *pf32Data;      /**< å›¾åƒæ•°æ®æŒ‡é’ˆ */
+	IMP_U32   u32Time;        /**< æ—¶é—´ */
 } HSV_IMAGE_S;
 
-/** »Ò¶ÈÍ¼Ïñ½á¹¹¶¨Òå */
+/** ç°åº¦å›¾åƒç»“æ„å®šä¹‰ */
 typedef struct impGRAY_IMAGE_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È */
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È */
-	IMP_U8 *pu8Data;        /**< Í¼ÏñÊı¾İÖ¸Õë */
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦ */
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦ */
+	IMP_U8 *pu8Data;        /**< å›¾åƒæ•°æ®æŒ‡é’ˆ */
 } GRAY_IMAGE_S;
 
-/** 16Î»»Ò¶ÈÍ¼Ïñ½á¹¹¶¨Òå */
+/** 16ä½ç°åº¦å›¾åƒç»“æ„å®šä¹‰ */
 typedef struct impGRAY_IMAGE16_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È */
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È */
-	IMP_S16 *ps16Data;      /**< Í¼ÏñÊı¾İÖ¸Õë */
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦ */
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦ */
+	IMP_S16 *ps16Data;      /**< å›¾åƒæ•°æ®æŒ‡é’ˆ */
 } GRAY_IMAGE16_S;
 
-/** 32Î»»Ò¶ÈÍ¼Ïñ½á¹¹¶¨Òå */
+/** 32ä½ç°åº¦å›¾åƒç»“æ„å®šä¹‰ */
 typedef struct impGRAY_IMAGE32_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È */
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È */
-	IMP_S32 *ps32Data;      /**< Í¼ÏñÊı¾İÖ¸Õë */
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦ */
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦ */
+	IMP_S32 *ps32Data;      /**< å›¾åƒæ•°æ®æŒ‡é’ˆ */
 } GRAY_IMAGE32_S;
 
-/** TMPLÍ¼Ïñ½á¹¹¶¨Òå */
+/** TMPLå›¾åƒç»“æ„å®šä¹‰ */
 typedef struct impTMPL_IMAGE_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È */
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È */
-	IMP_S32 s32BufLen;      /**< Í¼ÏñÄÚ´æ³¤¶È */
-	IMP_U8 *pu8Data;        /**< Í¼Ïñ¿í¶ÈÍ¼ÏñÊı¾İÖ¸Õë */
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦ */
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦ */
+	IMP_S32 s32BufLen;      /**< å›¾åƒå†…å­˜é•¿åº¦ */
+	IMP_U8 *pu8Data;        /**< å›¾åƒå®½åº¦å›¾åƒæ•°æ®æŒ‡é’ˆ */
 } TMPL_IMAGE_S;
 
-/** YUV422Í¼ÏñÊı¾İÀàĞÍ */
+/** YUV422å›¾åƒæ•°æ®ç±»å‹ */
 typedef struct impYUV_IMAGE422_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È*/
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È*/
-	IMP_U8 *pu8Y;           /**< Í¼ÏñY·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U8 *pu8U;           /**< Í¼ÏñU·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U8 *pu8V;           /**< Í¼ÏñV·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U32 u32Time;        /**< Ê±¼ä*/
-	IMP_U32 u32Flag;        /**< ±êÖ¾*/
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦*/
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦*/
+	IMP_U8 *pu8Y;           /**< å›¾åƒYåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U8 *pu8U;           /**< å›¾åƒUåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U8 *pu8V;           /**< å›¾åƒVåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U32 u32Time;        /**< æ—¶é—´*/
+	IMP_U32 u32Flag;        /**< æ ‡å¿—*/
 } YUV_IMAGE422_S;
 
-/** YUV420Í¼ÏñÊı¾İÀàĞÍ */
+/** YUV420å›¾åƒæ•°æ®ç±»å‹ */
 typedef struct impYUV_IMAGE420_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È*/
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È*/
-	IMP_U8 *pu8Y;           /**< Í¼ÏñY·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U8 *pu8U;           /**< Í¼ÏñU·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U8 *pu8V;           /**< Í¼ÏñV·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U32 u32Time;        /**< Ê±¼ä*/
-	IMP_U32 u32Flag;        /**< ±êÖ¾*/
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦*/
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦*/
+	IMP_U8 *pu8Y;           /**< å›¾åƒYåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U8 *pu8U;           /**< å›¾åƒUåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U8 *pu8V;           /**< å›¾åƒVåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U32 u32Time;        /**< æ—¶é—´*/
+	IMP_U32 u32Flag;        /**< æ ‡å¿—*/
 } YUV_IMAGE420_S;
 
 //YUV FORMAT TYPE
@@ -416,318 +400,319 @@ typedef enum impYUV_FORMAT_E
 //UNIVERSAL YUV IMAGE
 typedef struct impYUV_IMAGE_S
 {
-	IMP_S32 s32W;           /**< Í¼Ïñ¿í¶È*/
-	IMP_S32 s32H;           /**< Í¼Ïñ¸ß¶È*/
-	IMP_U8 *pu8Y;           /**< Í¼ÏñY·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U8 *pu8U;           /**< Í¼ÏñU·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U8 *pu8V;           /**< Í¼ÏñV·ÖÁ¿Êı¾İÖ¸Õë*/
-	IMP_U32 u32Time;        /**< Ê±¼ä*/
-	IMP_U32 u32Flag;        /**< ±êÖ¾*/
-	YUV_FORMAT_E enFormat;  /**< ¸ñÊ½*/
+	IMP_S32 s32W;           /**< å›¾åƒå®½åº¦*/
+	IMP_S32 s32H;           /**< å›¾åƒé«˜åº¦*/
+	IMP_U8 *pu8Y;           /**< å›¾åƒYåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U8 *pu8U;           /**< å›¾åƒUåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U8 *pu8V;           /**< å›¾åƒVåˆ†é‡æ•°æ®æŒ‡é’ˆ*/
+	IMP_U32 u32Time;        /**< æ—¶é—´*/
+	IMP_U32 u32Flag;        /**< æ ‡å¿—*/
+	YUV_FORMAT_E enFormat;  /**< æ ¼å¼*/
 } YUV_IMAGE_S;
 
 
 
-/** ÊÂ¼şÀàĞÍ */
+/** äº‹ä»¶ç±»å‹ */
 typedef enum impEVT_TYPE_TOP_E
 {
-	IMP_EVT_TYPE_UNKNOWN        = 0x00000000,		/**< Î´ÖªÀàĞÍ */
-	IMP_EVT_TYPE_Armed          = 0x00002000,		/**< ¾¯½äÆô¶¯ */
-	IMP_EVT_TYPE_Disarmed       = 0x00002001,		/**< ¾¯½ä½â³ı */
-	IMP_EVT_TYPE_AlarmCleared   = 0x00002002,		/**< ¾¯±¨Çå³ı */
-	IMP_EVT_TYPE_SignalLoss     = 0x00003000		/**< ÊÓÆµĞÅºÅ¶ªÊ§ */
+	IMP_EVT_TYPE_UNKNOWN        = 0x00000000,		/**< æœªçŸ¥ç±»å‹ */
+	IMP_EVT_TYPE_Armed          = 0x00002000,		/**< è­¦æˆ’å¯åŠ¨ */
+	IMP_EVT_TYPE_Disarmed       = 0x00002001,		/**< è­¦æˆ’è§£é™¤ */
+	IMP_EVT_TYPE_AlarmCleared   = 0x00002002,		/**< è­¦æŠ¥æ¸…é™¤ */
+	IMP_EVT_TYPE_SignalLoss     = 0x00003000		/**< è§†é¢‘ä¿¡å·ä¸¢å¤± */
 }EVT_TYPE_TOP_E;
 
-/** ÊÂ¼ş×´Ì¬ */
+/** äº‹ä»¶çŠ¶æ€ */
 typedef enum impEVT_STATUS_E
 {
-	IMP_EVT_STATUS_NOSTA         = 0,				/**< ÎŞ×´Ì¬ */
-	IMP_EVT_STATUS_START         = 1,				/**< ¿ªÊ¼ */
-	IMP_EVT_STATUS_END           = 2,				/**< ½áÊø */
-	IMP_EVT_STATUS_PROCEDURE     = 3				/**< ¹ı³ÌÖĞ */
+	IMP_EVT_STATUS_NOSTA         = 0,				/**< æ— çŠ¶æ€ */
+	IMP_EVT_STATUS_START         = 1,				/**< å¼€å§‹ */
+	IMP_EVT_STATUS_END           = 2,				/**< ç»“æŸ */
+	IMP_EVT_STATUS_PROCEDURE     = 3				/**< è¿‡ç¨‹ä¸­ */
 } EVT_STATUS_E;
 
-/** ÊÓÆµ·ÖÎö¹¦ÄÜÂë */
+/** è§†é¢‘åˆ†æåŠŸèƒ½ç  */
 typedef enum impFUNC_ANALYSIS_E
 {
-	IMP_FUNC_ABANDUM        = 0x00000002,	/**< ÒÅÆúÎï¼ì²â */
-	IMP_FUNC_OBJSTOLEN      = 0x00000004,	/**< ±»µÁÎï¼ì²â */
-	IMP_FUNC_NOPARKING      = 0x00000008,	/**< ·Ç·¨Í£³µ¼ì²â */
-	IMP_FUNC_PERIMETER      = 0x00000010,	/**< ÖÜ½ç±£»¤ */
-	IMP_FUNC_TRIPWIRE       = 0x00000020,	/**< °íÏß */
-	IMP_FUNC_MTRIPWIRE      = 0x00000040,	/**< ¶à°íÏß */
-	IMP_FUNC_ABNMLVEL       = 0x00000080,	/**< ·ÇÕı³£ËÙ¶È */
-	IMP_FUNC_LOITER         = 0x00000100,	/**< ÅÇ»² */
-	IMP_FUNC_OSC            = 0X00000200,   //ÎïÆ·ÒÅÁô
+	IMP_FUNC_ABANDUM        = 0x00000002,	/**< é—å¼ƒç‰©æ£€æµ‹ */
+	IMP_FUNC_OBJSTOLEN      = 0x00000004,	/**< è¢«ç›—ç‰©æ£€æµ‹ */
+	IMP_FUNC_NOPARKING      = 0x00000008,	/**< éæ³•åœè½¦æ£€æµ‹ */
+	IMP_FUNC_PERIMETER      = 0x00000010,	/**< å‘¨ç•Œä¿æŠ¤ */
+	IMP_FUNC_TRIPWIRE       = 0x00000020,	/**< ç»Šçº¿ */
+	IMP_FUNC_MTRIPWIRE      = 0x00000040,	/**< å¤šç»Šçº¿ */
+	IMP_FUNC_ABNMLVEL       = 0x00000080,	/**< éæ­£å¸¸é€Ÿåº¦ */
+	IMP_FUNC_LOITER         = 0x00000100,	/**< å¾˜å¾Š */
+	IMP_FUNC_OSC            = 0X00000200,   //ç‰©å“é—ç•™
+	IMP_FUNC_OSC_R          = 0X00000400
 }FUNC_ANALYSIS_E;
 
-/** Ä¿±êID×îĞ¡Öµ */
+/** ç›®æ ‡IDæœ€å°å€¼ */
 #define IMP_TGT_ID_MIN		0x00000000
-/** Ä¿±êID×î´óÖµ */
+/** ç›®æ ‡IDæœ€å¤§å€¼ */
 #define IMP_TGT_ID_MAX		0x1FFFFFFF
 
-/** Ä¿±êÀàĞÍ */
+/** ç›®æ ‡ç±»å‹ */
 typedef enum impTGT_TYPE_E
 {
-	IMP_TGT_TYPE_HUMAN          = 0x00000001,	/**< ÈË */
-	IMP_TGT_TYPE_UNKNOWN        = 0x00000002,	/**< Î´Öª */
-	IMP_TGT_TYPE_VEHICLE        = 0x00000003,	/**< ³µ */
-	IMP_TGT_TYPE_ANIMAL         = 0x00000004	/**< ¶¯Îï */
+	IMP_TGT_TYPE_HUMAN          = 0x00000001,	/**< äºº */
+	IMP_TGT_TYPE_UNKNOWN        = 0x00000002,	/**< æœªçŸ¥ */
+	IMP_TGT_TYPE_VEHICLE        = 0x00000003,	/**< è½¦ */
+	IMP_TGT_TYPE_ANIMAL         = 0x00000004	/**< åŠ¨ç‰© */
 }TGT_TYPE_E;
 
-/** Ä¿±êÊÂ¼ş */
+/** ç›®æ ‡äº‹ä»¶ */
 typedef enum impTGT_EVENT_E
 {
-	IMP_TGT_EVENT_UNKNOWN       = 0x00000000,	/**< Î´ÖªÊÂ¼ş*/
-	IMP_TGT_EVENT_ABANDUM       = 0x00000002,	/**< ÒÅÆúÎï¼ì²â */
-	IMP_TGT_EVENT_OBJSTOLEN     = 0x00000004,	/**< ±»µÁÎï¼ì²â */
-	IMP_TGT_EVENT_NOPARKING     = 0x00000008,	/**< ·Ç·¨Í£³µ¼ì²â */
-	IMP_TGT_EVENT_PERIMETER     = 0x00000010,	/**< ÖÜ½ç±£»¤ */
-	IMP_TGT_EVENT_TRIPWIRE      = 0x00000020,	/**< °íÏß */
-	IMP_TGT_EVENT_MTRIPWIRE     = 0x00000040,	/**< ¶à°íÏß */
-	IMP_TGT_EVENT_ABNORMALVEL   = 0x00000080,	/**< ·ÇÕı³£ËÙ¶È */
-	IMP_TGT_EVENT_LOITER        = 0x00000100,	/**< ÅÇ»² */
-	IMP_TGT_EVENT_OSC		    = 0x00000200,	/**< OSCÒÅÆúÎï¼ì²â */
-	IMP_TGT_EVENT_OSC_R		    = 0x00000400,	/**< OSC±»µÁÎï¼ì²â */
+	IMP_TGT_EVENT_UNKNOWN       = 0x00000000,	/**< æœªçŸ¥äº‹ä»¶*/
+	IMP_TGT_EVENT_ABANDUM       = 0x00000002,	/**< é—å¼ƒç‰©æ£€æµ‹ */
+	IMP_TGT_EVENT_OBJSTOLEN     = 0x00000004,	/**< è¢«ç›—ç‰©æ£€æµ‹ */
+	IMP_TGT_EVENT_NOPARKING     = 0x00000008,	/**< éæ³•åœè½¦æ£€æµ‹ */
+	IMP_TGT_EVENT_PERIMETER     = 0x00000010,	/**< å‘¨ç•Œä¿æŠ¤ */
+	IMP_TGT_EVENT_TRIPWIRE      = 0x00000020,	/**< ç»Šçº¿ */
+	IMP_TGT_EVENT_MTRIPWIRE     = 0x00000040,	/**< å¤šç»Šçº¿ */
+	IMP_TGT_EVENT_ABNORMALVEL   = 0x00000080,	/**< éæ­£å¸¸é€Ÿåº¦ */
+	IMP_TGT_EVENT_LOITER        = 0x00000100,	/**< å¾˜å¾Š */
+	IMP_TGT_EVENT_OSC		    = 0x00000200,	/**< OSCé—å¼ƒç‰©æ£€æµ‹ */
+	IMP_TGT_EVENT_OSC_R		    = 0x00000400,	/**< OSCè¢«ç›—ç‰©æ£€æµ‹ */
 }TGT_EVENT_E;
 
-/** Ä¿±ê×´Ì¬ */
+/** ç›®æ ‡çŠ¶æ€ */
 typedef enum impTGT_STATUS_E
 {
-	IMP_TGT_STATUS_UNKNOWN		= 0x00000000,	/**< Î´Öª×´Ì¬ */
-	IMP_TGT_STATUS_MEASURED		= 0x00000010,	/**< Ä¿±êÎ»ÖÃÓÉ²âÁ¿µÃµ½ */
-	IMP_TGT_STATUS_PREDICTED	= 0x00000020,	/**< Ä¿±êÎ»ÖÃÓÉÔ¤²âµÃµ½ */
-	IMP_TGT_STATUS_MOTION		= 0x00000100,	/**< Ä¿±ê¾ßÓĞÔË¶¯ÊôĞÔ */
-	IMP_TGT_STATUS_STATIC		= 0x00000200	/**< Ä¿±êµ±Ç°ÊÇ¾²Ö¹µÄ */
+	IMP_TGT_STATUS_UNKNOWN		= 0x00000000,	/**< æœªçŸ¥çŠ¶æ€ */
+	IMP_TGT_STATUS_MEASURED		= 0x00000010,	/**< ç›®æ ‡ä½ç½®ç”±æµ‹é‡å¾—åˆ° */
+	IMP_TGT_STATUS_PREDICTED	= 0x00000020,	/**< ç›®æ ‡ä½ç½®ç”±é¢„æµ‹å¾—åˆ° */
+	IMP_TGT_STATUS_MOTION		= 0x00000100,	/**< ç›®æ ‡å…·æœ‰è¿åŠ¨å±æ€§ */
+	IMP_TGT_STATUS_STATIC		= 0x00000200	/**< ç›®æ ‡å½“å‰æ˜¯é™æ­¢çš„ */
 }TGT_STATUS_E;
 
-/** Ä¿±ê¹ì¼£³¤¶È */
+/** ç›®æ ‡è½¨è¿¹é•¿åº¦ */
 #define IMP_MAX_TRAJECT_LEN	40
 
-/** Ä¿±ê¹ì¼£½á¹¹¶¨Òå */
+/** ç›®æ ‡è½¨è¿¹ç»“æ„å®šä¹‰ */
 typedef struct impTGT_TRAJECT_S
 {
-	IMP_S32 s32Length;			          	    /**< ¹ì¼£³¤¶È */
-	IMP_POINT_S	stPoints[IMP_MAX_TRAJECT_LEN];	/**< ¹ì¼£µãÊı×é */
+	IMP_S32 s32Length;			          	    /**< è½¨è¿¹é•¿åº¦ */
+	IMP_POINT_S	stPoints[IMP_MAX_TRAJECT_LEN];	/**< è½¨è¿¹ç‚¹æ•°ç»„ */
 } TGT_TRAJECT_S;
 
-/** Ä¿±êÊı¾İ */
+/** ç›®æ ‡æ•°æ® */
 typedef struct impTGT_MOTION_ITEM_S
 {
-	IMP_S32	  	  s32Velocity;				/**< ËÙÂÊ£¨pix/s£©*/
-	IMP_S32		  s32Direction;				/**< ·½Ïò£¨0~359¶È£©*/
-	TGT_TRAJECT_S stTraject;				/**< ¹ì¼£*/
+	IMP_S32	  	  s32Velocity;				/**< é€Ÿç‡ï¼ˆpix/sï¼‰*/
+	IMP_S32		  s32Direction;				/**< æ–¹å‘ï¼ˆ0~359åº¦ï¼‰*/
+	TGT_TRAJECT_S stTraject;				/**< è½¨è¿¹*/
 } TGT_MOTION_ITEM_S;
 
-/** Ä¿±êÊı¾İ»º³å³¤¶È */
+/** ç›®æ ‡æ•°æ®ç¼“å†²é•¿åº¦ */
 #define IMP_BUFLEN_TGT_ITEM	256
 
-/** Ä¿±êÊı¾İ */
+/** ç›®æ ‡æ•°æ® */
 #define IMP_BUFLEN_TGT_DATA	(IMP_BUFLEN_TGT_ITEM - (sizeof(IMP_U32) * 4 + sizeof(IMP_POINT_S) + sizeof(IMP_RECT_S)))
 
-/** Ä¿±êÊı¾İ½á¹¹ */
+/** ç›®æ ‡æ•°æ®ç»“æ„ */
 typedef struct impTGT_ITEM_S
 {
 	IMP_U32	u32Id;							/**< ID */
-	IMP_U32	u32Status;						/**< ×´Ì¬ */
-	IMP_U32	u32Type;						/**< ÀàĞÍ */
-	IMP_U32	u32Event;						/**< ÊÂ¼ş */
-	IMP_POINT_S	stPoint;					/**< Î»ÖÃ */
-	IMP_RECT_S	stRect;						/**< ÇøÓò */
-	IMP_U8	au8Data[IMP_BUFLEN_TGT_DATA];   /**< Êı¾İ */
+	IMP_U32	u32Status;						/**< çŠ¶æ€ */
+	IMP_U32	u32Type;						/**< ç±»å‹ */
+	IMP_U32	u32Event;						/**< äº‹ä»¶ */
+	IMP_POINT_S	stPoint;					/**< ä½ç½® */
+	IMP_RECT_S	stRect;						/**< åŒºåŸŸ */
+	IMP_U8	au8Data[IMP_BUFLEN_TGT_DATA];   /**< æ•°æ® */
 } TGT_ITEM_S;
 
-/** Ä¿±êµÄ×î´ó¸öÊı */
+/** ç›®æ ‡çš„æœ€å¤§ä¸ªæ•° */
 #define IMP_MAX_TGT_CNT			64
 
-/** Ä¿±ê¼¯ºÏ */
+/** ç›®æ ‡é›†åˆ */
 typedef struct impTGT_SET_S
 {
-	IMP_S32	    s32TargetNum;					 /**< Ä¿±êÊıÄ¿ */
-	TGT_ITEM_S	astTargets[IMP_MAX_TGT_CNT];     /**< Ä¿±êÊı¾İ */
+	IMP_S32	    s32TargetNum;					 /**< ç›®æ ‡æ•°ç›® */
+	TGT_ITEM_S	astTargets[IMP_MAX_TGT_CNT];     /**< ç›®æ ‡æ•°æ® */
 } TGT_SET_S;
 
 
 
-/** ÊÂ¼ş×î´ó¸öÊı */
+/** äº‹ä»¶æœ€å¤§ä¸ªæ•° */
 #define IMP_MAX_EVT_CNT	128
 
-/** ÊÂ¼şÏî¸öÊı */
+/** äº‹ä»¶é¡¹ä¸ªæ•° */
 #define IMP_BUFLEN_EVT_ITEM	64
 
-/** ÊÂ¼ş³¤¶È */
+/** äº‹ä»¶é•¿åº¦ */
 #define IMP_BUFLEN_EVT_DATA	(IMP_BUFLEN_EVT_ITEM - sizeof(IMP_U32) * 5)
 
-/** ÊÂ¼şÀàĞÍ¶¨Òå */
+/** äº‹ä»¶ç±»å‹å®šä¹‰ */
 typedef enum impEVT_TYPE_E
 {
-	IMP_EVT_TYPE_SignalBad          = 0x00000001,		/**< ÊÓÆµĞÅºÅÒì³£¼ì²â */
-	IMP_EVT_TYPE_AlarmAbabdum       = 0x00000102,		/**< ÒÅÆúÎï¼ì²â */
-	IMP_EVT_TYPE_AlarmObjStolen     = 0x00000103,		/**< ±»µÁÎï¼ì²â */
-	IMP_EVT_TYPE_AlarmNoParking     = 0x00000104,		/**< ·Ç·¨Í£³µ¼ì²â */
-	IMP_EVT_TYPE_AlarmPerimeter     = 0x00000105,		/**< ¾¯½äÇøÓò¼ì²â */
-	IMP_EVT_TYPE_AlarmTripwire      = 0x00000106,		/**< µ¥¾¯½äÏß¼ì²â */
-	IMP_EVT_TYPE_AlarmMTripwire     = 0x00000107,		/**< Ë«¾¯½äÏß¼ì²â */
-	IMP_EVT_TYPE_AlarmAbnmlvel      = 0x00000108,		/**< ·ÇÕı³£ËÙ¶È¼ì²â	*/
-	IMP_EVT_TYPE_AlarmLoiter        = 0x00000109,		/**< ÅÇ»²¼ì²â */
-	IMP_EVT_TYPE_AlarmOsc		    = 0x0000010a,		/**< OSCÒÅÆúÎï¼ì²â */
-	IMP_EVT_TYPE_AlarmOsc_R		    = 0x0000010b,		/**< OSC±»µÁÎï¼ì²â */
+	IMP_EVT_TYPE_SignalBad          = 0x00000001,		/**< è§†é¢‘ä¿¡å·å¼‚å¸¸æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmAbabdum       = 0x00000102,		/**< é—å¼ƒç‰©æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmObjStolen     = 0x00000103,		/**< è¢«ç›—ç‰©æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmNoParking     = 0x00000104,		/**< éæ³•åœè½¦æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmPerimeter     = 0x00000105,		/**< è­¦æˆ’åŒºåŸŸæ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmTripwire      = 0x00000106,		/**< å•è­¦æˆ’çº¿æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmMTripwire     = 0x00000107,		/**< åŒè­¦æˆ’çº¿æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmAbnmlvel      = 0x00000108,		/**< éæ­£å¸¸é€Ÿåº¦æ£€æµ‹	*/
+	IMP_EVT_TYPE_AlarmLoiter        = 0x00000109,		/**< å¾˜å¾Šæ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmOsc		    = 0x0000010a,		/**< OSCé—å¼ƒç‰©æ£€æµ‹ */
+	IMP_EVT_TYPE_AlarmOsc_R		    = 0x0000010b,		/**< OSCè¢«ç›—ç‰©æ£€æµ‹ */
 
-	IMP_EVT_TYPE_AVD_AlarmBase		= 0x00000200,		/**< AVDËã·¨¸æ¾¯ */
-	IMP_EVT_TYPE_AlarmSceneChg    	= 0x00000201,		/**< ³¡¾°±ä»» */
-	IMP_EVT_TYPE_AlarmNoSignal      = 0x00000202,		/**< ĞÅºÅÈ±Ê§ */
-	IMP_EVT_TYPE_AlarmBrightAbnml   = 0x00000203,		/**< ÁÁ¶ÈÒì³£ */
-	IMP_EVT_TYPE_AlarmClarityAbnml  = 0x00000204,		/**< ÊÓÆµÄ£ºı */
-	IMP_EVT_TYPE_AlarmColorAbnml    = 0x00000205,		/**< ÊÓÆµÆ«É« */
-	IMP_EVT_TYPE_AlarmNoise      	= 0x00000206,		/**< ÔëÉù¸ÉÈÅ */
-	IMP_EVT_TYPE_AlarmPtzLoseCrl    = 0x00000207,		/**< PTZÊ§¿Ø  */
-	IMP_EVT_TYPE_AlarmFreeze      	= 0x00000208,		/**< »­Ãæ¶³½á */
-	IMP_EVT_TYPE_AlarmInterfere		= 0x00000209,		/**< ÈËÎª¸ÉÈÅ */
+	IMP_EVT_TYPE_AVD_AlarmBase		= 0x00000200,		/**< AVDç®—æ³•å‘Šè­¦ */
+	IMP_EVT_TYPE_AlarmSceneChg    	= 0x00000201,		/**< åœºæ™¯å˜æ¢ */
+	IMP_EVT_TYPE_AlarmNoSignal      = 0x00000202,		/**< ä¿¡å·ç¼ºå¤± */
+	IMP_EVT_TYPE_AlarmBrightAbnml   = 0x00000203,		/**< äº®åº¦å¼‚å¸¸ */
+	IMP_EVT_TYPE_AlarmClarityAbnml  = 0x00000204,		/**< è§†é¢‘æ¨¡ç³Š */
+	IMP_EVT_TYPE_AlarmColorAbnml    = 0x00000205,		/**< è§†é¢‘åè‰² */
+	IMP_EVT_TYPE_AlarmNoise      	= 0x00000206,		/**< å™ªå£°å¹²æ‰° */
+	IMP_EVT_TYPE_AlarmPtzLoseCrl    = 0x00000207,		/**< PTZå¤±æ§  */
+	IMP_EVT_TYPE_AlarmFreeze      	= 0x00000208,		/**< ç”»é¢å†»ç»“ */
+	IMP_EVT_TYPE_AlarmInterfere		= 0x00000209,		/**< äººä¸ºå¹²æ‰° */
 
-	IMP_EVT_TYPE_VFD_AlarmBase		= 0x00000300,		/**< VFDËã·¨¸æ¾¯ */
-	IMP_EVT_TYPE_AlarmFaceCapture   = 0x00000301,		/**< ÈËÁ³×¥ÅÄ */
-	IMP_EVT_TYPE_AlarmFaceCamouflage= 0x00000302,		/**< ÈËÁ³Î±×° */
-	IMP_EVT_TYPE_AlarmPasswordPeep  = 0x00000303,		/**< ÃÜÂëÍµ¿ú */
+	IMP_EVT_TYPE_VFD_AlarmBase		= 0x00000300,		/**< VFDç®—æ³•å‘Šè­¦ */
+	IMP_EVT_TYPE_AlarmFaceCapture   = 0x00000301,		/**< äººè„¸æŠ“æ‹ */
+	IMP_EVT_TYPE_AlarmFaceCamouflage= 0x00000302,		/**< äººè„¸ä¼ªè£… */
+	IMP_EVT_TYPE_AlarmPasswordPeep  = 0x00000303,		/**< å¯†ç å·çª¥ */
 }EVT_TYPE_E;
 
-/** ÊÓÆµÒì³£ÀàĞÍ */
+/** è§†é¢‘å¼‚å¸¸ç±»å‹ */
 enum
 {
-	VETYPE_CameraMoved = 0,					/**< Ïà»úÒÆ¶¯»òÕÚµ² */
-	VETYPE_SignalBad						/**< ÊÓÆµÖÊÁ¿²î */
+	VETYPE_CameraMoved = 0,					/**< ç›¸æœºç§»åŠ¨æˆ–é®æŒ¡ */
+	VETYPE_SignalBad						/**< è§†é¢‘è´¨é‡å·® */
 };
 
-/** Òì³£ÀàĞÍ½á¹¹ */
+/** å¼‚å¸¸ç±»å‹ç»“æ„ */
 typedef struct impEVT_DATA_EXCEPTION_S
 {
-	IMP_U32	u32Type;						/**< Òì³£ÀàĞÍ */
+	IMP_U32	u32Type;						/**< å¼‚å¸¸ç±»å‹ */
 } EVT_DATA_EXCEPTION_S;
 
 
-/** ÒÅÆúÎïÊÂ¼şÊı¾İ½á¹¹ */
+/** é—å¼ƒç‰©äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_ABANDUM_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶ */
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ */
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯† */
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½® */
 } EVT_DATA_ABANDUM_S;
 
-/** ±»µÁÎï¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** è¢«ç›—ç‰©æ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_OBJSTOLEN_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶ */
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ */
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯† */
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½® */
 } EVT_DATA_OBJSTOLEN_S;
 
-/** Ä¿±ê¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** ç›®æ ‡æ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_TARGET_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶ */
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ */
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯† */
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½® */
 } EVT_DATA_TARGET_S;
 
-/** ÖÜ½ç¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** å‘¨ç•Œæ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_PERIMETER_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶ */
-	IMP_RECT_S  stRect;					/**< ÊÂ¼şÎ»ÖÃ */
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯† */
+	IMP_RECT_S  stRect;					/**< äº‹ä»¶ä½ç½® */
 	struct
-	{									/**< ¹æÔò */
-		IMP_U32	u32Mode;				/**< ¾¯½äÇøÄ£Ê½ */
+	{									/**< è§„åˆ™ */
+		IMP_U32	u32Mode;				/**< è­¦æˆ’åŒºæ¨¡å¼ */
 	} stRule;
 } EVT_DATA_PERIMETER_S;
 
-/** °íÏß¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** ç»Šçº¿æ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_TRIPWIRE_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶ */
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ */
-	IMP_U8  u8LineIndex;                /**< °íÏßºÅ */
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯† */
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½® */
+	IMP_U8  u8LineIndex;                /**< ç»Šçº¿å· */
 	struct
 	{
-		IMP_S32		s32Bidirection;		/**< ±íÊ¾¸Ã°íÏßÊÇ·ñÎªË«Ïò°íÏß(0: ·ñ, 1: ÊÇ) */
-		IMP_S32		s32AbnmlAngle;		/**< °íÏß½ûÖ¹·½Ïò½Ç¶È(unit: degree) */
-		LINE_S		stLine;				/**< °íÏßÎ»ÖÃ(unit: pixel) */
-	} stRule;							/**< ¹æÔò */
+		IMP_S32		s32Bidirection;		/**< è¡¨ç¤ºè¯¥ç»Šçº¿æ˜¯å¦ä¸ºåŒå‘ç»Šçº¿(0: å¦, 1: æ˜¯) */
+		IMP_S32		s32AbnmlAngle;		/**< ç»Šçº¿ç¦æ­¢æ–¹å‘è§’åº¦(unit: degree) */
+		LINE_S		stLine;				/**< ç»Šçº¿ä½ç½®(unit: pixel) */
+	} stRule;							/**< è§„åˆ™ */
 } EVT_DATA_TRIPWIRE_S;
 
-/** ¶à°íÏß¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** å¤šç»Šçº¿æ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_MTRIPWIRE_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶ */
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ */
-	IMP_U8  u8LineIndex;                /**< °íÏßºÅ */
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯† */
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½® */
+	IMP_U8  u8LineIndex;                /**< ç»Šçº¿å· */
 	struct
 	{
-		IMP_S32		as32AbnmlAngle[2];	/**< °íÏß½ûÖ¹·½Ïò½Ç¶È(unit: degree) */
-		LINE_S		astLine[2];			/**< °íÏßÎ»ÖÃ(unit: pixel) */
-	} stRule;							/**< ¹æÔò */
+		IMP_S32		as32AbnmlAngle[2];	/**< ç»Šçº¿ç¦æ­¢æ–¹å‘è§’åº¦(unit: degree) */
+		LINE_S		astLine[2];			/**< ç»Šçº¿ä½ç½®(unit: pixel) */
+	} stRule;							/**< è§„åˆ™ */
 } EVT_DATA_MTRIPWIRE_S;
 
-/** Òì³£ËÙ¶È¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** å¼‚å¸¸é€Ÿåº¦æ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_ABNMLVEL_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶*/
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ*/
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯†*/
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½®*/
 } EVT_DATA_ABNMLVEL_S;
 
-/** ÅÇ»²ËÙ¶È¼ì²âÊÂ¼şÊı¾İ½á¹¹ */
+/** å¾˜å¾Šé€Ÿåº¦æ£€æµ‹äº‹ä»¶æ•°æ®ç»“æ„ */
 typedef struct impEVT_DATA_LOITER_S
 {
-	IMP_U32	u32TId;						/**< Ä¿±ê±êÊ¶*/
-	IMP_RECT_S	stRect;					/**< ÊÂ¼şÎ»ÖÃ*/
+	IMP_U32	u32TId;						/**< ç›®æ ‡æ ‡è¯†*/
+	IMP_RECT_S	stRect;					/**< äº‹ä»¶ä½ç½®*/
 } EVT_DATA_LOITER_S;
 
-/** ÊÂ¼şÏî */
+/** äº‹ä»¶é¡¹ */
 typedef struct impEVT_ITEM_S
 {
-	IMP_U32	u32Type;						/**< ÊÂ¼şÀàĞÍ */
-	IMP_U32	u32Id;							/**< ÊÂ¼ş±êÊ¶ */
-	IMP_U32	u32Level;						/**< ÊÂ¼ş¾¯±¨¼¶±ğ */
-	IMP_U32	u32Status;						/**< ÊÂ¼ş×´Ì¬ */
-	IMP_U32	u32Zone;						/**< ÊÂ¼ş·¢ÉúÇøÓò */
-	IMP_U8	au8Data[IMP_BUFLEN_EVT_DATA];   /**< ÊÂ¼şÊı¾İ */
+	IMP_U32	u32Type;						/**< äº‹ä»¶ç±»å‹ */
+	IMP_U32	u32Id;							/**< äº‹ä»¶æ ‡è¯† */
+	IMP_U32	u32Level;						/**< äº‹ä»¶è­¦æŠ¥çº§åˆ« */
+	IMP_U32	u32Status;						/**< äº‹ä»¶çŠ¶æ€ */
+	IMP_U32	u32Zone;						/**< äº‹ä»¶å‘ç”ŸåŒºåŸŸ */
+	IMP_U8	au8Data[IMP_BUFLEN_EVT_DATA];   /**< äº‹ä»¶æ•°æ® */
 } EVT_ITEM_S;
 
-/** ÊÂ¼ş¼¯ */
+/** äº‹ä»¶é›† */
 typedef struct impEVT_SET_S
 {
-	IMP_S32	    s32EventNum;					/**< ÊÂ¼şÊıÄ¿ */
-	EVT_ITEM_S	astEvents[IMP_MAX_EVT_CNT];		/**< ÊÂ¼şÊı¾İ */
+	IMP_S32	    s32EventNum;					/**< äº‹ä»¶æ•°ç›® */
+	EVT_ITEM_S	astEvents[IMP_MAX_EVT_CNT];		/**< äº‹ä»¶æ•°æ® */
 } EVT_SET_S;
 
-/** PEA ´¦Àí½á¹û */
+/** PEA å¤„ç†ç»“æœ */
 typedef struct impRESULT_S
 {
-	TGT_SET_S	stTargetSet;		/**< Ä¿±ê */
-	EVT_SET_S	stEventSet;		    /**< ÊÂ¼ş */
+	TGT_SET_S	stTargetSet;		/**< ç›®æ ‡ */
+	EVT_SET_S	stEventSet;		    /**< äº‹ä»¶ */
 } RESULT_S;
 
-/** AVDÍ³¼ÆÊı¾İ */
+/** AVDç»Ÿè®¡æ•°æ® */
 typedef struct impAVD_STATCL_DATA_S
 {
-    IMP_S32 s32SceneChg;            /**< ³¡¾°¸Ä±ä */
-    IMP_S32 s32SignalValue;	        /**< ĞÅºÅÖµ */
-	IMP_S32 s32ClarityValue;        /**< Ä£ºı¶ÈÖµ */
-	IMP_S32 s32BrightHValue;        /**< ÁÁ¶È¸ßÖµ */
-	IMP_S32 s32BrightLValue;        /**< ÁÁ¶ÈµÍÖµ */
-	IMP_S32 s32ColorValue;	        /**< ÑÕÉ«Öµ */
-	IMP_S32 s32NoiseValue;	        /**< ÔëÉùÖµ */
-	IMP_S32 s32PtzValue;            /**< PTZÊ§¿Ø */
-	IMP_S32 s32FreezValue;          /**< »­Ãæ¶³½á */
-	IMP_S32 s32InterfereValue;      /**< ÈËÎª¸ÉÈÅ */
+    IMP_S32 s32SceneChg;            /**< åœºæ™¯æ”¹å˜ */
+    IMP_S32 s32SignalValue;	        /**< ä¿¡å·å€¼ */
+	IMP_S32 s32ClarityValue;        /**< æ¨¡ç³Šåº¦å€¼ */
+	IMP_S32 s32BrightHValue;        /**< äº®åº¦é«˜å€¼ */
+	IMP_S32 s32BrightLValue;        /**< äº®åº¦ä½å€¼ */
+	IMP_S32 s32ColorValue;	        /**< é¢œè‰²å€¼ */
+	IMP_S32 s32NoiseValue;	        /**< å™ªå£°å€¼ */
+	IMP_S32 s32PtzValue;            /**< PTZå¤±æ§ */
+	IMP_S32 s32FreezValue;          /**< ç”»é¢å†»ç»“ */
+	IMP_S32 s32InterfereValue;      /**< äººä¸ºå¹²æ‰° */
 }AVD_STATCL_DATA_S;
 
-/** AVD ´¦Àí½á¹û */
+/** AVD å¤„ç†ç»“æœ */
 typedef struct impAVD_RESULT_S
 {
-    AVD_STATCL_DATA_S stStatclData;	/**< AVDÍ³¼ÆÊı¾İ */
-	EVT_SET_S	stEventSet;			/**< AVD±¨¾¯Êı¾İ */
+    AVD_STATCL_DATA_S stStatclData;	/**< AVDç»Ÿè®¡æ•°æ® */
+	EVT_SET_S	stEventSet;			/**< AVDæŠ¥è­¦æ•°æ® */
 }AVD_RESULT_S;
 
 
-/** ×î¶àÈËÁ³Êı */
+/** æœ€å¤šäººè„¸æ•° */
 #define IMP_MAX_FACE_CNT 50
-/** ÈËÁ³Êı¾İ */
+/** äººè„¸æ•°æ® */
 typedef struct impVFD_FACE_ITEM_S
 {
 	IMP_S32 rightEyeX;
@@ -758,28 +743,28 @@ typedef struct impVFD_FACE_ITEM_S
 
 } FACE_ITEM_S;
 
-/** ÈËÁ³Êı¾İ¼¯ºÏ */
+/** äººè„¸æ•°æ®é›†åˆ */
 typedef struct impVFD_FACE_SET_S
 {
     IMP_S32	    s32FaceNum;
 	FACE_ITEM_S	astFaces[IMP_MAX_FACE_CNT];
 }VFD_FACE_SET_S;
 
-/** VFD ´¦Àí½á¹û */
+/** VFD å¤„ç†ç»“æœ */
 typedef struct impVFD_RESULT_S
 {
     VFD_FACE_SET_S stFaceSet;
     EVT_SET_S	stEventSet;
 }VFD_RESULT_S;
 
-/** ¹âÁ÷ÏñËØ¶¨Òå */
+/** å…‰æµåƒç´ å®šä¹‰ */
 typedef struct impOPTICAL_FLOW_PIXEL_S
 {
-	IMP_FLOAT fVx;   /** ¹âÁ÷ÏñËØX */
-	IMP_FLOAT fVy;   /** ¹âÁ÷ÏñËØY */
+	IMP_FLOAT fVx;   /** å…‰æµåƒç´ X */
+	IMP_FLOAT fVy;   /** å…‰æµåƒç´ Y */
 }OPTICAL_FLOW_PIXEL_S;
 
-/** ¹âÁ÷ */
+/** å…‰æµ */
 typedef struct impOPTICAL_FLOW_S
 {
 	IMP_S32 s32X1;

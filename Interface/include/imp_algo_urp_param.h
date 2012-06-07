@@ -1,21 +1,3 @@
-/**
-* \defgroup ½Ó¿Ú
-* ½Ó¿Ú
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-
-/**
-* \defgroup ÓÃ»§¹æÔòĞ­Òé£¨URP£©
-* ¹æÔò¶¨Òå¼°´¦Àí
-* @author ±±¾©ÒøÆÙ¼¼Êõ
-* @version 2.0
-* @data 2009-2010
-*/
-/*@{*/
-
 #ifndef _IMP_ALGO_URP_PARAM_H_
 #define _IMP_ALGO_URP_PARAM_H_
 
@@ -26,47 +8,47 @@ extern "C"
 #endif
 
 
-/** ³¡¾°ÀàĞÍ */
+/** åœºæ™¯ç±»å‹ */
 typedef enum impURP_SCENE_TYPE_E
 {
-	IMP_URP_INDOOR = 0,					/**< ÊÒÄÚ³¡¾° */
-	IMP_URP_OUTDOOR						/**< ÊÒÍâ³¡¾° */
+	IMP_URP_INDOOR = 0,					/**< å®¤å†…åœºæ™¯ */
+	IMP_URP_OUTDOOR						/**< å®¤å¤–åœºæ™¯ */
 } URP_SCENE_TYPE_E;
 
-//Ïà»úÀàĞÍ
+//ç›¸æœºç±»å‹
 typedef enum impURP_CAMERA_TYPE_E
 {
 	IMP_URP_COMMON_CAMERA = 0,
 	IMP_URP_PINHOLE_CAMERA
 } URP_CAMERA_TYPE_E;
 
-/** ÖÜ½ç¼ì²âÄ£Ê½ */
+/** å‘¨ç•Œæ£€æµ‹æ¨¡å¼ */
 typedef enum impURP_PERIMETER_MODE_E
 {
-	IMP_URP_PMODE_INTRUSION = 0,/**< ÈëÇÖ */
-	IMP_URP_PMODE_ENTER,		/**< ½øÈë */
-	IMP_URP_PMODE_EXIT			/**< Àë¿ª */
+	IMP_URP_PMODE_INTRUSION = 0,/**< å…¥ä¾µ */
+	IMP_URP_PMODE_ENTER,		/**< è¿›å…¥ */
+	IMP_URP_PMODE_EXIT			/**< ç¦»å¼€ */
 } URP_PERIMETER_MODE_E;
 
-/** ×î´ó±ß½çµãÊı */
+/** æœ€å¤§è¾¹ç•Œç‚¹æ•° */
 #define IMP_MAX_BOUNDARY_POINT_NUM 8
 
 //Added by mzhang 2011-11-14 14:02:48
 #define IMP_MAX_POINT_NUM 4
 #define IMP_NAME_BUF_SIZE 16
 
-/** ×ø±êµã */
+/** åæ ‡ç‚¹ */
 typedef struct impURP_IMP_POINT_S
 {
 	IMP_S16 s16X;        /**< x */
 	IMP_S16 s16Y;        /**< y */
 }URP_IMP_POINT_S;
 
-/** Ïß½á¹¹ */
+/** çº¿ç»“æ„ */
 typedef struct impURP_LINE_S
 {
-	URP_IMP_POINT_S stStartPt;	/**< Ïß¶ÎÆğµã */
-	URP_IMP_POINT_S stEndPt;	/**< Ïß¶ÎÖÕµã */
+	URP_IMP_POINT_S stStartPt;	/**< çº¿æ®µèµ·ç‚¹ */
+	URP_IMP_POINT_S stEndPt;	/**< çº¿æ®µç»ˆç‚¹ */
 }URP_LINE_S;
 
 //added by mzhang 2011-11-14 14:00:14
@@ -77,308 +59,309 @@ typedef struct impURP_POLYGON_REGION_S
 	URP_IMP_POINT_S astPoint[IMP_MAX_BOUNDARY_POINT_NUM];
 } URP_POLYGON_REGION_S;
 
-/** URPÖÜ½ç¼ì²â±ß½çµã */
+/** URPå‘¨ç•Œæ£€æµ‹è¾¹ç•Œç‚¹ */
 typedef struct impURP_PERIMETER_LIMIT_BOUNDARY_S
 {
-	IMP_S32       s32BoundaryPtNum;								    /**< ±ß½çµãÊıÄ¿ */
-	URP_IMP_POINT_S   astBoundaryPts[IMP_MAX_BOUNDARY_POINT_NUM];	/**< ±ß½çµã¼¯ºÏ */
+	IMP_S32       s32BoundaryPtNum;								    /**< è¾¹ç•Œç‚¹æ•°ç›® */
+	URP_IMP_POINT_S   astBoundaryPts[IMP_MAX_BOUNDARY_POINT_NUM];	/**< è¾¹ç•Œç‚¹é›†åˆ */
 }URP_PERIMETER_LIMIT_BOUNDARY_S;
 
-/** URPÖÜ½ç¼ì²âÏŞÖÆ²ÎÊı */
+/** URPå‘¨ç•Œæ£€æµ‹é™åˆ¶å‚æ•° */
 typedef struct impURP_PERIMETER_LIMIT_PARA_S
 {
-	IMP_S32 s32MinDist;							    /**< ×îĞ¡ÏñËØ¾àÀë */
-	IMP_S32 s32MinTime;							    /**< ×î¶ÌÊ±¼ä */
-	IMP_S32	s32DirectionLimit;						/**< ÊÇ·ñ×ö·½ÏòÏŞÖÆ */
-	IMP_S32 s32ForbiddenDirection;					/**< ½ûÖ¹·½Ïò½Ç¶È(µ¥Î»: ½Ç¶È) */
-	URP_PERIMETER_LIMIT_BOUNDARY_S stBoundary;		/**< ÖÜ½ç±ß½çÇøÓò */
+	IMP_S32 s32MinDist;							    /**< æœ€å°åƒç´ è·ç¦» */
+	IMP_S32 s32MinTime;							    /**< æœ€çŸ­æ—¶é—´ */
+	IMP_S32	s32DirectionLimit;						/**< æ˜¯å¦åšæ–¹å‘é™åˆ¶ */
+	IMP_S32 s32ForbiddenDirection;					/**< ç¦æ­¢æ–¹å‘è§’åº¦(å•ä½: è§’åº¦) */
+	URP_PERIMETER_LIMIT_BOUNDARY_S stBoundary;		/**< å‘¨ç•Œè¾¹ç•ŒåŒºåŸŸ */
 }URP_PERIMETER_LIMIT_PARA_S;
 
-/** URPÖÜ½ç¼ì²â¹æÔò²ÎÊı */
+/** URPå‘¨ç•Œæ£€æµ‹è§„åˆ™å‚æ•° */
 typedef struct impURP_PERIMETER_RULE_PARA_S
 {
-	IMP_S32 s32TypeLimit;							/**< Ä¿±êÀàĞÍÏŞÖÆ */
-	IMP_S32 s32TypeHuman;							/**< Ä¿±êÀà±ğ£ºÈË(ÏŞ¶¨ÀàĞÍÊ±Ê¹ÓÃ) */
-	IMP_S32 s32TypeVehicle;						    /**< Ä¿±êÀà±ğ£º³µ */
-	IMP_S32 s32Mode;								/**< ÖÜ½çÄ£Ê½ */
-	URP_PERIMETER_LIMIT_PARA_S stLimitPara;		/**< ÖÜ½çÏŞÖÆ²ÎÊı */
+	IMP_S32 s32TypeLimit;							/**< ç›®æ ‡ç±»å‹é™åˆ¶ */
+	IMP_S32 s32TypeHuman;							/**< ç›®æ ‡ç±»åˆ«ï¼šäºº(é™å®šç±»å‹æ—¶ä½¿ç”¨) */
+	IMP_S32 s32TypeVehicle;						    /**< ç›®æ ‡ç±»åˆ«ï¼šè½¦ */
+	IMP_S32 s32Mode;								/**< å‘¨ç•Œæ¨¡å¼ */
+	URP_PERIMETER_LIMIT_PARA_S stLimitPara;		/**< å‘¨ç•Œé™åˆ¶å‚æ•° */
 } URP_PERIMETER_RULE_PARA_S;
 
-//ÎïÆ·ÒÅÁô-begin
+//ç‰©å“é—ç•™-begin
 #define IMP_MAX_OSC_NUM 4
 typedef struct impURP_OSC_SPECL_REGIONS_S
 {
-	IMP_S32 s32Valid; //ÊÇ·ñÓĞĞ§
-	IMP_S8 as8Name[IMP_NAME_BUF_SIZE]; //ÇøÓòÃû³Æ
-	URP_POLYGON_REGION_S stOscRg; //Òª¼ì²âÇøÓò¶¨Òå
-	URP_POLYGON_REGION_S astSubRgA; //¼ì²âÇøÓòÖĞµÄÎŞĞ§×ÓÇøÓò
-	URP_POLYGON_REGION_S astSubRgB; //¼ì²âÇøÓòÖĞµÄÎŞĞ§×ÓÇøÓò
-	URP_POLYGON_REGION_S astSubRgC; //¼ì²âÇøÓòÖĞµÄÎŞĞ§×ÓÇøÓò
+	IMP_S32 s32Valid; //æ˜¯å¦æœ‰æ•ˆ
+	IMP_S8 as8Name[IMP_NAME_BUF_SIZE]; //åŒºåŸŸåç§°
+	URP_POLYGON_REGION_S stOscRg; //è¦æ£€æµ‹åŒºåŸŸå®šä¹‰
+	URP_POLYGON_REGION_S astSubRgA; //æ£€æµ‹åŒºåŸŸä¸­çš„æ— æ•ˆå­åŒºåŸŸ
+	URP_POLYGON_REGION_S astSubRgB; //æ£€æµ‹åŒºåŸŸä¸­çš„æ— æ•ˆå­åŒºåŸŸ
+	URP_POLYGON_REGION_S astSubRgC; //æ£€æµ‹åŒºåŸŸä¸­çš„æ— æ•ˆå­åŒºåŸŸ
 } URP_OSC_SPECL_REGIONS_S;
 
 typedef struct impURP_OSC_LMT_PARA_S
 {
-	IMP_S32 s32TimeMin; //Ê±¼äÔ¼Êø
-	IMP_S32 s32SizeMin; //×îĞ¡³ß´ç
-	IMP_S32 s32SizeMax; //×î´ó³ß´ç
+	IMP_S32 s32TimeMin; //æ—¶é—´çº¦æŸ
+	IMP_S32 s32SizeMin; //æœ€å°å°ºå¯¸
+	IMP_S32 s32SizeMax; //æœ€å¤§å°ºå¯¸
 } URP_OSC_LMT_PARA_S;
 
 typedef struct impURP_OSC_RULE_PARA_S
 {
-	IMP_S32 s32SceneType; //³¡¾°ÀàĞÍ
-	IMP_S32 s32CameraType; //Ïà»úÀàĞÍ
-	URP_OSC_SPECL_REGIONS_S astSpclRgs[IMP_MAX_OSC_NUM]; //Òª´¦ÀíµÄÇøÓò¸öÊı
-	URP_OSC_LMT_PARA_S stOscPara; //Ò»Ğ©Ô¼Êø
+	IMP_S32 s32SceneType; //åœºæ™¯ç±»å‹
+	IMP_S32 s32CameraType; //ç›¸æœºç±»å‹
+	URP_OSC_SPECL_REGIONS_S astSpclRgs[IMP_MAX_OSC_NUM]; //è¦å¤„ç†çš„åŒºåŸŸä¸ªæ•°
+	URP_OSC_LMT_PARA_S stOscPara; //ä¸€äº›çº¦æŸ
 } URP_OSC_RULE_PARA_S;
-//ÎïÆ·ÒÅÁô-end
+//ç‰©å“é—ç•™-end
 
-/** URPµ¥°íÏß×î¶àÌõÊı */
+/** URPå•ç»Šçº¿æœ€å¤šæ¡æ•° */
 #define IMP_URP_MAX_TRIPWIRE_CNT 8
 
-/** URPµ¥°íÏß½á¹¹ */
+/** URPå•ç»Šçº¿ç»“æ„ */
 typedef struct impURP_TRIPWIRE_S
 {
-	IMP_S32     s32Valid;							/**< ÊÇ·ñÓĞĞ§ */
-	IMP_S32     s32IsDoubleDirection;			    /**< ±íÊ¾¸Ã°íÏßÊÇ·ñÎªË«Ïò°íÏß(0: ·ñ, 1: ÊÇ) */
-	IMP_S32     s32ForbiddenDirection;	            /**< µ¥°íÏß½ûÖ¹·½Ïò½Ç¶È(µ¥Î»: ¶È) */
-	URP_LINE_S	stLine;				          	    /**< µ¥°íÏßÎ»ÖÃ */
+	IMP_S32     s32Valid;							/**< æ˜¯å¦æœ‰æ•ˆ */
+	IMP_S32     s32IsDoubleDirection;			    /**< è¡¨ç¤ºè¯¥ç»Šçº¿æ˜¯å¦ä¸ºåŒå‘ç»Šçº¿(0: å¦, 1: æ˜¯) */
+	IMP_S32     s32ForbiddenDirection;	            /**< å•ç»Šçº¿ç¦æ­¢æ–¹å‘è§’åº¦(å•ä½: åº¦) */
+	URP_LINE_S	stLine;				          	    /**< å•ç»Šçº¿ä½ç½® */
 }URP_TRIPWIRE_S;
 
-/** URPµ¥°íÏßÏŞÖÆ²ÎÊı */
+/** URPå•ç»Šçº¿é™åˆ¶å‚æ•° */
 typedef struct impURP_TRIPWIRE_LIMIT_PARA_S
 {
-	IMP_S32 s32MinDist;			/**< ×îĞ¡ÏñËØ¾àÀë */
-	IMP_S32 s32MinTime;			/**< ×î¶ÌÊ±¼ä */
+	IMP_S32 s32MinDist;			/**< æœ€å°åƒç´ è·ç¦» */
+	IMP_S32 s32MinTime;			/**< æœ€çŸ­æ—¶é—´ */
 }URP_TRIPWIRE_LIMIT_PARA_S;
 
-/** URPµ¥°íÏß¹æÔò²ÎÊı */
+/** URPå•ç»Šçº¿è§„åˆ™å‚æ•° */
 typedef struct impURP_TRIPWIRE_RULE_PARA_S
 {
-	IMP_S32 s32TypeLimit;							    /**< Ä¿±êÀàĞÍÏŞÖÆ */
-	IMP_S32 s32TypeHuman;							    /**< Ä¿±êÀà±ğ£ºÈË(ÏŞ¶¨ÀàĞÍÊ±Ê¹ÓÃ) */
-	IMP_S32 s32TypeVehicle;							    /**< Ä¿±êÀà±ğ£º³µ */
-	URP_TRIPWIRE_S astLines[IMP_URP_MAX_TRIPWIRE_CNT];	/**< µ¥°íÏß */
-	URP_TRIPWIRE_LIMIT_PARA_S stLimitPara;			    /**< µ¥°íÏßÏŞÖÆ²ÎÊı */
+	IMP_S32 s32TypeLimit;							    /**< ç›®æ ‡ç±»å‹é™åˆ¶ */
+	IMP_S32 s32TypeHuman;							    /**< ç›®æ ‡ç±»åˆ«ï¼šäºº(é™å®šç±»å‹æ—¶ä½¿ç”¨) */
+	IMP_S32 s32TypeVehicle;							    /**< ç›®æ ‡ç±»åˆ«ï¼šè½¦ */
+	URP_TRIPWIRE_S astLines[IMP_URP_MAX_TRIPWIRE_CNT];	/**< å•ç»Šçº¿ */
+	URP_TRIPWIRE_LIMIT_PARA_S stLimitPara;			    /**< å•ç»Šçº¿é™åˆ¶å‚æ•° */
 } URP_TRIPWIRE_RULE_PARA_S;
 
-/** URPË«¾¯½äÏß×î´óÊı */
+/** URPåŒè­¦æˆ’çº¿æœ€å¤§æ•° */
 #define IMP_URP_MAX_MTRIPWIRE_CNT 4
 
-/** URPË«¾¯½äÏß½á¹¹¶¨Òå */
+/** URPåŒè­¦æˆ’çº¿ç»“æ„å®šä¹‰ */
 typedef struct impURP_MTRIPWIRE_S
 {
-	IMP_S32 s32Valid;					/**< ÊÇ·ñÓĞĞ§*/
-	IMP_S32 s32TimeMin;					/**< ´©Ô½Á½ÌõÏßµÄ×î¶ÌÊ±¼ä¼ä¸ô(unit: s)*/
-	IMP_S32 s32TimeMax;					/**< ´©Ô½Á½ÌõÏßµÄ×î³¤Ê±¼ä¼ä¸ô(unit: s)*/
-	IMP_S32 as32AbnmlAngle[2];			/**< Ë«¾¯½äÏß½ûÖ¹·½Ïò½Ç¶È(unit: degree)*/
-	URP_LINE_S	astLine[2];				/**< Ë«¾¯½äÏßÎ»ÖÃ(unit: pixel)*/
+	IMP_S32 s32Valid;					/**< æ˜¯å¦æœ‰æ•ˆ*/
+	IMP_S32 s32TimeMin;					/**< ç©¿è¶Šä¸¤æ¡çº¿çš„æœ€çŸ­æ—¶é—´é—´éš”(unit: s)*/
+	IMP_S32 s32TimeMax;					/**< ç©¿è¶Šä¸¤æ¡çº¿çš„æœ€é•¿æ—¶é—´é—´éš”(unit: s)*/
+	IMP_S32 as32AbnmlAngle[2];			/**< åŒè­¦æˆ’çº¿ç¦æ­¢æ–¹å‘è§’åº¦(unit: degree)*/
+	URP_LINE_S	astLine[2];				/**< åŒè­¦æˆ’çº¿ä½ç½®(unit: pixel)*/
 } URP_MTRIPWIRE_S;
 
-/** URPË«¾¯½äÏßÏŞÖÆ²ÎÊı¶¨Òå */
+/** URPåŒè­¦æˆ’çº¿é™åˆ¶å‚æ•°å®šä¹‰ */
 typedef struct impURP_MTRIPWIRE_LMT_PARA_S
 {
-	IMP_S32 s32DistMin;                /**< ×îĞ¡¾àÀë */
-	IMP_S32 s32TimeMin;                /**< ×îĞ¡Ê±¼ä */
+	IMP_S32 s32DistMin;                /**< æœ€å°è·ç¦» */
+	IMP_S32 s32TimeMin;                /**< æœ€å°æ—¶é—´ */
 } URP_MTRIPWIRE_LMT_PARA_S;
 
-/** URPË«¾¯½äÏß¹æÔò²ÎÊı */
+/** URPåŒè­¦æˆ’çº¿è§„åˆ™å‚æ•° */
 typedef struct impURP_MTRIPWIRE_RULE_PARA_S
 {
-	IMP_S32 s32TypeLimit;						    /**< Ä¿±êÀàĞÍÏŞÖÆ */
-	IMP_S32 s32TypeHuman;							    /**< Ä¿±êÀà±ğ£ºÈË(ÏŞ¶¨ÀàĞÍÊ±Ê¹ÓÃ) */
-	IMP_S32 s32TypeVehicle;						        /**< Ä¿±êÀà±ğ£º³µ */
-	URP_MTRIPWIRE_S astLines[IMP_URP_MAX_MTRIPWIRE_CNT];	/**< Ë«¾¯½äÏß */
-	URP_MTRIPWIRE_LMT_PARA_S stLimitPara;                   /**< ÏŞÖÆ²ÎÊı */
+	IMP_S32 s32TypeLimit;						    /**< ç›®æ ‡ç±»å‹é™åˆ¶ */
+	IMP_S32 s32TypeHuman;							    /**< ç›®æ ‡ç±»åˆ«ï¼šäºº(é™å®šç±»å‹æ—¶ä½¿ç”¨) */
+	IMP_S32 s32TypeVehicle;						        /**< ç›®æ ‡ç±»åˆ«ï¼šè½¦ */
+	URP_MTRIPWIRE_S astLines[IMP_URP_MAX_MTRIPWIRE_CNT];	/**< åŒè­¦æˆ’çº¿ */
+	URP_MTRIPWIRE_LMT_PARA_S stLimitPara;                   /**< é™åˆ¶å‚æ•° */
 } URP_MTRIPWIRE_RULE_PARA_S;
 
-/** URPÅÇ»²¹æÔò²ÎÊı */
+/** URPå¾˜å¾Šè§„åˆ™å‚æ•° */
 typedef struct impURP_LOITER_RULE_PARA_S
 {
-	IMP_S32 s32TypeLimit;  	/**< Ä¿±êÀàĞÍÏŞÖÆ */
-	IMP_S32 s32TimeMin;			/**< ÏĞ¹ä×î¶ÌÊ±¼ä(unit: s) */
+	IMP_S32 s32TypeLimit;  	/**< ç›®æ ‡ç±»å‹é™åˆ¶ */
+	IMP_S32 s32TimeMin;			/**< é—²é€›æœ€çŸ­æ—¶é—´(unit: s) */
 } URP_LOITER_RULE_PARA_S;
 
-/** ÎïÆ·ÒÅÆú */
+/** ç‰©å“é—å¼ƒ */
 typedef struct impURP_RULE_PARA_ABANDUM_S
 {
-	IMP_S32 s32TimeMin;			/**< ×îĞ¡±¨¾¯Ê±¼ä */
-	IMP_S32 s32SizeMin;			/**< ×îĞ¡ÏñËØ³ß´ç */
-	IMP_S32 s32SizeMax;			/**< ×î´óÏñËØ³ß´ç */
+	IMP_S32 s32TimeMin;			/**< æœ€å°æŠ¥è­¦æ—¶é—´ */
+	IMP_S32 s32SizeMin;			/**< æœ€å°åƒç´ å°ºå¯¸ */
+	IMP_S32 s32SizeMax;			/**< æœ€å¤§åƒç´ å°ºå¯¸ */
 } URP_RULE_PARA_ABANDUM_S;
 
-/** ÎïÆ·±»µÁ */
+/** ç‰©å“è¢«ç›— */
 typedef struct impURP_RULE_PARA_OBJ_STOLEN_S
 {
-	IMP_S32 s32TimeMin;			/**< ×îĞ¡±¨¾¯Ê±¼ä */
-	IMP_S32 s32SizeMin;			/**< ×îĞ¡ÏñËØ³ß´ç */
-	IMP_S32 s32SizeMax;			/**< ×î´óÏñËØ³ß´ç */
+	IMP_S32 s32TimeMin;			/**< æœ€å°æŠ¥è­¦æ—¶é—´ */
+	IMP_S32 s32SizeMin;			/**< æœ€å°åƒç´ å°ºå¯¸ */
+	IMP_S32 s32SizeMax;			/**< æœ€å¤§åƒç´ å°ºå¯¸ */
 } URP_RULE_PARA_OBJ_STOLEN_S;
 
-/** ·Ç·¨Í£³µ */
+/** éæ³•åœè½¦ */
 typedef struct impURP_RULE_PARA_NO_PARKING_S
 {
-	IMP_S32 s32TimeMin;			/**< ×îĞ¡±¨¾¯Ê±¼ä */
+	IMP_S32 s32TimeMin;			/**< æœ€å°æŠ¥è­¦æ—¶é—´ */
 } URP_RULE_PARA_NO_PARKING_S;
 
-/** URP¾²Ö¹Ä¿±ê¼ì²â¹æÔò²ÎÊı */
+/** URPé™æ­¢ç›®æ ‡æ£€æµ‹è§„åˆ™å‚æ•° */
 typedef struct impURP_STATIC_OBJ_DETECT_RULE_PARA_S
 {
-	URP_RULE_PARA_ABANDUM_S stObjAbandumRulePara;     /**< ÎïÆ·ÒÅÁô²ÎÊı */
-	URP_RULE_PARA_OBJ_STOLEN_S stObjStolenRulePara;   /**< ÎïÆ·±»µÁ²ÎÊı */
-	URP_RULE_PARA_NO_PARKING_S stNoParkingRulePara;   /**< ·Ç·¨Í£³µ²ÎÊı */
+	URP_RULE_PARA_ABANDUM_S stObjAbandumRulePara;     /**< ç‰©å“é—ç•™å‚æ•° */
+	URP_RULE_PARA_OBJ_STOLEN_S stObjStolenRulePara;   /**< ç‰©å“è¢«ç›—å‚æ•° */
+	URP_RULE_PARA_NO_PARKING_S stNoParkingRulePara;   /**< éæ³•åœè½¦å‚æ•° */
 } URP_STATIC_OBJ_DETECT_RULE_PARA_S;
 
 
-/** ÓÃ»§¹æÔòĞ­Òé£¨URP£©²ÎÊı */
+/** ç”¨æˆ·è§„åˆ™åè®®ï¼ˆURPï¼‰å‚æ•° */
 typedef struct impURP_RULE_PARA_S
 {
-	URP_OSC_RULE_PARA_S     stOscRulePara;  //ÎïÆ·ÒÅÁô¼ì²â
-	URP_PERIMETER_RULE_PARA_S	stPerimeterRulePara;	          /**< ÖÜ½ç¼ì²â */
-	URP_TRIPWIRE_RULE_PARA_S	stTripwireRulePara;		          /**< µ¥°íÏß¼ì²â */
-	URP_MTRIPWIRE_RULE_PARA_S	stMTripwireRulePara;		      /**< ¶à°íÏß¼ì²â */
-	URP_LOITER_RULE_PARA_S      stLoiterRulePara;                 /**< ÅÇ»²¼ì²â */
-	URP_STATIC_OBJ_DETECT_RULE_PARA_S stStaticObjDetectRulePara;  /**< ¾²Îï¼ì²â */
+	URP_OSC_RULE_PARA_S     stOscRulePara;  //ç‰©å“é—ç•™æ£€æµ‹
+	URP_PERIMETER_RULE_PARA_S	stPerimeterRulePara;	          /**< å‘¨ç•Œæ£€æµ‹ */
+	URP_TRIPWIRE_RULE_PARA_S	stTripwireRulePara;		          /**< å•ç»Šçº¿æ£€æµ‹ */
+	URP_MTRIPWIRE_RULE_PARA_S	stMTripwireRulePara;		      /**< å¤šç»Šçº¿æ£€æµ‹ */
+	URP_LOITER_RULE_PARA_S      stLoiterRulePara;                 /**< å¾˜å¾Šæ£€æµ‹ */
+	URP_STATIC_OBJ_DETECT_RULE_PARA_S stStaticObjDetectRulePara;  /**< é™ç‰©æ£€æµ‹ */
 }URP_RULE_PARA_S;
 
-/** ×î´ó¹æÔòÊıÄ¿ */
+/** æœ€å¤§è§„åˆ™æ•°ç›® */
 #define IMP_URP_MAX_NUM_RULE_NUM 8
 
-/** ×î´ó¹æÔòÃû×Ö³¤¶È */
+/** æœ€å¤§è§„åˆ™åå­—é•¿åº¦ */
 #define IMP_URP_NAME_BUF_SIZE 16
 
-/** URP¹¦ÄÜÂë */
+/** URPåŠŸèƒ½ç  */
 typedef enum impURP_FUNC_PERIMETER_E
 {
-	IMP_URP_FUNC_ABANDUM        = 0x00000002,	/**< ÒÅÆúÎï¼ì²â */
-	IMP_URP_FUNC_OBJSTOLEN      = 0x00000004,	/**< ±»µÁÎï¼ì²â */
-	IMP_URP_FUNC_NOPARKING      = 0x00000008,	/**< ·Ç·¨Í£³µ¼ì²â */
-	IMP_URP_FUNC_PERIMETER		= 0x00000010,	/**< ÖÜ½ç¼ì²â */
-	IMP_URP_FUNC_TRIPWIRE		= 0x00000020,	/**< µ¥°íÏß¼ì²â */
-	IMP_URP_FUNC_MTRIPWIRE      = 0x00000040,	/**< ¶à°íÏß */
-	IMP_URP_FUNC_ABNMLVEL       = 0x00000080,	/**< ·ÇÕı³£ËÙ¶È */
-	IMP_URP_FUNC_LOITER         = 0x00000100,	/**< ÅÇ»² */
-	IMP_URP_FUNC_OSC            = 0X00000200    //object status change
+	IMP_URP_FUNC_ABANDUM        = 0x00000002,	/**< é—å¼ƒç‰©æ£€æµ‹ */
+	IMP_URP_FUNC_OBJSTOLEN      = 0x00000004,	/**< è¢«ç›—ç‰©æ£€æµ‹ */
+	IMP_URP_FUNC_NOPARKING      = 0x00000008,	/**< éæ³•åœè½¦æ£€æµ‹ */
+	IMP_URP_FUNC_PERIMETER		= 0x00000010,	/**< å‘¨ç•Œæ£€æµ‹ */
+	IMP_URP_FUNC_TRIPWIRE		= 0x00000020,	/**< å•ç»Šçº¿æ£€æµ‹ */
+	IMP_URP_FUNC_MTRIPWIRE      = 0x00000040,	/**< å¤šç»Šçº¿ */
+	IMP_URP_FUNC_ABNMLVEL       = 0x00000080,	/**< éæ­£å¸¸é€Ÿåº¦ */
+	IMP_URP_FUNC_LOITER         = 0x00000100,	/**< å¾˜å¾Š */
+	IMP_URP_FUNC_OSC            = 0X00000200,   //object status change
+	IMP_URP_FUNC_OSC_R          = 0X00000400    //object status change
 }URP_FUNC_PERIMETER_E;
 
-/** URP¹æÔò½á¹¹¶¨Òå */
+/** URPè§„åˆ™ç»“æ„å®šä¹‰ */
 typedef struct impURP_RULE_S
 {
-	IMP_S8  aName[IMP_URP_NAME_BUF_SIZE];		/**< ¹æÔòÃû³Æ */
-	IMP_U32 u32Valid;				 	        /**< ÊÇ·ñÓĞĞ§ */
-	IMP_U32 u32Enable;			  	            /**< ÊÇ·ñÊ¹ÄÜ */
-	IMP_U32 u32Level;					        /**< ¾¯½ä¼¶±ğ */
-	IMP_U32 u32Mode;					        /**< ¹æÔòÄ£Ê½£¨ÆôÓÃµÄ¹¦ÄÜ¶ÔÓ¦¹¦ÄÜÂë°´Î»Ïà»ò£© */
-	URP_RULE_PARA_S stPara;				        /**< ¹æÔò²ÎÊı */
+	IMP_S8  aName[IMP_URP_NAME_BUF_SIZE];		/**< è§„åˆ™åç§° */
+	IMP_U32 u32Valid;				 	        /**< æ˜¯å¦æœ‰æ•ˆ */
+	IMP_U32 u32Enable;			  	            /**< æ˜¯å¦ä½¿èƒ½ */
+	IMP_U32 u32Level;					        /**< è­¦æˆ’çº§åˆ« */
+	IMP_U32 u32Mode;					        /**< è§„åˆ™æ¨¡å¼ï¼ˆå¯ç”¨çš„åŠŸèƒ½å¯¹åº”åŠŸèƒ½ç æŒ‰ä½ç›¸æˆ–ï¼‰ */
+	URP_RULE_PARA_S stPara;				        /**< è§„åˆ™å‚æ•° */
 }URP_RULE_S;
 
-/** URP¹æÔò¼¯ºÏ */
+/** URPè§„åˆ™é›†åˆ */
 typedef struct impURP_RULE_SET_S
 {
-	URP_RULE_S astRule[IMP_URP_MAX_NUM_RULE_NUM];			/**< ¹æÔò¼¯ºÏ */
+	URP_RULE_S astRule[IMP_URP_MAX_NUM_RULE_NUM];			/**< è§„åˆ™é›†åˆ */
 }URP_RULE_SET_S;
 
-/** D1Í¼Ïñ¿í¶È */
+/** D1å›¾åƒå®½åº¦ */
 #define IMP_D1_IMG_WIDTH 704
-/** CIFÍ¼Ïñ¿í¶È */
+/** CIFå›¾åƒå®½åº¦ */
 #define IMP_CIF_IMG_WIDTH 352
-/** QCIFÍ¼Ïñ¿í¶È */
+/** QCIFå›¾åƒå®½åº¦ */
 #define IMP_QCIF_IMG_WIDTH 176
-/** PAL D1Í¼Ïñ¸ß¶È */
+/** PAL D1å›¾åƒé«˜åº¦ */
 #define IMP_D1_PAL_IMG_HEIGHT 576
-/** PAL CIFÍ¼Ïñ¸ß¶È */
+/** PAL CIFå›¾åƒé«˜åº¦ */
 #define IMP_CIF_PAL_IMG_HEIGHT 288
-/** PAL QCIFÍ¼Ïñ¸ß¶È */
+/** PAL QCIFå›¾åƒé«˜åº¦ */
 #define IMP_QCIF_PAL_IMG_HEIGHT 144
-/** NTSC D1Í¼Ïñ¸ß¶È */
+/** NTSC D1å›¾åƒé«˜åº¦ */
 #define IMP_D1_NTSC_IMG_HEIGHT 480
-/** NTSC CIFÍ¼Ïñ¸ß¶È */
+/** NTSC CIFå›¾åƒé«˜åº¦ */
 #define IMP_CIF_NTSC_IMG_HEIGHT 240
-/** NTSC QCIFÍ¼Ïñ¸ß¶È */
+/** NTSC QCIFå›¾åƒé«˜åº¦ */
 #define IMP_QCIF_NTSC_IMG_HEIGHT 120
 
 typedef enum impVIDEO_STANDARD_E
 {
-    IMP_NTSC,				/**< NTSCÖÆÊ½ */
-    IMP_PAL				    /**< PALÖÆÊ½ */
+    IMP_NTSC,				/**< NTSCåˆ¶å¼ */
+    IMP_PAL				    /**< PALåˆ¶å¼ */
 }VIDEO_STANDARD_E;
-/** URPÅäÖÃ²ÎÊı */
+/** URPé…ç½®å‚æ•° */
 typedef struct impURP_CONFIG_PARA_S
 {
-	IMP_S32 s32Version;									/**< °æ±¾ºÅ */
-	IMP_S32 s32ImgW;									/**< ËùÅäÖÃÊÓÆµÔ´µÄ¿í¶È */
-	IMP_S32 s32ImgH;									/**< ËùÅäÖÃÊÓÆµÔ´µÄ¸ß¶È */
-	VIDEO_STANDARD_E eVideoStandard;					/**< ËùÅäÖÃÊÓÆµÔ´µÄÖÆÊ½ */
+	IMP_S32 s32Version;									/**< ç‰ˆæœ¬å· */
+	IMP_S32 s32ImgW;									/**< æ‰€é…ç½®è§†é¢‘æºçš„å®½åº¦ */
+	IMP_S32 s32ImgH;									/**< æ‰€é…ç½®è§†é¢‘æºçš„é«˜åº¦ */
+	VIDEO_STANDARD_E eVideoStandard;					/**< æ‰€é…ç½®è§†é¢‘æºçš„åˆ¶å¼ */
 }URP_CONFIG_PARA_S;
 
 
-/** URPÄ¿±êÊä³öÁéÃô¶È¼¶±ğ */
+/** URPç›®æ ‡è¾“å‡ºçµæ•åº¦çº§åˆ« */
 typedef enum impSENSITIVITY_LEVEL_E
 {
-	IMP_HIGH_LEVEL_SENSITIVITY,         /**< ¸ßÁéÃô¶È */
-	IMP_MIDDLE_LEVEL_SENSITIVITY,		/**< ÖĞÁéÃô¶È */
-	IMP_LOW_LEVEL_SENSITIVITY			/**< µÍÁéÃô¶È */
+	IMP_HIGH_LEVEL_SENSITIVITY,         /**< é«˜çµæ•åº¦ */
+	IMP_MIDDLE_LEVEL_SENSITIVITY,		/**< ä¸­çµæ•åº¦ */
+	IMP_LOW_LEVEL_SENSITIVITY			/**< ä½çµæ•åº¦ */
 }SENSITIVITY_LEVEL_E;
 
-/** URP¸ß¼¶²ÎÊı */
+/** URPé«˜çº§å‚æ•° */
 typedef struct impURP_ADVANCE_PARA_S
 {
-	IMP_S32   s32AdvanceParaEnable;				/**< ÊÇ·ñÆôÓÃ¸ß¼¶²ÎÊı(0:·ñ 1:ÊÇ) */
-	IMP_S32   s32TargetMinSize;					/**< Ä¿±ê×îĞ¡ÏñËØ³ß´ç(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMaxSize;					/**< Ä¿±ê×î´óÏñËØ³ß´ç(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMinWidth;				/**< Ä¿±ê×îĞ¡ÏñËØ¿í¶È(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMaxWidth;				/**< Ä¿±ê×î´óÏñËØ¿í¶È(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMinHeight;				/**< Ä¿±ê×îĞ¡ÏñËØ¸ß¶È(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMaxHeight;				/**< Ä¿±ê×î´óÏñËØ¸ß¶È(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMinSpeed;				/**< Ä¿±ê×îĞ¡ÏñËØËÙ¶È(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetMaxSpeed;				/**< Ä¿±ê×î´óÏñËØËÙ¶È(-1Îª²»×öÏŞÖÆ) */
-	IMP_S32   s32TargetOutputSensitivityLevel;	/**< Ä¿±êÊä³öÁéÃô¶È¼¶±ğ(¸ß¡¢ÖĞ¡¢µÍ) */
+	IMP_S32   s32AdvanceParaEnable;				/**< æ˜¯å¦å¯ç”¨é«˜çº§å‚æ•°(0:å¦ 1:æ˜¯) */
+	IMP_S32   s32TargetMinSize;					/**< ç›®æ ‡æœ€å°åƒç´ å°ºå¯¸(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMaxSize;					/**< ç›®æ ‡æœ€å¤§åƒç´ å°ºå¯¸(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMinWidth;				/**< ç›®æ ‡æœ€å°åƒç´ å®½åº¦(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMaxWidth;				/**< ç›®æ ‡æœ€å¤§åƒç´ å®½åº¦(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMinHeight;				/**< ç›®æ ‡æœ€å°åƒç´ é«˜åº¦(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMaxHeight;				/**< ç›®æ ‡æœ€å¤§åƒç´ é«˜åº¦(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMinSpeed;				/**< ç›®æ ‡æœ€å°åƒç´ é€Ÿåº¦(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetMaxSpeed;				/**< ç›®æ ‡æœ€å¤§åƒç´ é€Ÿåº¦(-1ä¸ºä¸åšé™åˆ¶) */
+	IMP_S32   s32TargetOutputSensitivityLevel;	/**< ç›®æ ‡è¾“å‡ºçµæ•åº¦çº§åˆ«(é«˜ã€ä¸­ã€ä½) */
 }URP_ADVANCE_PARA_S;
 
 
 
 #define IMP_URP_MAX_NUM_FDEPTH_LINE 3
-/** ¾°ÉîÏß½á¹¹ */
+/** æ™¯æ·±çº¿ç»“æ„ */
 typedef struct impURP_FDZ_LINE_S
 {
-	LINE_S stRefLine;			/**< ´¹Ö±Ïß¶Î×ø±ê(unit: pixel) */
-	IMP_S32 s32RefLen;			/**< Ïß¶Î³¤¶È(unit: cm) */
+	LINE_S stRefLine;			/**< å‚ç›´çº¿æ®µåæ ‡(unit: pixel) */
+	IMP_S32 s32RefLen;			/**< çº¿æ®µé•¿åº¦(unit: cm) */
 } URP_FDZ_LINE_S;
 
-/** ¾°ÉîÏß½á¹¹ */
+/** æ™¯æ·±çº¿ç»“æ„ */
 typedef struct impURP_FDZ_LINES_S
 {
-	IMP_U32    u32NumUsed;			               /**< Ñù±¾ÊıÄ¿ ´óÓÚµÈÓÚ2 */
-	URP_FDZ_LINE_S stLines[IMP_URP_MAX_NUM_FDEPTH_LINE];   /**< Ñù±¾ÊıÄ¿ */
+	IMP_U32    u32NumUsed;			               /**< æ ·æœ¬æ•°ç›® å¤§äºç­‰äº2 */
+	URP_FDZ_LINE_S stLines[IMP_URP_MAX_NUM_FDEPTH_LINE];   /**< æ ·æœ¬æ•°ç›® */
 } URP_FDZ_LINES_S;
 
-/** ¾°Éî²âÁ¿½á¹¹ */
+/** æ™¯æ·±æµ‹é‡ç»“æ„ */
 typedef struct impURP_FDEPTH_MEASURE_S
 {
-	URP_FDZ_LINES_S stFdzLines;		/**< ±ê¶¨Êı¾İ */
+	URP_FDZ_LINES_S stFdzLines;		/**< æ ‡å®šæ•°æ® */
 } URP_FDEPTH_MEASURE_S;
-/** ±ê¶¨²ÎÊı */
+/** æ ‡å®šå‚æ•° */
 typedef struct impURP_FDEPTH_S
 {
-	IMP_U32 u32Enable;					/**< ÆôÓÃ±êÊ¶*/
-	URP_FDEPTH_MEASURE_S stMeasure;			/**< ±ê¶¨Êı¾İ*/
+	IMP_U32 u32Enable;					/**< å¯ç”¨æ ‡è¯†*/
+	URP_FDEPTH_MEASURE_S stMeasure;			/**< æ ‡å®šæ•°æ®*/
 }URP_FDEPTH_S;
 
 
-/** »·¾³²ÎÊı */
+/** ç¯å¢ƒå‚æ•° */
 typedef struct impURP_ENVIRONMENT_S
 {
-	IMP_U32 u32Enable;					/**< ÆôÓÃ±êÊ¶*/
-	IMP_S32 s32SceneType;				/**< ³¡¾°ÀàĞÍ */
+	IMP_U32 u32Enable;					/**< å¯ç”¨æ ‡è¯†*/
+	IMP_S32 s32SceneType;				/**< åœºæ™¯ç±»å‹ */
 } URP_ENVIRONMENT_S;
 
-/** URP²ÎÊı */
+/** URPå‚æ•° */
 typedef struct impURP_PARA_S
 {
-	URP_CONFIG_PARA_S stConfigPara;				/**< ÅäÖÃ²ÎÊı */
-	URP_RULE_SET_S    stRuleSet;				/**< ¹æÔò²ÎÊı */
-	URP_FDEPTH_S	stFdepth;					/**< ±ê¶¨²ÎÊı */
-	URP_ENVIRONMENT_S stEnvironment;            /**< »·¾³²ÎÊı */
-	URP_ADVANCE_PARA_S  stAdvancePara;			/**< ¸ß¼¶²ÎÊı */
+	URP_CONFIG_PARA_S stConfigPara;				/**< é…ç½®å‚æ•° */
+	URP_RULE_SET_S    stRuleSet;				/**< è§„åˆ™å‚æ•° */
+	URP_FDEPTH_S	stFdepth;					/**< æ ‡å®šå‚æ•° */
+	URP_ENVIRONMENT_S stEnvironment;            /**< ç¯å¢ƒå‚æ•° */
+	URP_ADVANCE_PARA_S  stAdvancePara;			/**< é«˜çº§å‚æ•° */
 }URP_PARA_S;
 
 #ifdef __cplusplus
