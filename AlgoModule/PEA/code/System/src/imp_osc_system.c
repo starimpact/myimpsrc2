@@ -443,7 +443,11 @@ static STATUS_E IMP_OSC_TansURPToInnerData(URP_PARA_S *pURPpara, RULE_S *pRule)
 //		printf("Size: ori:%d urp:%d\n", sizeof(RULE_PARA_OSC_S), sizeof(URP_OSC_RULE_PARA_S));
 
 //#ifdef SUPPORT_OSC
+		
+//		printf("pURPpara->stRuleSet.astRule[%d].stPara.stOscRulePara:%d\n", s32ZoneIndex, pURPpara->stRuleSet.astRule[s32ZoneIndex].stPara.stOscRulePara.stOscPara.s32TimeMin);
 		memcpy(&pRule->stZones.astZone[s32ZoneIndex].stPara.stOsc ,&pURPpara->stRuleSet.astRule[s32ZoneIndex].stPara.stOscRulePara,sizeof(RULE_PARA_OSC_S));
+		
+//		printf("pRule->stZones.astZone[%d].stPara.stOsc:%d\n", s32ZoneIndex, pRule->stZones.astZone[s32ZoneIndex].stPara.stOsc.stOscPara.s32TimeMin);
 //#endif
 
 		memcpy(&pRule->stZones.astZone[s32ZoneIndex].stPara.stPerimeter ,&pURPpara->stRuleSet.astRule[s32ZoneIndex].stPara.stPerimeterRulePara,sizeof(RULE_PARA_PERIMETER_S));
@@ -714,13 +718,8 @@ static IMP_VOID IMP_OSC_OutputTargets( PEA_MODULE *pModule );
 //the main procedure of the algorithm
 STATUS_E IMP_OSC_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage )
 {
-#ifdef TIME_TEST_TD
-    //timer
-    struct timeval start;
-    struct timeval end;
-    float timeuse;
-    int timestart,timeend;
-#endif
+#define PI_TIME 1
+	struct timeval t1, t2;
 
 	PEA_MODULE *pModule = (PEA_MODULE*)hModule;
 	PEA_RESULT_S *pstResult = pModule->pstResult;
@@ -739,9 +738,10 @@ STATUS_E IMP_OSC_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage )
     }
 #endif
 
-#ifdef TIME_TEST_TD
-    gettimeofday(&start,NULL);//start timer
+#if PI_TIME
+gettimeofday(&t1, NULL);
 #endif
+
 	IMP_GA_ResultClear( pstOutput );
 
 	IMP_OSC_ReStartStatus( hModule );
@@ -755,7 +755,7 @@ STATUS_E IMP_OSC_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage )
 
 	pstStatus->u32SceneStatusPre = pstStatus->u32SceneStatus;
 	pstStatus->u32SignalStatusPre = pstStatus->u32SignalStatus;
-#define PI_TIME 0
+
 	pstResult->u32FrmTimePre = pstResult->u32FrmTimeCur;
 	pstResult->u32FrmTimeCur = u32Time;
 	IMP_GrayImageClone( &stImage, &pstResult->stImgInGray );
@@ -763,48 +763,13 @@ STATUS_E IMP_OSC_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage )
 //	ipShowGrayImage(stImage.s32W, stImage.s32H, stImage.pu8Data, "In1");
 #if 0
 	ipShowGrayImage(stImage.s32W, stImage.s32H, pstResult->stImgInGray.pu8Data, "pstResult->stImgInGray.pu8Data 1");
-#endif
-
-#if PI_TIME
-struct timeval t1, t2;
-#endif
+#endif	
 
 	if ( IMP_OSC_CheckRuleEnable (pModule ) )
 	{
 		if( IMP_OSC_CheckCurrentImage( pModule ) )
 		{
-
-#if 0
-	ipShowGrayImage(stImage.s32W, stImage.s32H, pstResult->stImgInGray.pu8Data, "pstResult->stImgInGray.pu8Data 2");
-#endif			
-
-#if PI_TIME
-gettimeofday(&t1, NULL);
-#endif
-
 			IMP_PEA_ProcessObjRecognition( pModule->hObjRecg );
-//ipShowGrayImage(stImage.s32W, stImage.s32H, stImage.pu8Data, "In1");
-#if PI_TIME
-gettimeofday(&t2, NULL);
-printf("ProcessObjRecognition:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
-#endif
-#if 0
-	ipShowGrayImage(stImage.s32W, stImage.s32H, pstResult->stImgInGray.pu8Data, "pstResult->stImgInGray.pu8Data 3");
-#endif	
-#if PI_TIME
-gettimeofday(&t1, NULL);
-#endif
-
- 			IMP_PEA_BVA_ProcessBehaviorAnalysis( pModule->hEvtAnls );
-
-#if PI_TIME
-gettimeofday(&t2, NULL);
-printf("ProcessBehaviorAnalysi:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000); 			
-#endif
-
-			IMP_PEA_BVA_PostProcessBehaviorAnalysis( pModule->hEvtAnls );
-			IMP_PEA_PostProcessObjRecognition( pModule->hObjRecg );
-			IMP_OSC_OutputTargets( pModule );	//
 		}
 		else
 		{
@@ -816,14 +781,12 @@ printf("ProcessBehaviorAnalysi:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 	{
 		enStatus = IMP_STATUS_UNSUPPORT;
 	}
-#ifdef TIME_TEST_TD
-        gettimeofday(&end,NULL);
-        timestart=1000000*start.tv_sec+start.tv_usec;
-        timeend=1000000*end.tv_sec+end.tv_usec;
-#if DBG_PROCESSIMAGE
-printf("IMP_ProcessImage used:%d us\n",timeend - timestart);
-#endif
-#endif
+	
+#if PI_TIME
+gettimeofday(&t2, NULL);
+printf("ProcessObjRecognition:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+#endif	
+
 	return enStatus;
 }
 
