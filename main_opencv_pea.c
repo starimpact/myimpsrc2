@@ -988,7 +988,7 @@ int main()
 
 #ifdef cif
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-23033-近点芦苇荡-低对比度.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11032-1.avi";
 //   IMP_S8 *fileName = "/home/zm/video/PEA/SILVER-1080.avi";
@@ -1017,13 +1017,15 @@ int main()
 //	IMP_S8 *fileName = "/home/zm/video/PEA/cif1.y";
     //IMP_S8 *fileName = "../../all-1-cif.avi";
 	//IMP_S8 *fileName = "../../normal.yuv";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
 //    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;

@@ -43,6 +43,52 @@
 64更新太慢, 8比较合适.
 忘了当初为何要设为64.
 
+2012年05月29日 星期二 16时10分22秒 
+impReplaceObject(18356)_2:4.2 ms
+impMatchSObject(1393)_2:2.9 ms
+impCheckMotion(1019):19.9 ms impGetPosAlongDir_U8(1019):13.9 ms
+impReplaceObject(44)_2:0.0 ms
+impMatchSObject(17)_2:0.0 ms
+impCheckMotion(23):0.7 ms
+impCmp_SArea_SOBJSign_2:29.7 ms
+
+2012年05月31日 星期四 09时24分01秒 
+usleep(10000);
+//////176*144///////////
+noise:4 ms
+DiffNum:0%
+vibe:14 ms
+impDetectEdges:3.1 ms
+s32ObjNum:0
+IMP_ProcessOSCD:9 ms
+ProcessDetector:30 ms
+ProcessObjRecognition:30 ms
+W:704, H:576
+AlgoTime:31.5 ms
+OthTime:44.7 ms
+CVTImage:3.9
+GetFrameTime:30.1 ms
+
+//////352*288//////////
+noise:16 ms
+DiffNum:0%
+vibe:62 ms
+impDetectEdges:12.4 ms
+s32ObjNum:3
+IMP_ProcessOSCD:38 ms
+ProcessDetector:123 ms
+ProcessObjRecognition:124 ms
+W:704, H:576
+AlgoTime:124.9 ms
+OthTime:22.0 ms
+CVTImage:14.9
+GetFrameTime:2.6 ms
+
+
+
+
+
+
 
 
 

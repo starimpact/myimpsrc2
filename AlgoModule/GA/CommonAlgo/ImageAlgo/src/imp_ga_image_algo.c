@@ -1802,6 +1802,19 @@ IMP_VOID ipGradientXY(IMP_U8 *src, IMP_U8 *dst,IMP_U16 width, IMP_U16 height)
 }
 
 
+/***************************************************
+name:ipSobel3_3
+do:3Ｘ3 sobel算梯度
+input:
+	src:灰度图像
+	stride1:src图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	stride2:dst图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	width:图像宽
+	height:图像高
+output:
+	dst:目标梯度大小图像
+history:
+****************************************************/
 IMP_VOID ipSobel3_3(IMP_U8 *src, IMP_U16 stride1, IMP_U8 *dst, IMP_U16 stride2, IMP_U16 width, IMP_U16 height)
 {
 	IMP_S32 H, O, V;
@@ -1975,6 +1988,7 @@ IMP_VOID ipSobelGrad3_3(IMP_U8 *src, IMP_U16 stride1, IMP_U8 *edge, IMP_U16 stri
 	IMP_DOUBLE xu, yu, ang;
 	IMP_S32 i00, i01, i02;
 	IMP_S32 i10, i11, i12;
+
 
 
 	IMP_S32 i20, i21, i22;

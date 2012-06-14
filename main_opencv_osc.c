@@ -985,6 +985,7 @@ int main(int argc,char *argv[])
 //	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体丢失.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体丢失.mp4";
 	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体丢失.mp4";
+
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
