@@ -23,8 +23,8 @@
     #include <sys/time.h>
 #endif
 
-#define cif
-//#define qcif
+//#define cif
+#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176

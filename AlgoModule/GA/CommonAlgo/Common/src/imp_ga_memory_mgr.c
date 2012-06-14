@@ -62,7 +62,7 @@ static IMP_VOID IMP_MemMgrTerminate( MEM_MGR_S *pstMgr )
 			p_node = p_node->pstNext;
 		}
 	}
-//	printf( "max used mem is (%d, %d)\n", pstMgr->s32MemLen, pstMgr->s32MemMax );
+	printf( "max used mem is (%d, %d)\n", pstMgr->s32MemLen, pstMgr->s32MemMax );
 
 	memset( pstMgr, 0, sizeof(MEM_MGR_S) );
 }
