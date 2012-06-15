@@ -1,0 +1,35 @@
+/***************************************************
+name:imp_ive_Sobel3_3
+do:3Ｘ3 sobel算梯度
+input:
+	src:灰度图像
+	stride1:src图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	stride2:dst图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	width:图像宽
+	height:图像高
+output:
+	dst:目标梯度大小图像
+history:
+****************************************************/
+IMP_VOID imp_ive_Sobel3_3(IMP_U8 *src, IMP_U16 stride1, IMP_U8 *dst, IMP_U16 stride2, IMP_U16 width, IMP_U16 height);
+
+
+/***************************************************
+name:imp_ive_SmoothGauss_3x3
+do:3Ｘ3 高斯平滑
+input:
+	src:灰度图像
+	stride1:src图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	stride2:dst图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	width:图像宽
+	height:图像高
+output:
+	dst:平滑后的图像
+history:
+****************************************************/
+IMP_VOID imp_ive_GaussianSmooth_3x3(IMP_U8 *src, IMP_U16 stride1, IMP_U8 *dst, IMP_U16 stride2, IMP_U16 width, IMP_U16 height);
+
+
+
+
+
