@@ -214,6 +214,7 @@ imp_pea_common.c:(.text+0x2cc)：对‘cvReleaseImage’未定义的引用
 //Noise Estimate by 5X5 area, better and quicker version
 IMP_S32 ipNoiseEstimateByBox_25(GRAY_IMAGE_S *pimgNow, GRAY_IMAGE_S *pimgTmp, IMP_S32 *pdwNoiseValue)
 {
+#define NEBB_SHW 1
 	IMP_S32 dwRI, dwCI;
 	IMP_S32 dwBRI, dwBCI;
 	IMP_S32 dwOft, dwOft2, dwMax;
@@ -225,11 +226,21 @@ IMP_S32 ipNoiseEstimateByBox_25(GRAY_IMAGE_S *pimgNow, GRAY_IMAGE_S *pimgTmp, IM
 	IMP_S32 fMean, fVar;
 	float fNoise;
 	IMP_U8 *pubyEdge = 0;
-	
+#if NEBB_SHW
+	struct timeval t1, t2;
+#endif
 //FILE *pf = fopen("/home/zm/mean_var", "w");
 
 	pubyEdge = pubyTmp;
+	
+#if NEBB_SHW
+gettimeofday(&t1, NULL);
+#endif
 	ipSobel3_3(pubyNow, dwWidth, pubyEdge, dwWidth, dwWidth, dwHeight);
+#if NEBB_SHW
+gettimeofday(&t2, NULL);
+printf("ipSobel3_3:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
+#endif
 //	ipShowGrayImage(dwWidth, dwHeight, pubyEdge, "pimgTmp->pu8Data");
 	
 	memset(adwHist, 0, 256 * 4);

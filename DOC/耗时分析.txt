@@ -1,0 +1,35 @@
+
+
+
+
+2012年06月15日 星期五 10时08分34秒 
+
+3520板子,176*144图片:
+
+IMP_HiImageConvertToYUV422Image:3.6 ms:下采样需要预先做一下gauss平滑.可以用ive中的filter.
+
+ipSobel3_3:1.4 ms:用ive中的sobel.
+
+imp_vibe_bgmodel.c中:
+vibe-motion-diff:0.8 ms:用ive中的图像减
+vibe-binary:1.7 ms:将双背景分开后,用ive中的图像减和二值化
+vibe-contour:4.7 ms
+vibe-pixel:0.9 ms:用ive中的直方图来计算
+vibe-diffuse:3.3 ms
+vibe-bkgavg:1.5 ms:双背景分开后,这一步可以省略
+
+假设ive中的函数耗时可以忽略不计,那么ive优化后可以节省1.4+0.8+1.7+0.9+1.5=6.3ms.
+如果IMP_HiImageConvertToYUV422Image能优化到2.5ms,那总共可以节省:6.3+(3.6-2.5)=7.4ms.
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -78,13 +78,13 @@ gettimeofday(&t1, NULL);
         HI_MPI_VI_ReleaseFrame(ViDev, ViChn, &stFrame);
 
         // Process Image
-//		IMP_ProcessImage( hIMP, &stImage );
+		IMP_ProcessImage( hIMP, &stImage );
 
         // Get Algo Result
-//		IMP_GetResults( hIMP, &stResult );
+		IMP_GetResults( hIMP, &stResult );
 
 gettimeofday(&t2, NULL);
-printf("out:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("out:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 printf("\n--------------------------\n");
 #ifdef SHOW_DEBUG_INFO
         IMP_ShowDebugInfo(&stResult);
@@ -120,6 +120,9 @@ static void IMP_HiImageConvertToYUV422Image(VIDEO_FRAME_S *pVBuf, YUV_IMAGE422_S
 	HI_CHAR *pUserPageAddr[2];
     PIXEL_FORMAT_E  enPixelFormat = pVBuf->enPixelFormat;
     HI_U32 u32UvHeight;
+    
+struct timeval t1, t2;
+gettimeofday(&t1, NULL);
 
     pImage->u32Time = pVBuf->u64pts/(40*1000);
 
@@ -205,6 +208,9 @@ static void IMP_HiImageConvertToYUV422Image(VIDEO_FRAME_S *pVBuf, YUV_IMAGE422_S
         pImage->pu8Y = pY;
     }
     HI_MPI_SYS_Munmap(pUserPageAddr[0], size);
+    
+gettimeofday(&t2, NULL);
+printf("IMP_HiImageConvertToYUV422Image:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 }
 
 static void IMP_ShowDebugInfo( RESULT_S *result )

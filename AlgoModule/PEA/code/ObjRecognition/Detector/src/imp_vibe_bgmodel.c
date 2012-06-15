@@ -229,7 +229,7 @@ IMP_S32 IMP_ProcessViBe( IMP_MODULE_HANDLE hModule )
 
 IMP_S32 impGetAvgBkg_2(IMP_U8 **ppu8Bkgs, IMP_U8 *pu8Bkg, IMP_S32 s32Width, IMP_S32 s32Height);
 
-#define VIBE_SHW_TIME 0
+#define VIBE_SHW_TIME 1
 //two backgrounds
 IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 {
@@ -283,9 +283,17 @@ IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 	pu8FgTmp = pstModule->stImgFgTmp.pu8Data;
 	pu8PreGray = pstModule->stImgPreGray.pu8Data;
 	
+#if VIBE_SHW_TIME
+gettimeofday(&t1, NULL);
+#endif	
 	//it will be used for the static object detection.
 	IMP_CalcMotionDiffImage(s32Width, s32Height, pstResult->s32Noise, pu8InGray, pu8PreGray, pstResult->stDRegionSet.pstImgFrmDiff->pu8Data);
 //	printf("RAND_MAX:%d(%d)\n", RAND_MAX, 0x7fff);
+#if VIBE_SHW_TIME
+gettimeofday(&t2, NULL);
+printf("vibe-motion-diff:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
+//	memcpy(pu8Fg, pu8FgTmp, s32Height * s32Width);
+#endif
 
 	//initialize
 	if (pstResult->u32FrmTimeCur == 0)
@@ -343,7 +351,7 @@ gettimeofday(&t1, NULL);
 	}
 #if VIBE_SHW_TIME
 gettimeofday(&t2, NULL);
-printf("vibe-binary:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("vibe-binary:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 //	memcpy(pu8Fg, pu8FgTmp, s32Height * s32Width);
 #endif
 	
@@ -383,15 +391,6 @@ gettimeofday(&t1, NULL);
 				}
 			}
 			
-			if (s32BkgUR > 1 && //disable it when 1
-				u16Val2 > 0 && u16Val2 < 9 && 
-				u8Diff < s32R && 
-				!pu8Fg[s32Oft] 
-				)
-			{
-				if (pu8FgTmp[s32Oft] < 127) pu8FgTmp[s32Oft]++; //increasing slowly, useless	
-			}
-			
 			if (!pu8Fg[s32Oft] || u8Diff > s32R)
 			{
 				pu8FgTmp[s32Oft] = pu8FgTmp[s32Oft] - 2 < 0 ? 0 : pu8FgTmp[s32Oft] - 2; //decreasing quickly
@@ -402,7 +401,7 @@ gettimeofday(&t1, NULL);
 	
 #if VIBE_SHW_TIME
 gettimeofday(&t2, NULL);
-printf("vibe-contour:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("vibe-contour:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 
 #endif	//cat
@@ -423,7 +422,7 @@ gettimeofday(&t1, NULL);
 
 #if VIBE_SHW_TIME
 gettimeofday(&t2, NULL);
-printf("vibe-pixel:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("vibe-pixel:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 
 //	printf("%.2f%%\n", abs(s32NowPixelNum - s32PrePixelNum) * 100.f / (s32Width * s32Height));
@@ -486,19 +485,13 @@ gettimeofday(&t1, NULL);
 				u16Val = (u8GrayVal * 16 + u8Bkg * (128 - 16) + 64) >> 7; //can prevent the dust
 				u8GrayVal = u16Val > 255 ? 255 : u16Val;
 				pu8Tmp1[1] = u8GrayVal;
-			//	
-				if (pu8FgTmp[s32Oft] >= s32BkgUR && s32BkgUR > 1) //only diffuse on the stable contour point, has been disabled when s32BkgUR > 1
-				{
-					s32Rnd2 = impRand(8);
-					ppu8Bkgs[s32Oft + as32Oft[s32Rnd2]][1] = u8GrayVal;
-				}
 			}
 		}
 
 	}
 #if VIBE_SHW_TIME
 gettimeofday(&t2, NULL);
-printf("vibe-diffuse:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("vibe-diffuse:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 
 
@@ -508,7 +501,7 @@ gettimeofday(&t1, NULL);
 	impGetAvgBkg_2(ppu8Bkgs, pu8Bkg, s32Width, s32Height);
 #if VIBE_SHW_TIME
 gettimeofday(&t2, NULL);
-printf("vibe-bkgavg:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("vibe-bkgavg:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 
 #if 0
