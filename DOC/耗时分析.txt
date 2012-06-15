@@ -4,6 +4,8 @@
 
 2012年06月15日 星期五 10时08分34秒 
 
+///////////////////////////////////////////////////////////////////////////////
+
 3520板子,176*144图片:
 
 IMP_HiImageConvertToYUV422Image:3.6 ms:下采样需要预先做一下gauss平滑.可以用ive中的filter.
@@ -21,6 +23,42 @@ vibe-bkgavg:1.5 ms:双背景分开后,这一步可以省略
 假设ive中的函数耗时可以忽略不计,那么ive优化后可以节省1.4+0.8+1.7+0.9+1.5=6.3ms.
 如果IMP_HiImageConvertToYUV422Image能优化到2.5ms,那总共可以节省:6.3+(3.6-2.5)=7.4ms.
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+需要封装的两个ive函数.
+/***************************************************
+name:imp_ive_Sobel3_3
+do:3Ｘ3 sobel算梯度
+input:
+	src:灰度图像
+	stride1:src图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	stride2:dst图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	width:图像宽
+	height:图像高
+output:
+	dst:目标梯度大小图像
+history:
+****************************************************/
+IMP_VOID imp_ive_Sobel3_3(IMP_U8 *src, IMP_U16 stride1, IMP_U8 *dst, IMP_U16 stride2, IMP_U16 width, IMP_U16 height);
+
+
+/***************************************************
+name:imp_ive_SmoothGauss_3x3
+do:3Ｘ3 高斯平滑
+input:
+	src:灰度图像
+	stride1:src图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	stride2:dst图像的内存跨度,当图像宽是４的倍数时,它等行图像宽
+	width:图像宽
+	height:图像高
+output:
+	dst:平滑后的图像
+history:
+****************************************************/
+IMP_VOID imp_ive_GaussianSmooth_3x3(IMP_U8 *src, IMP_U16 stride1, IMP_U8 *dst, IMP_U16 stride2, IMP_U16 width, IMP_U16 height);
 
 
 
