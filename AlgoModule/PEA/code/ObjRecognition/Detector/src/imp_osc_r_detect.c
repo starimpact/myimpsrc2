@@ -17,14 +17,33 @@
 IMP_S32 impRMVDetect(IMP_OSCD_S *pstModule)
 {
 	IMP_S32 s32OI, s32PI;
-	IMP_U8 *pu8InGray = 0;
-	GA_HARDWARE_RS_S  *pstHwResource = pstModule->pstHwResource; //系统硬件资源
-	PEA_RESULT_S      *pstResult = pstModule->pstResult; //系统公共数据
+	IMP_S32 s32R;
+	IMP_U8 *pu8InGray = 0, *pu8PreGray = 0, *pu8Static2 = 0;
+	GA_HARDWARE_RS_S *pstHwResource = pstModule->pstHwResource; //系统硬件资源
+	PEA_RESULT_S *pstResult = pstModule->pstResult; //系统公共数据
 	
 	GRAY_IMAGE_S *pstInGray = &pstResult->stImgInGray;
 	IMP_S32 s32Width = pstResult->s32Width, s32Height = pstResult->s32Height;
 	
 	pu8InGray = pstInGray->pu8Data;
+	pu8PreGray = pstModule->stImgPreGray.pu8Data;
+	pu8Static2 = pstModule->stImgFgStatic2.pu8Data;
+	
+	s32R = pstResult->s32Noise;
+	
+	memset(pu8Static2, 0, s32Width * s32Height);
+	
+	for (s32PI = 0; s32PI < s32Width * s32Height; s32PI++)
+	{
+		if (abs(pu8InGray[s32PI] - pu8PreGray[s32PI]) > s32R)
+		{
+			pu8Static2[s32PI] = 1;
+		}
+	}
+	
+#if OSCD_DBG_SHW
+	ipShowBinImage(s32Width, s32Height, pu8Static2, "pu8Static2");
+#endif
 	
 	for (s32OI = 0; s32OI < OSCD_MAX_TGT_CNT; s32OI++)
 	{
@@ -673,7 +692,7 @@ IMP_S32 impMatchRObject(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 	printf("ID_%d_MatchScore_NCC:%d%%\n", pstObj->u32TargetId, s32MatchScore);
 #endif
 
-	IMP_S32 s32TestLen = RMV_CHK_NEED_LEN;
+	IMP_S32 s32TestLen = RMV_CHK_NEED_LEN * 4;
 	//judge if mark the RMV object
 	if (pstObj->s32PosLen > s32TestLen)
 	{
@@ -686,7 +705,7 @@ IMP_S32 impMatchRObject(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 		s32MatchScore /= s32TestLen;
 		
 //		if (s32MatchScore < 50) impDeleteObject(pstModule, pstObj);
-		
+
 		if (s32MatchScore < 50) OSCD_ROBJ_SET_REALOBJ(pstObj->u8Used);;
 	}
 	

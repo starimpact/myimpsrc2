@@ -824,7 +824,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 			cvCopy(imageDst, gpstImgRMV, NULL);
 			memcpy(stImage.pu8Y,imageDst->imageData,s32ImgW * s32ImgH);
 			
-			if (0 && frame && !gadwRMVPntNum)
+			if (1 && frame && !gadwRMVPntNum)
   			{
   				char byKey;
     			cvShowImage("DrawRMV", pImgGray);
@@ -984,7 +984,10 @@ int main(int argc,char *argv[])
 //	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体丢失.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体丢失.mp4";
-	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体丢失.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体丢失.mp4";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12115-公司大堂-展台杯子失窃.avi";
+	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12110-公司大堂-展台提包失窃.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12106-电子商场-柜台杯子失窃.avi";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;

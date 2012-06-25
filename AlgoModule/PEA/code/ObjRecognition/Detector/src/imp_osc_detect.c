@@ -179,12 +179,22 @@ history:
 IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 {
 	IMP_OSCD_S *pstModule = (IMP_OSCD_S*)hModule;
-
+	IMP_U8 *pu8PreGray = 0, *pu8InGray = 0;
+	PEA_RESULT_S *pstResult = pstModule->pstResult; //系统公共数据
+	IMP_S32 s32Width = pstResult->s32Width, s32Height = pstResult->s32Height;
+	
+	pu8InGray = pstResult->stImgInGray.pu8Data;
+	pu8PreGray = pstModule->stImgPreGray.pu8Data;
+	if (pstResult->u32FrmTimeCur == 0)
+	{
+		memcpy(pu8PreGray, pu8InGray, s32Width * s32Height);
+	}
+	
 #if OSCD_DBG_SHW_TIME || 1	
 	struct timeval t1, t2;
 #endif
 
-	if (pstModule->pstResult->stSysStatus.u32NeedReInit)
+	if (pstResult->stSysStatus.u32NeedReInit)
 	{
 	//	impOSCD_Clear(pstModule);
 		return 0;
@@ -269,7 +279,7 @@ IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 	gettimeofday(&t1, NULL);
 #endif
 
-	impProcessOSCD0(pstModule);
+//	impProcessOSCD0(pstModule);
 
 #if OSCD_DBG_SHW_TIME
 	gettimeofday(&t2, NULL);
@@ -278,6 +288,8 @@ IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 //	printf("***pstModule->pstRule->stZones.astZone[0].stPara.stOsc.stOscPara.s32TimeMin:%d\n", pstModule->pstRule->stZones.astZone[0].stPara.stOsc.stOscPara.s32TimeMin);
 	
 	impOutPutResult(pstModule);
+	
+	memcpy(pu8PreGray, pu8InGray, s32Width * s32Height); //save current image as preimage
 	
 	return 0;
 }
