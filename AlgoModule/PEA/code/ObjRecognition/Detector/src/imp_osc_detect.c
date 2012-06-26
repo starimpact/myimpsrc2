@@ -166,6 +166,7 @@ IMP_S32 IMP_ConfigOSCD(IMP_MODULE_HANDLE hModule, IMP_OSCDPara_S *pstPara)
 
 IMP_S32 impProcessOSCD0( IMP_MODULE_HANDLE hModule );
 IMP_S32 impRule2Inner(IMP_OSCD_S *pstModule);
+IMP_S32 impUpdateSBkg(IMP_MODULE_HANDLE hModule);
 /***************************************************
 name:IMP_ProcessOSCD
 do:算法主过程
@@ -254,7 +255,9 @@ IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 #endif
 	return 0;
 #endif
-
+	
+	impUpdateSBkg(hModule);
+	
 #if 1
 	if (1 && pstModule->s32First)
 	{
@@ -353,6 +356,47 @@ IMP_S32 impRule2Inner(IMP_OSCD_S *pstModule)
 }
 
 
+IMP_S32 impUpdateSBkg(IMP_MODULE_HANDLE hModule)
+{
+	IMP_S32 s32RI, s32CI;
+	IMP_S32 s32Oft;
+	IMP_OSCD_S *pstModule = (IMP_OSCD_S*)hModule;
+	PEA_RESULT_S *pstResult = pstModule->pstResult; //系统公共数据
+	IMP_U8 *pu8SBkg = 0, *pu8InGray = 0;
+
+	GRAY_IMAGE_S *pstInGray = &pstResult->stImgInGray;
+	IMP_S32 s32Width = pstResult->s32Width, s32Height = pstResult->s32Height;
+	
+	pu8InGray = pstInGray->pu8Data;
+	pu8SBkg = pstModule->stImgSBkg.pu8Data;
+	
+	if (pstResult->u32FrmTimeCur == 0)
+	{
+		memcpy(pu8SBkg, pu8InGray, s32Width * s32Height);
+		return 0;
+	}
+	
+	for (s32RI = 1; s32RI < s32Height - 1; s32RI++)
+	{
+		for (s32CI = 1; s32CI < s32Width - 1; s32CI++)
+		{
+			s32Oft = s32RI * s32Width + s32CI;
+			
+			if (pstModule->s32FrmNum % 2 == 0)
+			{
+				pu8SBkg[s32Oft] = (pu8SBkg[s32Oft] * (128 - 32) + pu8InGray[s32Oft] * 32) >> 7;
+			}
+		}
+	}
+	
+#if OSCD_DBG_SHW	
+	ipShowGrayImage(s32Width, s32Height, pu8SBkg, "s_bkg");
+#endif		
+	
+	return 0;
+}
+
+
 //two backgrounds
 IMP_S32 impProcessOSCD0(IMP_MODULE_HANDLE hModule)
 {
@@ -396,7 +440,6 @@ IMP_S32 impProcessOSCD0(IMP_MODULE_HANDLE hModule)
 	
 	if (pstResult->u32FrmTimeCur == 0)
 	{
-		memcpy(pu8SBkg, pu8InGray, s32Width * s32Height);
 		memcpy(pu8PreGray, pu8InGray, s32Width * s32Height);
 		return 0;
 	}
@@ -419,12 +462,7 @@ IMP_S32 impProcessOSCD0(IMP_MODULE_HANDLE hModule)
 		for (s32CI = 1; s32CI < s32Width - 1; s32CI++)
 		{
 			s32Oft = s32RI * s32Width + s32CI;
-			
-			if (pstModule->s32FrmNum % 2 == 0)
-			{
-				pu8SBkg[s32Oft] = (pu8SBkg[s32Oft] * (128 - 32) + pu8InGray[s32Oft] * 32) >> 7;
-			}
-			
+						
 			u8Diff = abs(pu8InGray[s32Oft] - pu8SBkg[s32Oft]);
 			
 			if (pu8Fg[s32Oft] && u8Diff < s32R * 2)
@@ -447,9 +485,7 @@ IMP_S32 impProcessOSCD0(IMP_MODULE_HANDLE hModule)
 	printf("ProcessOSCD_1:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 	
-#if OSCD_DBG_SHW	
-	ipShowGrayImage(s32Width, s32Height, pu8SBkg, "s_bkg");
-#endif	
+
 
 #if OSCD_DBG_SHW_TIME
 	gettimeofday(&t1, NULL);

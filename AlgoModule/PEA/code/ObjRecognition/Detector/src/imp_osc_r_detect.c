@@ -19,6 +19,7 @@ IMP_S32 impRMVDetect(IMP_OSCD_S *pstModule)
 	IMP_S32 s32OI, s32PI;
 	IMP_S32 s32R;
 	IMP_U8 *pu8InGray = 0, *pu8PreGray = 0, *pu8Static2 = 0;
+	IMP_U8 *pu8SBkg = 0;
 	GA_HARDWARE_RS_S *pstHwResource = pstModule->pstHwResource; //系统硬件资源
 	PEA_RESULT_S *pstResult = pstModule->pstResult; //系统公共数据
 	
@@ -28,6 +29,7 @@ IMP_S32 impRMVDetect(IMP_OSCD_S *pstModule)
 	pu8InGray = pstInGray->pu8Data;
 	pu8PreGray = pstModule->stImgPreGray.pu8Data;
 	pu8Static2 = pstModule->stImgFgStatic2.pu8Data;
+	pu8SBkg = pstModule->stImgSBkg.pu8Data;
 	
 	s32R = pstResult->s32Noise;
 	
@@ -35,7 +37,7 @@ IMP_S32 impRMVDetect(IMP_OSCD_S *pstModule)
 	
 	for (s32PI = 0; s32PI < s32Width * s32Height; s32PI++)
 	{
-		if (abs(pu8InGray[s32PI] - pu8PreGray[s32PI]) > s32R)
+		if (abs(pu8InGray[s32PI] - pu8SBkg[s32PI]) > s32R)
 		{
 			pu8Static2[s32PI] = 1;
 		}
@@ -51,8 +53,14 @@ IMP_S32 impRMVDetect(IMP_OSCD_S *pstModule)
 		IMP_STATIC_OBJ_S *pstSObj = &pstModule->stSObjSet.aSObjs[s32OI];
 		if (OSCD_ROBJ_IS_CANDIDATE(pstSObj->u8Used))
 		{
-			IMP_S32 s32RMVNum = 0, s32NeedLen = RMV_CHK_NEED_LEN;
+			IMP_S32 s32RMVNum = 0, s32NeedLen = RMV_CHK_NEED_LEN, s32IFM;
 			pstSObj->stSOBJType = impCheckRMotion(pstModule, pstSObj);
+			s32IFM = impCheckIFM(pstModule, pstSObj);
+			//set SOBJT_UKN when there is motion in the RMV object area.
+			if (s32IFM > 2)
+			{
+				pstSObj->stSOBJType = SOBJT_UKN;
+			}
 			//match static object with current frame, and update
 			impMatchRObject(pstModule, pstSObj);
 			impUpdateRPosition(pstSObj);
@@ -467,6 +475,54 @@ IMP_S32 impDeleteRObject(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 }
 
 
+//check if has inter-frame motion in the object area
+IMP_S32 impCheckIFM(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
+{
+	IMP_S32 s32RI, s32CI;
+	IMP_S32 s32W = 0, s32H = 0, s32Oft;
+	PEA_RESULT_S *pstResult = pstModule->pstResult;
+	IMP_U8 *pu8Static2 = 0, *pu8ObjSign = 0;
+	IMP_U8 u8ObjSign;
+	IMP_RECT_S stRect;
+	IMP_S32 s32MovePntNum, s32ObjPntNum;
+	
+	pu8Static2 = pstModule->stImgFgStatic2.pu8Data;
+	pu8ObjSign = pstModule->stImgRObjSign.pu8Data;
+
+	stRect = pstObj->stRect;
+	u8ObjSign = pstObj->u8Sign;
+	
+	s32W = pstResult->stImgInGray.s32W;
+	s32H = pstResult->stImgInGray.s32H;
+	
+	s32MovePntNum = 0;
+	s32ObjPntNum = 0;
+	for (s32RI = stRect.s16Y1; s32RI <= stRect.s16Y2; s32RI++)
+	{
+		for (s32CI = stRect.s16X1; s32CI <= stRect.s16X2; s32CI++)
+		{
+			s32Oft = s32RI * s32W + s32CI;
+			if (pu8ObjSign[s32Oft] == u8ObjSign)
+			{
+				s32ObjPntNum++;
+				if (pu8Static2[s32Oft])
+				{
+					s32MovePntNum++;
+				}
+			}
+		}
+	}
+	
+	s32ObjPntNum += 1;
+	
+	printf("CheckIFM_%d:%d\n", pstObj->u32TargetId, s32MovePntNum * 100 / s32ObjPntNum);
+	
+	
+	
+	return s32MovePntNum * 100 / s32ObjPntNum;
+}
+
+
 //check motion type
 IMP_SOBJ_TYPE_S impCheckRMotion(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 {
@@ -705,8 +761,11 @@ IMP_S32 impMatchRObject(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 		s32MatchScore /= s32TestLen;
 		
 //		if (s32MatchScore < 50) impDeleteObject(pstModule, pstObj);
-
-		if (s32MatchScore < 50) OSCD_ROBJ_SET_REALOBJ(pstObj->u8Used);;
+#if OSCD_DBG_SHW
+	printf("ID_%d_MatchScore_NCC_2:%d%%\n", pstObj->u32TargetId, s32MatchScore);
+#endif
+//		if (s32MatchScore < 50) OSCD_ROBJ_SET_REALOBJ(pstObj->u8Used);
+		if (s32MatchScore < 40) OSCD_ROBJ_SET_REALOBJ(pstObj->u8Used);
 	}
 	
 	return 0;
