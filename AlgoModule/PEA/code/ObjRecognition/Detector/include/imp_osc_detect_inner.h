@@ -14,7 +14,7 @@ extern "C"
 {
 #endif
 
-#define OSCD_DBG_SHW 1
+#define OSCD_DBG_SHW 0
 #define OSCD_DBG_SHW_TIME 0
 
 #define OSCD_SOBJ_ELEM_LEN 128

@@ -23,7 +23,8 @@
     #include <sys/time.h>
 #endif
 
-#define cif
+#define d1
+//#define cif
 //#define qcif
 
 #ifdef qcif
@@ -40,13 +41,25 @@
 #define CIF_U_HEIGHT 144
 #define CIF_V_WIDTH 176
 #define CIF_V_HEIGHT 144
+
 #elif defined(cif)
+
 #define Y_WIDTH 352
 #define Y_HEIGHT 288
 #define U_WIDTH 176
 #define U_HEIGHT 144
 #define V_WIDTH 176
 #define V_HEIGHT 144
+
+#elif defined(d1)
+
+#define Y_WIDTH 720
+#define Y_HEIGHT 576
+#define U_WIDTH 352
+#define U_HEIGHT 288
+#define V_WIDTH 352
+#define V_HEIGHT 288
+
 #endif
 
 
@@ -738,6 +751,11 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		s32ImgW = IMP_QCIF_IMG_WIDTH;
 		s32ImgH = IMP_QCIF_PAL_IMG_HEIGHT;
 	}
+	else if (enVideoFormat == IMP_D1)
+	{
+		s32ImgW = IMP_D1_IMG_WIDTH;
+		s32ImgH = IMP_D1_PAL_IMG_HEIGHT;
+	}
 
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
     pFrImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
@@ -1021,12 +1039,23 @@ int main()
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
+
+#ifdef d1
+//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
+//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+    m_frame_width = 720;
+	m_frame_height = 576;
+	videoFormat = IMP_D1;
+#else
 //    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
 	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
+#endif
+
 #endif
 
 	m_interFrame = 1;

@@ -282,7 +282,7 @@ IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 	gettimeofday(&t1, NULL);
 #endif
 
-//	impProcessOSCD0(pstModule);
+	impProcessOSCD0(pstModule);
 
 #if OSCD_DBG_SHW_TIME
 	gettimeofday(&t2, NULL);
@@ -1686,7 +1686,7 @@ IMP_S32 impGetPosAlongDir(IMP_S32 s32GradX, IMP_S32 s32GradY, IMP_S32 s32Len, IM
 }
 
 
-
+#if 1 //optimization
 //check motion type
 IMP_SOBJ_TYPE_S impCheckMotion(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 {
@@ -1837,7 +1837,7 @@ IMP_SOBJ_TYPE_S impCheckMotion(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 	
 	return SOBJT_UKN;
 }
-
+#endif //optimization
 
 
 //detect edges of background and gray image.
