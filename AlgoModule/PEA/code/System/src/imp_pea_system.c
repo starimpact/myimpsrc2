@@ -259,9 +259,13 @@ STATUS_E IMP_Release( IMP_HANDLE hModule )
   	IMP_RULE_AdvParaFree( &pModule->pstInnerPara->stAdvance, IMP_VPARAADVBUFNUM_MAX, pMemMgr );
 	IMP_RULE_Free( pModule->pstInnerPara->pRule, pMemMgr );
 	IMP_MMFree( pMemMgr, IMP_MEMBLK_TYPE_SLOW, pModule->pstInnerPara );
-
+	
+	printf("MemMax:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+	
 	// terminate memory
 	IMP_MMTerminate( pMemMgr );
+	
+	
 
 	return IMP_STATUS_OK;
 }

@@ -1,6 +1,6 @@
 #CC = arm-hisiv100-linux-gcc
 pc1:=1
-ifdef pc0
+ifdef pc1
 	CC = gcc
 	AR = ar
 #	CFLAGS = -g -DIMP_ARM_PEA
