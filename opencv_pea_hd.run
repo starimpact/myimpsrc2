@@ -1,0 +1,7 @@
+
+make
+make pea_static
+make -f Makefile.OPENCV.PEA.HD
+gdb ./PEA_HD_OPENCV_EXE
+
+

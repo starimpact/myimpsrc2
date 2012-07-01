@@ -172,6 +172,8 @@ STATUS_E IMP_OSC_Release( IMP_HANDLE hModule )
 	IMP_RULE_Free( pModule->pstInnerPara->pRule, pMemMgr );
 	IMP_MMFree( pMemMgr, IMP_MEMBLK_TYPE_SLOW, pModule->pstInnerPara );
 
+	printf("MemMax:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+	
 	// terminate memory
 	IMP_MMTerminate( pMemMgr );
 
@@ -718,7 +720,7 @@ static IMP_VOID IMP_OSC_OutputTargets( PEA_MODULE *pModule );
 //the main procedure of the algorithm
 STATUS_E IMP_OSC_ProcessImage( IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage )
 {
-#define PI_TIME 1
+#define PI_TIME 0
 	struct timeval t1, t2;
 
 	PEA_MODULE *pModule = (PEA_MODULE*)hModule;

@@ -1,0 +1,29 @@
+include Makefile.param
+
+HI3520_SDK_PATH:=/home/zm/Workingarea/Hi3520_SDK_V1.0.6.0.c2
+MPP_PATH:=$(HI3520_SDK_PATH)/mpp_master
+MPP_INCLUDE_PATH:=-I$(MPP_PATH)/include -I$(HI3520_SDK_PATH)/extdrv
+
+OPENCV_INCLUDES:=-I/usr/local/include/opencv
+OTH_INCLUDES:=-I$(ALGODIR)/PEA/code/PEACommon/include -I$(ALGODIR)/PEA/code/System/include \
+	-I$(ALGODIR)/GA/EventManager/include -I$(ALGODIR)/PEA/code/ObjRecognition \
+	-I$(ALGODIR)/PEA/code/ObjRecognition/Detector/include -I$(ALGODIR)/AVD/include \
+	-I$(ALGODIR)/GA/WaterMark/include -I$(ALGODIR)/PEA/code/ObjRecognition/Tracker/include \
+	-I$(ALGODIR)/PEA/code/ObjRecognition/Classify/include -I$(ALGODIR)/PEA/code/ObjRecognition/Classify/svmlight601 \
+	-I$(ALGODIR)/PEA/code/BVA/include
+
+CV_LIBS:=-lopencv_core -lopencv_highgui -lopencv_ml -lopencv_imgproc
+
+INCLUDES:=$(INCLUDES) $(MPP_INCLUDE_PATH) $(OPENCV_INCLUDES) $(OTH_INCLUDES)
+
+
+objs:=main_opencv_pea_hd.o
+PEA_OPENCV_EXE:$(objs) libPEA.a $(MPP_LIBS)
+	$(CC) $(CFLAGS) -o PEA_HD_OPENCV_EXE $(objs) -lm libPEA.a $(CV_LIBS)
+
+$(objs):%.o:%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES) 2> hi
+
+clean:
+	@rm -rf *.o
+

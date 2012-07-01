@@ -1,0 +1,7 @@
+
+make
+make pea_static
+make -f Makefile.OPENCV.OSC.HD
+gdb ./OSC_HD_OPENCV_EXE
+
+

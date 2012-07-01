@@ -22,8 +22,10 @@
     #include <sys/time.h>
 #endif
 
+
+#define d1
 //#define cif
-#define qcif
+//#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
@@ -39,13 +41,25 @@
 #define CIF_U_HEIGHT 144
 #define CIF_V_WIDTH 176
 #define CIF_V_HEIGHT 144
+
 #elif defined(cif)
+
 #define Y_WIDTH 352
 #define Y_HEIGHT 288
 #define U_WIDTH 176
 #define U_HEIGHT 144
 #define V_WIDTH 176
 #define V_HEIGHT 144
+
+#elif defined(d1)
+
+#define Y_WIDTH 720
+#define Y_HEIGHT 576
+#define U_WIDTH 352
+#define U_HEIGHT 288
+#define V_WIDTH 352
+#define V_HEIGHT 288
+
 #endif
 
 
@@ -203,101 +217,6 @@ static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PRO
 	}
 }
 
-
-static void draw_motion_trajectory_ttarget( PEA_RESULT_S *rs,IplImage *img, IMP_S32 flag )
-{
-	IMP_S32 i, j, k, n, cnt, num,flag1,line_thickness;
-	CvScalar *pcrRect,*pcrLine;
-	IpTargetPosition *pos0, *pos1;
-	IMP_POINT_S *pt1, *pt2;
-	IpTrackedTargetSet *tts;
-	IpTrackedTarget *target;
-	
-	tts = &rs->stTrackedTargetSetOsc;
-	target = tts->astTargets;
-	cnt = tts->s32UsedTotal;
-    line_thickness=1;
-    flag1=0;
-    
-    int lnum = 0, rnum = 0;
-    char abyText[100];
-    
-    CvFont font;
-    
-    cvInitFont(&font,CV_FONT_HERSHEY_DUPLEX ,0.35f,0.35f,0,1,CV_AA);
-
-	for( i=0, j=0; i<IMP_MAX_TGT_CNT; i++ )
-	{
-    //    if( target->stTargetInfo.u32TgtEvent & IMP_TGT_EVENT_PERIMETER )
-    	target = &tts->astTargets[i];
-    	if (target->s32Used)
-        {
-
-			n = 0;
-			pos0 = ipTargetTrajectoryGetPosition( &target->stTrajectory, 0 );
-			num = ipTargetTrajectoryGetLength( &target->stTrajectory );
-			pt1 = &pos0->stPt;
-			pcrLine = &(colors[target->u32TargetId%12]);
-#if 0
-			if (target->stTargetInfo.u32Type==IMP_TGT_TYPE_HUMAN)
-			{
-				pcrRect = &(colors[12]);
-			}
-			else if(target->stTargetInfo.u32Type==IMP_TGT_TYPE_VEHICLE)
-			{
-				pcrRect = &(colors[1]);
-			}
-			else if (target->stTargetInfo.u32Type==IMP_TGT_TYPE_UNKNOWN)
-			{
-				pcrRect = &(colors[0]);
-			}
-			else
-#endif
-			{
-				pcrRect = &(colors[4]);//
-			}
-			
-			if (pos0->u32AreaPixel > 100 && pos0->u32AreaPixel < 10000)
-			{ //
-			//	printf("id:%d %d\n", target->u32TargetId, target->u32TargetId == -1610612592);
-				sprintf(abyText, "%d,%d,%d", target->u32TargetId, pos0->u32AreaPixel, num);
-				cvPutText(img,abyText,cvPoint(pt1->s16X,pt1->s16Y),&font, CV_RGB(0, 255, 0));
-				
-		//		cvRectangle( img, cvPoint(pos0->stRg.s16X1,pos0->stRg.s16Y1), cvPoint(pos0->stRg.s16X2,pos0->stRg.s16Y2),*pcrRect, 0, CV_AA, 0 );
-			}
-			lnum = 0;
-			rnum = 0;
-			for( k=1; k<num; k++ )
-			{
-				pos1 = ipTargetTrajectoryGetPosition( &target->stTrajectory, -k );
-				if (IMP_IS_RGN_RSTATIC_L(pos1->u32DrgType)) lnum++;
-				if (IMP_IS_RGN_RSTATIC_R(pos1->u32DrgType)) rnum++;
-			}
-			
-			if (
-				(lnum > 0 || rnum > 0) &&
-				target->u32TargetId == -1610612732
-				)
-			{
-			//c	printf("id:%d, lnum:%d, rnum:%d, num:%d\n", target->u32TargetId, lnum, rnum, num);
-				for( k=1; k < num; k++ )
-				{
-					pos1 = ipTargetTrajectoryGetPosition( &target->stTrajectory, -k );
-					pt2 = &pos1->stPt;
-					cvLine( img, cvPoint(pt1->s16X,pt1->s16Y), cvPoint(pt2->s16X,pt2->s16Y),
-					*pcrLine, line_thickness, CV_AA, 0 );
-					pt1 = pt2;
-				}
-           	 	cvRectangle(img, cvPoint(pos0->stRg.s16X1,pos0->stRg.s16Y1), cvPoint(pos0->stRg.s16X2,pos0->stRg.s16Y2),*pcrRect, 0, CV_AA, 0);
-           	}
-		}
-
-		j += target->s32Used ? 1 : 0;
-		if( j>=cnt ) break;
-
-		target++;
-	}
-}
 
 static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32 flag )
 {
@@ -615,7 +534,7 @@ int dwI;
 	}
 
     printf("IMP_ParaConfig\n");
-	IMP_OSC_ConfigArmPeaParameter( hModule, NULL ,&stURPpara );
+	IMP_OSC_HD_ConfigArmPeaParameter( hModule, NULL ,&stURPpara );
 }
 
 
@@ -685,45 +604,13 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	YUV_IMAGE422_S stImage;
 	RESULT_S stResult;
 	IMP_S32 s32Width, s32Height;
-    PEA_MODULE *pModule;
-    PEA_RESULT_S *pResult;
 	IMP_S32 cmd_cancel=1;
 	IMP_S32 bRet;
-
-#ifdef DEBUG_OBJRECG
-	PEA_ModuleObjRecognition *pObjRecg;
-	IpModuleBehaviorAnalysis *pEvtAnls ;
-#ifdef DEBUG_OBJRECG_DETECTOR
-	IMP_MODULE_HANDLE hDetector;
-	PEA_TARGET_DETECTOR_S *pDetector;
-#endif
-#ifdef DEBUG_OBJRECG_TRACKER
-	IMP_MODULE_HANDLE hTracker;
-	IpTargetTracker *pTracker;
-#endif
-#ifdef DEBUG_OBJRECG_CLASSIFIER
-	IMP_MODULE_HANDLE hClassifier;
-	IpTargetClassifier *pClassifier ;
-#endif
-#ifdef DEBUG_OBJRECG_ANALYST
-	IMP_MODULE_HANDLE hAnalyst ;
-	BEHAVIOR_ANALYSIS_S* pAnalyst ;
-#endif
-#endif
-
-	PEA_MODULE *pPEA ;
-	IMP_MODULE_HANDLE hObjRecg;
-	IMP_MODULE_HANDLE hEvtAnls;
-
-
+	
     cvNamedWindow("videoBlob", 1);
     cvNamedWindow("videoTrajectory", 1);
-    cvNamedWindow("foreground", 1);
-    cvNamedWindow("background", 1);
     cvMoveWindow("videoBlob", 0, 0);
     cvMoveWindow("videoTrajectory", 360, 0);
-    cvMoveWindow("background", 0, 288+60);
-    cvMoveWindow("foreground", 360, 288+60);
 
 	if (enVideoFormat == IMP_CIF)
 	{
@@ -735,10 +622,13 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		s32ImgW = IMP_QCIF_IMG_WIDTH;
 		s32ImgH = IMP_QCIF_PAL_IMG_HEIGHT;
 	}
+	else if (enVideoFormat == IMP_D1)
+	{
+		s32ImgW = IMP_D1_IMG_WIDTH;
+		s32ImgH = IMP_D1_PAL_IMG_HEIGHT;
+	}
 
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
-    pFrImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
-    pBkImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
     color_dst_blob = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
     color_dst_trajectory = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
 	
@@ -755,20 +645,19 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
 	s32Width = s32ImgW; s32Height = s32ImgH;
 	IMP_YUVImage422Create( &stImage, s32Width, s32Height, NULL );
-	IMP_GetAlgoLibInfo( hIMP, &stLibInfo );
 	stMems.u32ImgW = s32Width;
 	stMems.u32ImgH = s32Height;
-	IMP_GetMemReq( hIMP, &stMems );
+	IMP_OSC_HD_GetMemReq(hIMP, &stMems);
 	IMP_MemsAlloc( &stMems );
-
-    if(IMP_OSC_Create( hIMP, &stMems ) != IMP_STATUS_OK)
+	
+    if(IMP_OSC_HD_Create( hIMP, &stMems ) != IMP_STATUS_OK)
 		exit(0);
 	
     if(enVideoSource == IMP_AVI)
     {
         stImage.u32Time = 0;
 		pCapture = cvCaptureFromFile(cFileName);
-
+		
         if( pCapture == NULL )
         {
             printf("failed to open avi file!\n");
@@ -848,29 +737,16 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         }
 //printf("vfprint:0\n");
         // prepare stImage...
-		IMP_OSC_ProcessImage( hIMP, &stImage );
+		IMP_OSC_HD_ProcessImage(hIMP, &stImage);
 //printf("vfprint:0_1\n");
-		IMP_OSC_GetResults( hIMP, &stResult );
+		IMP_OSC_HD_GetResults(hIMP, &stResult);
 //printf("vfprint:0_2\n");
+		
+		cvCvtColor(pImgGray, color_dst_blob, CV_GRAY2BGR);
+		cvCvtColor(pImgGray, color_dst_trajectory, CV_GRAY2BGR);
+		
+		draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
 
-		pModule = (PEA_MODULE*)hIMP;
-        pResult= pModule->pstResult;
-        pPEA = (PEA_MODULE*)pModule;
-        hObjRecg = pPEA->hObjRecg;
-        hEvtAnls = pPEA->hEvtAnls;
-
-		memcpy(pFrImg->imageData,pResult->stDRegionSet.pstImgFgRgn->pu8Data,s32ImgW*s32ImgH);
-		memcpy(pBkImg->imageData,pResult->stDRegionSet.pstImgBgGray->pu8Data,s32ImgW*s32ImgH);
-     	
-		cvCvtColor( pImgGray, color_dst_blob, CV_GRAY2BGR );
-		cvCvtColor( pImgGray, color_dst_trajectory, CV_GRAY2BGR );
-
-	//	draw_motion_trajectory_dregion(pPEA->pstResult,color_dst_blob,IMP_PROCESS_OSC);
-		draw_motion_trajectory_ttarget( pPEA->pstResult, color_dst_blob, 1 );
-        //draw_classtype_trajectory_ttarget(pPEA->m_pResult, color_dst_trajectory, 1 );
-    //  draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
-
-        //ShowTargetMsg(pModule,color_dst_trajectory);
 #if 1
         ShowPEAResult(&stResult,color_dst_blob);
 
@@ -879,17 +755,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	    cvShowImage("videoBlob", color_dst_blob);
 	    
         cvShowImage("videoTrajectory", color_dst_trajectory);
-        cvShowImage("background", pBkImg);
-		
-		IMP_S32 dwPI;
-		for (dwPI = 0; dwPI < s32ImgW*s32ImgH; dwPI++)
-		{
-			pFrImg->imageData[dwPI] = (pFrImg->imageData[dwPI] != 0) * 255;
-		}
-		
-        cvShowImage("foreground", pFrImg);
-     //   printf("HI\n");
-     
+
      	if (nFrmNum == 1033)
      	{
         	key = cvWaitKey(0);
@@ -926,19 +792,15 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 			printf("----------------------------\n");
 		}
     }
-
-	IMP_OSC_Release( hIMP );
-	IMP_MemsFree( &stMems );
-	IMP_YUVImage422Destroy( &stImage, NULL );
+	
+	IMP_OSC_HD_Release(hIMP);
+	IMP_MemsFree(&stMems);
+	IMP_YUVImage422Destroy(&stImage, NULL);
     cvDestroyWindow("videoBlob");
     cvDestroyWindow("videoTrajectory");
-    cvDestroyWindow("background");
-    cvDestroyWindow("foreground");
 	cvReleaseImage(&pImgGray);
 	cvReleaseImage(&color_dst_blob);
 	cvReleaseImage(&color_dst_trajectory);
-	cvReleaseImage(&pFrImg);
-	cvReleaseImage(&pBkImg);
 	cvReleaseImage(&imageSrc);
 	cvReleaseImage(&imageDst);
 	cvReleaseImage(&gpstImgRMV);
@@ -971,44 +833,24 @@ int main(int argc,char *argv[])
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
+	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
+
 #ifdef cif
-//	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-混合.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体丢失.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体丢失.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体丢失.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12115-公司大堂-展台杯子失窃.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12110-公司大堂-展台提包失窃.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12106-电子商场-柜台杯子失窃.avi";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
-	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体遗留光线干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留灯光干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/低对比度小物体遗留.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/大物体遗留灯光干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体遗留光线干扰.mp4";
+
+#ifdef d1
+    m_frame_width = 720;
+	m_frame_height = 576;
+	videoFormat = IMP_D1;
+#else
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
+#endif
+
 #endif
 
 	m_interFrame = 2;

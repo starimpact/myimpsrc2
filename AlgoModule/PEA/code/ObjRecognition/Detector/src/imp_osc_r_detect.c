@@ -515,7 +515,7 @@ IMP_S32 impCheckIFM(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj)
 	
 	s32ObjPntNum += 1;
 	
-	printf("CheckIFM_%d:%d\n", pstObj->u32TargetId, s32MovePntNum * 100 / s32ObjPntNum);
+//	printf("CheckIFM_%d:%d\n", pstObj->u32TargetId, s32MovePntNum * 100 / s32ObjPntNum);
 	
 	
 	

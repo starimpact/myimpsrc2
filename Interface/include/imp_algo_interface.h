@@ -20,6 +20,22 @@ return:
 history:
 ****************************************************/
 
+
+STATUS_E IMP_PEA_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems);
+STATUS_E IMP_PEA_HD_Create(IMP_HANDLE hModule, MEM_SET_S *pstMems);
+STATUS_E IMP_PEA_HD_Release(IMP_HANDLE hModule);
+STATUS_E IMP_PEA_HD_ConfigArmPeaParameter(IMP_HANDLE hModule, EXTERNAL_PARA_S *pstExtnalPara ,URP_PARA_S *pstURPPara);
+STATUS_E IMP_PEA_HD_ProcessImage(IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage);
+STATUS_E IMP_PEA_HD_GetResults(IMP_HANDLE hModule, RESULT_S *pstResult);
+
+
+STATUS_E IMP_OSC_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems);
+STATUS_E IMP_OSC_HD_Create(IMP_HANDLE hModule, MEM_SET_S *pstMems);
+STATUS_E IMP_OSC_HD_Release(IMP_HANDLE hModule);
+STATUS_E IMP_OSC_HD_ConfigArmPeaParameter(IMP_HANDLE hModule, EXTERNAL_PARA_S *pstExtnalPara ,URP_PARA_S *pstURPPara);
+STATUS_E IMP_OSC_HD_ProcessImage(IMP_HANDLE hModule, YUV_IMAGE422_S *pstImage);
+STATUS_E IMP_OSC_HD_GetResults(IMP_HANDLE hModule, RESULT_S *pstResult);
+
 /***************************************************
 name:IMP_GetAlgoLibInfo
 do:算法主过程

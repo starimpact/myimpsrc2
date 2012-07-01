@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <time.h>
+#include <sys/time.h>
 
 #define PRINT_DBG 0
 
@@ -178,7 +179,7 @@ typedef enum impSTATUS_E
 typedef void *IMP_HANDLE;
 
 /** 模块数据长度定义 */
-#define IMP_MODULE_DATLEN	256
+#define IMP_MODULE_DATLEN 256 //256
 
 /** IMP目标定义 */
 typedef struct impOBJ_S

@@ -221,7 +221,7 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 
 	// init result
 	pModule->pstResult = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_RESULT_S) );
-		
+
 	IMP_PEA_ResultInit( pModule->pstResult, s32ImgW, s32ImgH, pMemMgr );
 	
 	pModule->pstResult->s32ModuleSwitch = 1;
@@ -496,6 +496,8 @@ static STATUS_E IMP_RULE_ReSample(RULE_S *pstRuleSrc, RULE_S *pstRuleDst)
 	IMP_DownSampleImage(&pstRuleSrc->stZones.stImage,&pstRuleDst->stZones.stImage);
 	return ret;
 }
+
+
 
 
 

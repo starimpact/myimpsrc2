@@ -191,7 +191,7 @@ IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 		memcpy(pu8PreGray, pu8InGray, s32Width * s32Height);
 	}
 	
-#if OSCD_DBG_SHW_TIME || 1	
+#if OSCD_DBG_SHW_TIME
 	struct timeval t1, t2;
 #endif
 
@@ -201,13 +201,13 @@ IMP_S32 IMP_ProcessOSCD(IMP_MODULE_HANDLE hModule)
 		return 0;
 	}
 
-#if OSCD_DBG_SHW_TIME || 1
+#if OSCD_DBG_SHW_TIME
 	gettimeofday(&t1, NULL);
 #endif
 
 	impDetectEdges((IMP_OSCD_S*)hModule);
 
-#if OSCD_DBG_SHW_TIME || 1
+#if OSCD_DBG_SHW_TIME
 	gettimeofday(&t2, NULL);
 	printf("impDetectEdges:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif

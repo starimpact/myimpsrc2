@@ -154,6 +154,7 @@ int ReadImage(unsigned char *pImage,char *cFileName,int nWidth,int nHeight,long 
      return flag;
 }
 
+
 static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PROCESS_TYPE_E enFlag )
 {
     IMP_S32 i;
@@ -212,78 +213,6 @@ static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PRO
 		}
 	}
 }
-
-#if 0
-static void draw_motion_trajectory_ttarget( RESULT_S *rs,IplImage *img, IMP_S32 flag )
-{
-	IMP_S32 i, j, k, n, cnt, num,flag1,line_thickness;
-	CvScalar *pcrRect,*pcrLine;
-	IpTargetPosition *pos0, *pos1;
-	IMP_POINT_S *pt1, *pt2;
-	TGT_SET_S *tts;
-	TGT_ITEM_S *target;
-	tts = &rs->stTargetSet;
-	cnt = tts->s32TargetNum;
-    line_thickness=1;
-    flag1=0;
-    char abyText[100];
-    
-    CvFont font;
-    
-    cvInitFont(&font,CV_FONT_HERSHEY_DUPLEX ,0.35f,0.35f,0,1,CV_AA);	    
-
-	for( i=0, j=0; i<cnt; i++ )
-	{
-    //    if( target->stTargetInfo.u32TgtEvent & IMP_TGT_EVENT_PERIMETER )
-    	target = &tts->astTargets[i];
-   // 	if (target->s32Used)    
-        {
-
-			n = 0;
-			pos0 = ipTargetTrajectoryGetPosition( &target->stTrajectory, 0 );
-			num = ipTargetTrajectoryGetLength( &target->stTrajectory );
-			pt1 = &pos0->stPt;
-			pcrLine = &(colors[target->u32TargetId%12]);
-
-			if (target->stTargetInfo.u32Type==IMP_TGT_TYPE_HUMAN)
-			{
-				pcrRect = &(colors[12]);
-			}
-			else if(target->stTargetInfo.u32Type==IMP_TGT_TYPE_VEHICLE)
-			{
-				pcrRect = &(colors[1]);
-			}
-			else if (target->stTargetInfo.u32Type==IMP_TGT_TYPE_UNKNOWN)
-			{
-				pcrRect = &(colors[0]);
-			}
-			else
-			{
-				pcrRect = &(colors[4]);//
-			}
-				
-			sprintf(abyText, "%d,%d,%d", target->u32TargetId, pos0->u32AreaPixel, num);
-			cvPutText(img,abyText,cvPoint(pt1->s16X,pt1->s16Y),&font, CV_RGB(0, 255, 0));
-				
-			for( k=1; k<num; k++ )
-			{
-				pos1 = ipTargetTrajectoryGetPosition( &target->stTrajectory, -k );
-				pt2 = &pos1->stPt;
-				cvLine( img, cvPoint(pt1->s16X,pt1->s16Y), cvPoint(pt2->s16X,pt2->s16Y),
-					*pcrLine, line_thickness, CV_AA, 0 );
-				pt1 = pt2;
-			}
-            cvRectangle( img, cvPoint(pos0->stRg.s16X1,pos0->stRg.s16Y1), cvPoint(pos0->stRg.s16X2,pos0->stRg.s16Y2),*pcrRect, 0, CV_AA, 0 );
-
-		}
-
-		j += target->s32Used ? 1 : 0;
-		if( j>=cnt ) break;
-
-		target++;
-	}
-}
-#endif
 
 
 static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32 flag )
@@ -484,17 +413,6 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
 			    }
 
 
-                /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-              */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
 
         }
@@ -504,19 +422,7 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             {
 
                 zone=result->stEventSet.astEvents[i].u32Zone;
-               // printf("Target:%d perimeter procedure \n",result->stEventSet.astEvents[i].u32Id);
 
-                /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-               */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
 
 
@@ -527,25 +433,7 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             pcrRect = &(colors[2]);
              if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
-                //printf("Target:%d perimeter end \n",result->stEventSet.astEvents[i].u32Id);
 
-                 //zone = result->stEventSet.astEvents[i].u32Zone;
-				// NICE_EVT_DATA_PERIMETER *pData = (NICE_EVT_DATA_PERIMETER *)result->stEventSet.astEvents[i].au8Data;
-
-
-                /*zone=result->stEventSet.astEvents[i].u32Zone;
-
-                num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-                */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
         }
     }
@@ -653,7 +541,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].s32RefLen = 180;
 	}
 //	IMP_PARA_Init( pstPara, NULL, NULL, s32ImgW, s32ImgH, NULL );
-	IMP_ConfigArmPeaParameter( hModule, NULL ,&stURPpara );
+	IMP_PEA_HD_ConfigArmPeaParameter(hModule, NULL ,&stURPpara);
 //	IMP_PARA_Free( pstPara, IMP_PARA_ADVBUF_BUFCNT, NULL );
 }
 
@@ -706,40 +594,10 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	IMP_S32 cmd_cancel=1;
 	IMP_S32 bRet;
 
-#ifdef DEBUG_OBJRECG
-	PEA_ModuleObjRecognition *pObjRecg;
-	IpModuleBehaviorAnalysis *pEvtAnls ;
-#ifdef DEBUG_OBJRECG_DETECTOR
-	IMP_MODULE_HANDLE hDetector;
-	PEA_TARGET_DETECTOR_S *pDetector;
-#endif
-#ifdef DEBUG_OBJRECG_TRACKER
-	IMP_MODULE_HANDLE hTracker;
-	IpTargetTracker *pTracker;
-#endif
-#ifdef DEBUG_OBJRECG_CLASSIFIER
-	IMP_MODULE_HANDLE hClassifier;
-	IpTargetClassifier *pClassifier ;
-#endif
-#ifdef DEBUG_OBJRECG_ANALYST
-	IMP_MODULE_HANDLE hAnalyst ;
-	BEHAVIOR_ANALYSIS_S* pAnalyst ;
-#endif
-#endif
-
-	PEA_MODULE *pPEA ;
-	IMP_MODULE_HANDLE hObjRecg;
-	IMP_MODULE_HANDLE hEvtAnls;
-
-
     cvNamedWindow("videoBlob", 1);
     cvNamedWindow("videoTrajectory", 1);
-    cvNamedWindow("foreground", 1);
-    cvNamedWindow("background", 1);
     cvMoveWindow("videoBlob", 0, 0);
     cvMoveWindow("videoTrajectory", 360, 0);
-    cvMoveWindow("background", 0, 288);
-    cvMoveWindow("foreground", 360, 288);
 
 	if (enVideoFormat == IMP_CIF)
 	{
@@ -756,14 +614,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		s32ImgW = IMP_D1_IMG_WIDTH;
 		s32ImgH = IMP_D1_PAL_IMG_HEIGHT;
 	}
-	
+
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
-    pFrImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
-    pBkImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
     
     color_dst_blob = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
     color_dst_trajectory = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
-	
+
 	imageDst = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
 	hsv = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3);
 	
@@ -775,16 +631,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	s32Width = s32ImgW; s32Height = s32ImgH;
 	IMP_YUVImage422Create( &stImage, s32Width, s32Height, NULL );
 	
-	IMP_GetAlgoLibInfo(hIMP, &stLibInfo);
-	printVersion(stLibInfo.pu32Version);
-//	return;
-	
 	stMems.u32ImgW = s32Width;
 	stMems.u32ImgH = s32Height;
-	IMP_GetMemReq( hIMP, &stMems );
-	IMP_MemsAlloc( &stMems );
+	IMP_PEA_HD_GetMemReq(hIMP, &stMems);
+	IMP_MemsAlloc(&stMems);
 
-    if(IMP_Create( hIMP, &stMems ) != IMP_STATUS_OK)
+    if(IMP_PEA_HD_Create(hIMP, &stMems) != IMP_STATUS_OK)
 		exit(0);
 	
 	IMP_PARA_Config(hIMP,s32Width,s32Height);
@@ -883,58 +735,18 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         }
 		
         // prepare stImage...
-		IMP_ProcessImage( hIMP, &stImage );
-		IMP_GetResults( hIMP, &stResult );
-		pModule = (PEA_MODULE*)hIMP;
-        pResult= pModule->pstResult;
-        pPEA = (PEA_MODULE*)pModule;
-        hObjRecg = pPEA->hObjRecg;
-        hEvtAnls = pPEA->hEvtAnls;
-#ifdef DEBUG_OBJRECG
-		pObjRecg = (PEA_ModuleObjRecognition*)hObjRecg;
-		pEvtAnls = (IpModuleBehaviorAnalysis*)hEvtAnls;
-#ifdef DEBUG_OBJRECG_DETECTOR
-		hDetector = pObjRecg->hDetector;
-		pDetector = (PEA_TARGET_DETECTOR_S*)(*(IMP_U32*)hDetector);
-#endif
-#ifdef DEBUG_OBJRECG_TRACKER
-		hTracker = pObjRecg->hTracker;
-		pTracker = (IpTargetTracker*)(*(IMP_U32*)hTracker);
-#endif
-#ifdef DEBUG_OBJRECG_CLASSIFIER
-		hClassifier = pObjRecg->hClassifier;
-		pClassifier = (IpTargetClassifier*)(*(IMP_U32*)hClassifier);
-#endif
-#ifdef DEBUG_OBJRECG_ANALYST
-		hAnalyst = pEvtAnls->hAnalyst;
-		pAnalyst = (BEHAVIOR_ANALYSIS_S*) (*(IMP_U32*) hAnalyst);
-#endif
-#endif
-
-		memcpy(pFrImg->imageData,pDetector->stImgFgRgnMotion.pu8Data,s32ImgW*s32ImgH);
-		memcpy(pBkImg->imageData,pDetector->stImgBgGray.pu8Data,s32ImgW*s32ImgH);
-
+		IMP_PEA_HD_ProcessImage(hIMP, &stImage);
+		IMP_PEA_HD_GetResults(hIMP, &stResult);
+		
         cvCvtColor( pImgGray, color_dst_blob, CV_GRAY2BGR );
         cvCvtColor( pImgGray, color_dst_trajectory, CV_GRAY2BGR );
-    //    draw_motion_trajectory_dregion(pPEA->pstResult,color_dst_blob,IMP_PROCESS_CHG);
-    //    draw_motion_trajectory_ttarget(&stResult,color_dst_blob,2);
-        //draw_classtype_trajectory_ttarget(pPEA->m_pResult, color_dst_trajectory, 1 );
         draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
-        //ShowTargetMsg(pModule,color_dst_trajectory);
         ShowPEAResult(&stResult,color_dst_blob);
-
         ShowPeaRule(&stURPpara,color_dst_blob);
 
-	    cvShowImage("videoBlob", color_dst_blob);
-        cvShowImage("videoTrajectory", color_dst_trajectory);
-        cvShowImage("background", pBkImg);
+		cvShowImage("videoBlob", color_dst_blob);
+		cvShowImage("videoTrajectory", color_dst_trajectory);
         
-        int dwI;
-        for (dwI = 0; dwI < s32ImgW*s32ImgH; dwI++)
-        {
-        	pFrImg->imageData[dwI] = pFrImg->imageData[dwI] != 0 ? 255 : 0;
-        }
-        cvShowImage("foreground", pFrImg);
         //time increase
         stImage.u32Time += s32SubSampleT;
 
@@ -960,18 +772,14 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
     }
 
 //	IMP_Stop( hIMP, &stResult );
-	IMP_Release( hIMP );
+	IMP_PEA_HD_Release(hIMP);
 	IMP_MemsFree( &stMems );
 	IMP_YUVImage422Destroy( &stImage, NULL );
     cvDestroyWindow("videoBlob");
     cvDestroyWindow("videoTrajectory");
-    cvDestroyWindow("background");
-    cvDestroyWindow("foreground");
 	cvReleaseImage(&pImgGray);
 	cvReleaseImage(&color_dst_blob);
 	cvReleaseImage(&color_dst_trajectory);
-	cvReleaseImage(&pFrImg);
-	cvReleaseImage(&pBkImg);
 	cvReleaseImage(&imageSrc);
 	cvReleaseImage(&imageDst);
 	cvReleaseCapture(&pCapture);
@@ -1006,35 +814,9 @@ int main()
 
 #ifdef cif
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-23033-近点芦苇荡-低对比度.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11032-1.avi";
-//   IMP_S8 *fileName = "/home/zm/video/PEA/SILVER-1080.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31024-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21004-夜晚路灯-车辆逆行大灯.mpg";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31053-夜红外切换-小目标低对比.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/26P-2.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
 
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-21014-1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/yl-kjg-z.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13012.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13005.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/6.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00016.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
-//	IMP_S8 *fileName = "/home/star/video/pea/PEA-11015-校区道路行人-自然光线变化.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13022-白天行人-快速跑动.avi";
-//	IMP_S8 *fileName = "";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/cif1.y";
-    //IMP_S8 *fileName = "../../all-1-cif.avi";
-	//IMP_S8 *fileName = "../../normal.yuv";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
@@ -1050,7 +832,7 @@ int main()
 #else
 //    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
