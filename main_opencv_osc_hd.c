@@ -6,8 +6,7 @@
 #include "imp_algo_type.h"
 #include "imp_algo_interface.h"
 #include "imp_algo_urp_param.h"
-#include "imp_pea_common.h"
-#include "imp_pea_system.h"
+
 
 #define DEBUG_OBJRECG
 #define DEBUG_OBJRECG_DETECTOR
@@ -23,44 +22,41 @@
 #endif
 
 
-#define d1
+#define h2
+//#define h1
+//#define d1
 //#define cif
 //#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
 #define Y_HEIGHT 144
-#define U_WIDTH 88
-#define U_HEIGHT 72
-#define V_WIDTH 88
-#define V_HEIGHT 72
+#endif
 
-#define CIF_Y_WIDTH 352
-#define CIF_Y_HEIGHT 288
-#define CIF_U_WIDTH 176
-#define CIF_U_HEIGHT 144
-#define CIF_V_WIDTH 176
-#define CIF_V_HEIGHT 144
-
-#elif defined(cif)
-
+#ifdef cif
 #define Y_WIDTH 352
 #define Y_HEIGHT 288
-#define U_WIDTH 176
-#define U_HEIGHT 144
-#define V_WIDTH 176
-#define V_HEIGHT 144
-
-#elif defined(d1)
-
-#define Y_WIDTH 720
-#define Y_HEIGHT 576
-#define U_WIDTH 352
-#define U_HEIGHT 288
-#define V_WIDTH 352
-#define V_HEIGHT 288
-
 #endif
+
+#ifdef d1
+#define Y_WIDTH 704
+#define Y_HEIGHT 576
+#endif
+
+#ifdef h1
+#define Y_WIDTH 1280
+#define Y_HEIGHT 720
+#endif
+
+#ifdef h2
+#define Y_WIDTH 1920
+#define Y_HEIGHT 1080
+#endif
+
+#define U_WIDTH (Y_WIDTH/2)
+#define U_HEIGHT (Y_HEIGHT/2)
+#define V_WIDTH (Y_WIDTH/2)
+#define V_HEIGHT (Y_HEIGHT/2)
 
 
 #define TBL_YUV(y,u,v) {y,u,v}
@@ -94,7 +90,8 @@ typedef enum impVIDEO_FORMAT_E
     IMP_QCIF,
     IMP_CIF,
     IMP_D1,
-	IMP_HD1
+	IMP_HD1,
+	IMP_HD2
 }VIDEO_FORMAT_E;
 
 
@@ -152,69 +149,6 @@ int ReadImage(unsigned char *pImage,char *cFileName,int nWidth,int nHeight,long 
 	     printf("Failed to open file %s\n!",cFileName);
      }
      return flag;
-}
-
-static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PROCESS_TYPE_E enFlag )
-{
-    IMP_S32 i;
-    IMP_RECT_S rc;
-
-
-	PEA_DETECTED_REGIONSET_S *rgs;
-	IMP_S8 ch[10];
-	CvFont font1;
-
-    CvScalar cr;
-	CvScalar cr_m=CV_RGB( 0, 0, 255);
-	CvScalar cr_sl=CV_RGB( 0, 255, 0 );
-	CvScalar cr_sr=CV_RGB( 255, 0, 0 );
-	CvScalar cr_suk=CV_RGB( 0,255,255 );
-	CvScalar cr_light=CV_RGB( 255, 255, 0 );
-	CvScalar cr_uk=CV_RGB( 255, 0, 255);
-
-	cvInitFont( &font1, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA );
-
-
-	if( enFlag == IMP_PROCESS_CHG)
-	{
-		rgs = &rs->stDRegionSetChg;
-	}
-	if(enFlag == IMP_PROCESS_OSC)
-	{
-		rgs = &rs->stDRegionSetOsc;
-	}
-	else
-	{
-		rgs = &rs->stDRegionSet;
-	}
-
-	for( i=1; i<IMP_MAX_TGT_CNT-1; i++ )
-	{
-		if( rgs->astDrg[i].u8Used )
-		{
-			rc.s16X1 = rgs->astDrg[i].stRect.s16X1;
-			rc.s16X2 = rgs->astDrg[i].stRect.s16X2;
-			rc.s16Y1 = rgs->astDrg[i].stRect.s16Y1;
-			rc.s16Y2 = rgs->astDrg[i].stRect.s16Y2;
-			if( IMP_DRG_IS_MOTION(rgs->astDrg[i].u8Used) )
-				cr = cr_m;
-			else if( IMP_DRG_IS_STATIC_L(rgs->astDrg[i].u8Used) )
-				cr = cr_sl;
-			else if( IMP_DRG_IS_STATIC_R(rgs->astDrg[i].u8Used) )
-				cr = cr_sr;
-			else if( IMP_DRG_IS_LIGHT(rgs->astDrg[i].u8Used) )
-				cr = cr_suk;
-			else
-				cr = cr_uk;
-			if( IMP_DRG_IS_DIFF( rgs->astDrg[i].u8Used ) )
-				cr = cr_light;
-
-            cvRectangle( img, cvPoint(rc.s16X1,rc.s16Y1), cvPoint(rc.s16X2,rc.s16Y2),
-				cr, 0, CV_AA, 0 );
-			//             sprintf( ch, "%d", i );
-			// 			cvPutText( img, ch, cvPoint(rc.s16X1,rc.s16Y1), &font1, cvScalar(255,0,0,0) );
-		}
-	}
 }
 
 
@@ -612,21 +546,8 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
     cvMoveWindow("videoBlob", 0, 0);
     cvMoveWindow("videoTrajectory", 360, 0);
 
-	if (enVideoFormat == IMP_CIF)
-	{
-		s32ImgW = IMP_CIF_IMG_WIDTH;
-		s32ImgH = IMP_CIF_PAL_IMG_HEIGHT;
-	}
-	else if (enVideoFormat == IMP_QCIF)
-	{
-		s32ImgW = IMP_QCIF_IMG_WIDTH;
-		s32ImgH = IMP_QCIF_PAL_IMG_HEIGHT;
-	}
-	else if (enVideoFormat == IMP_D1)
-	{
-		s32ImgW = IMP_D1_IMG_WIDTH;
-		s32ImgH = IMP_D1_PAL_IMG_HEIGHT;
-	}
+	s32ImgW = Y_WIDTH;
+	s32ImgH = Y_HEIGHT;
 
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
     color_dst_blob = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
@@ -835,22 +756,25 @@ int main(int argc,char *argv[])
 
 	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
 
-#ifdef cif
-	m_frame_width = 352;
-	m_frame_height = 288;
-	videoFormat = IMP_CIF;
-#else
+	m_frame_width = Y_WIDTH;
+	m_frame_height = Y_HEIGHT;
 
 #ifdef d1
-    m_frame_width = 720;
-	m_frame_height = 576;
+    
 	videoFormat = IMP_D1;
-#else
-    m_frame_width = 176;
-	m_frame_height = 144;
-	videoFormat = IMP_QCIF;
 #endif
 
+
+#ifdef d1
+	videoFormat = IMP_D1;
+#endif
+
+#ifdef cif
+	videoFormat = IMP_CIF;
+#endif
+
+#ifdef qcif
+	videoFormat = IMP_QCIF;
 #endif
 
 	m_interFrame = 2;

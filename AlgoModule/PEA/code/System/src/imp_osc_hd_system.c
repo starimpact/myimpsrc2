@@ -46,16 +46,16 @@ STATUS_E IMP_OSC_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems)
 		s32MemSize = 4400000;//4007104;
 		break;
 	case 288://cif
-		s32MemSize = 8300000; //7127040
+		s32MemSize = 8300000; //8267776
 		break;
 	case 576://d1
-		s32MemSize = 8300000;//19601536;
+		s32MemSize = 8300000;//8267776;
 		break;
 	case 720://720p
-		s32MemSize = 0;
+		s32MemSize = 15000000; //14981312
 		break;
 	case 1080://1080p
-		s32MemSize = 0;
+		s32MemSize = 30000000; //29962112
 		break;
 	default:
 		pstHDInfo->s32IfQuad = 2;

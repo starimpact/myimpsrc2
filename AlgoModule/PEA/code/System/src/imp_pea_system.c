@@ -619,17 +619,6 @@ static STATUS_E IMP_ReSampleRuleDate(URP_PARA_S *pURPpara, RULE_S *pRule)
 	IMP_S32 i = 0;
 
 
-/*	if (s32SrcImgW !=IMP_D1_IMG_WIDTH && s32SrcImgW != IMP_CIF_IMG_WIDTH && s32SrcImgW !=IMP_QCIF_IMG_WIDTH)
-	{
-		enRet = IMP_STATUS_FALSE;
-		return enRet;
-	}*/
-	if (s32DstImgW !=IMP_D1_IMG_WIDTH && s32DstImgW != IMP_CIF_IMG_WIDTH && s32DstImgW !=IMP_QCIF_IMG_WIDTH)
-	{
-		enRet = IMP_STATUS_FALSE;
-		return enRet;
-	}
-
 	for( s32ZoneIndex=0; s32ZoneIndex<8; s32ZoneIndex++ )
 	{
 		if( 0

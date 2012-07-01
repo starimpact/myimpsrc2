@@ -49,13 +49,13 @@ STATUS_E IMP_PEA_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems)
 		s32MemSize = 7200000; //7127040
 		break;
 	case 576://d1
-		s32MemSize = 7200000;//19601536;
+		s32MemSize = 7200000;//7127040;
 		break;
 	case 720://720p
-		s32MemSize = 0;
+		s32MemSize = 13000000; //12421312
 		break;
 	case 1080://1080p
-		s32MemSize = 0;
+		s32MemSize = 25000000; //24234112
 		break;
 	default:
 		pstHDInfo->s32IfQuad = 2;
@@ -349,12 +349,7 @@ STATUS_E IMP_HD_ReSampleRuleDate(URP_PARA_S *pURPpara)
 	IMP_S32 s32ZoneIndex = 0;
 	IMP_S32 i = 0;
 	
-	
-	if (s32DstImgW !=IMP_D1_IMG_WIDTH && s32DstImgW != IMP_CIF_IMG_WIDTH && s32DstImgW !=IMP_QCIF_IMG_WIDTH)
-	{
-		enRet = IMP_STATUS_FALSE;
-		return enRet;
-	}
+
 	
 	for( s32ZoneIndex=0; s32ZoneIndex<8; s32ZoneIndex++ )
 	{
