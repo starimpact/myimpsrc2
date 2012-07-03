@@ -26,6 +26,8 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	pstTargetDetector->hViBeModel = IMP_CreateViBe( pstResult, pHwResouce );
 	
 	pstTargetDetector->hOSCDModel = IMP_CreateOSCD( pstResult, pHwResouce );
+	
+	pstTargetDetector->hLFModel = IMP_CreateLightRemove(pstResult, pHwResouce);
 
 #ifdef USE_WATERMARK_DETECOTR
 	ipCreateWaterMarkDetector(&pstTargetDetector->stWaterMarkDetector,pstResult,pHwResouce);
@@ -181,6 +183,8 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	
 	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
 	
+	IMP_ReleaseLightRemove(pstTargetDetector->hLFModel);
+	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
 
@@ -313,7 +317,7 @@ gettimeofday(&t2, NULL);
 printf("ipPreProcessCurrentImage:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
-#if PTDI_TIME || 0
+#if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif	
 	//noise estimation
@@ -321,7 +325,7 @@ gettimeofday(&t1, NULL);
 //	ipNoiseEstimateByBox(pstImgIn, pstImgFrmDiff, &pstTargetDetector->pstResult->s32Noise);
 	ipNoiseEstimateByBox_25(pstImgIn, pstImgFrmDiff, &pstTargetDetector->pstResult->s32Noise);
 //	pstTargetDetector->pstResult->s32Noise = 10;
-#if PTDI_TIME || 0
+#if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
@@ -330,24 +334,25 @@ printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 
 #if 1 //VIBE
 
-#if PTDI_TIME || 0
+#if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
 	//process ViBe
 	IMP_ProcessViBe(pstTargetDetector->hViBeModel);
-#if PTDI_TIME || 0
+#if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
 #endif //VIBE
 
+	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
 
-#if PTDI_TIME || 0
+#if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
 	IMP_ProcessOSCD(pstTargetDetector->hOSCDModel);
-#if PTDI_TIME || 0
+#if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("IMP_ProcessOSCD:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
@@ -456,6 +461,7 @@ IMP_S32 IMP_PEA_ProcessDetector( IMP_MODULE_HANDLE hModule )
 //printf("ProcessDetector\n");
 	return ipProcessTargetDetectorInternal( pDetector );
 }
+
 
 IMP_S32 ipPostProcessDetector( IMP_MODULE_HANDLE hModule )
 {

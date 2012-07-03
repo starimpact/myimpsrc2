@@ -607,6 +607,12 @@ typedef struct impOutputViBe_S
 	GRAY_IMAGE_S stImgFg; //binary image
 }IMP_OutputViBe_S;
 
+//light remove
+typedef struct impOutputLightRemove_S
+{
+	IMP_UCHAR * pu8img;
+}IMP_OutputLightRemove_S;
+
 
 typedef struct impPEA_RESULT_S
 {
@@ -634,6 +640,7 @@ typedef struct impPEA_RESULT_S
 	EVT_MGR_S stEvtMgr;
 	
 	IMP_OutputViBe_S stOutPutViBeModel; //
+	IMP_OutputLightRemove_S stOutPutLR;
 	
 } PEA_RESULT_S;
 

@@ -8,6 +8,7 @@
 #include "imp_pea_bgm_common.h"
 #include "imp_vibe_bgmodel.h"
 #include "imp_osc_detect.h"
+#include "imp_lightremove.h"
 #include "imp_pea_watermark.h"
 #include "imp_pea_bgm_stabilizer.h"
 #include "imp_pea_region_extract.h"
@@ -63,9 +64,10 @@ typedef struct impPEA_TARGET_DETECTOR_S
 
 	IMP_MODULE_HANDLE hViBeModel; //ViBe Model
 	IMP_MODULE_HANDLE hOSCDModel; //OSCD Model
-
+	IMP_MODULE_HANDLE hLFModel; //Light Filter Model
+	
 	PEA_REGION_EXTRACT_MODULE_S stRgExtract;
-
+	
 
 #ifdef USE_WATERMARK_DETECOTR
 	IpWaterMarkDetector stWaterMarkDetector;

@@ -23,8 +23,8 @@
     #include <sys/time.h>
 #endif
 
-#define d1
-//#define cif
+//#define d1
+#define cif
 //#define qcif
 
 #ifdef qcif
