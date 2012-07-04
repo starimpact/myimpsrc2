@@ -22,8 +22,8 @@
     #include <sys/time.h>
 #endif
 
-#define cif
-//#define qcif
+//#define cif
+#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
@@ -824,7 +824,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 			cvCopy(imageDst, gpstImgRMV, NULL);
 			memcpy(stImage.pu8Y,imageDst->imageData,s32ImgW * s32ImgH);
 			
-			if (1 && frame && !gadwRMVPntNum)
+			if (0 && frame && !gadwRMVPntNum)
   			{
   				char byKey;
     			cvShowImage("DrawRMV", pImgGray);
@@ -971,41 +971,13 @@ int main(int argc,char *argv[])
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
+	IMP_S8 *fileName = "/home/zm/video/OSC/OSC_1004_1.MTS";
+	
 #ifdef cif
-//	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-32018-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-混合.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体丢失.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体丢失.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体丢失.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12115-公司大堂-展台杯子失窃.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12110-公司大堂-展台提包失窃.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12106-电子商场-柜台杯子失窃.avi";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
-	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体遗留光线干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留灯光干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/低对比度小物体遗留.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/大物体遗留灯光干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体遗留光线干扰.mp4";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
