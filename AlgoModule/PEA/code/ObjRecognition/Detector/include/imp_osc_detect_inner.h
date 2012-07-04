@@ -184,6 +184,9 @@ IMP_S32 impDeleteRObject(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj);
 
 IMP_S32 impOSCD_Clear(IMP_OSCD_S *pstModule);
 
+//check if has inter-frame motion in the object area
+IMP_S32 impCheckIFM(IMP_OSCD_S *pstModule, IMP_STATIC_OBJ_S *pstObj);
+
 
 #ifdef __cplusplus
 }
