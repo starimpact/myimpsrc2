@@ -974,9 +974,9 @@ int main(int argc,char *argv[])
 #ifdef cif
 //	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-32020-1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-32020-1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-混合.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
+	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";

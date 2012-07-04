@@ -1,17 +1,19 @@
-In file included from main_opencv_pea.c:9:
+In file included from main_opencv_osc.c:9:
 /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/PEACommon/include/imp_pea_common.h:17:1: warning: "MIN" redefined
 In file included from /usr/local/include/opencv2/core/core_c.h:47,
                  from /usr/local/include/opencv/cv.h:63,
-                 from main_opencv_pea.c:2:
+                 from main_opencv_osc.c:2:
 /usr/local/include/opencv2/core/types_c.h:268:1: warning: this is the location of the previous definition
-In file included from main_opencv_pea.c:9:
+In file included from main_opencv_osc.c:9:
 /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/PEACommon/include/imp_pea_common.h:18:1: warning: "MAX" redefined
 In file included from /usr/local/include/opencv2/core/core_c.h:47,
                  from /usr/local/include/opencv/cv.h:63,
-                 from main_opencv_pea.c:2:
+                 from main_opencv_osc.c:2:
 /usr/local/include/opencv2/core/types_c.h:272:1: warning: this is the location of the previous definition
-main_opencv_pea.c: In function ‘ReadImage’:
-main_opencv_pea.c:139: warning: ignoring return value of ‘fread’, declared with attribute warn_unused_result
-main_opencv_pea.c: In function ‘IMP_OpencvExample’:
-main_opencv_pea.c:806: warning: ‘return’ with a value, in function returning void
-main_opencv_pea.c:983: warning: ‘return’ with a value, in function returning void
+main_opencv_osc.c: In function ‘ReadImage’:
+main_opencv_osc.c:125: warning: ignoring return value of ‘fread’, declared with attribute warn_unused_result
+main_opencv_osc.c: In function ‘IMP_OSC_PARA_Config’:
+main_opencv_osc.c:552: warning: initialization from incompatible pointer type
+main_opencv_osc.c: In function ‘IMP_OpencvExample’:
+main_opencv_osc.c:779: warning: ‘return’ with a value, in function returning void
+main_opencv_osc.c:952: warning: ‘return’ with a value, in function returning void

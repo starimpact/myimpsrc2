@@ -20,7 +20,7 @@ extern "C"
 #define INSIDE 0
 #define OUTSIDE 1
 
-#define IMP_DBG_USE_OPENCV 0
+#define IMP_DBG_USE_OPENCV 1
 #if IMP_DBG_USE_OPENCV
 
 #include "cv.h"
