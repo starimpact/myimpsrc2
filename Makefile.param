@@ -5,10 +5,10 @@ ifdef pc1
 	AR = ar
 	CFLAGS = -g -DIMP_ARM_PEA
 else
-	CC = arm-hismall-linux-gcc
-	AR = arm-hismall-linux-ar
-#	CC = arm-hisiv100-linux-gcc
-#	AR = arm-hisiv100-linux-ar
+#	CC = arm-hismall-linux-gcc
+#	AR = arm-hismall-linux-ar
+	CC = arm-hisiv100-linux-gcc
+	AR = arm-hisiv100-linux-ar
 	CFLAGS =  -O2 -DUSE_TIME_LICENSE_LIMIT -DIMP_ARM_PEA -Os
 endif
 
