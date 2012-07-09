@@ -13,6 +13,7 @@ IMP_EXPORTS "C"
 #endif
 
 #define SUPPORT_TRIPWIRE
+#define SUPPORT_MTRIPWIRE
 #define SUPPORT_PERIMETER
 
 
@@ -384,6 +385,7 @@ typedef struct impMTRIPWIRE_S
 	IMP_S32 s32Valid;
 	IMP_S32 s32TimeMin;
 	IMP_S32 s32TimeMax;
+	IMP_S32 as32Bidirection[2];
 	IMP_S32 as32AbnmlAngle[2];
 	LINE_S	astLine[2];
 } MTRIPWIRE_S;

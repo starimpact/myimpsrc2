@@ -23,8 +23,8 @@
     #include <sys/time.h>
 #endif
 
-#define d1
-//#define cif
+//#define d1
+#define cif
 //#define qcif
 
 #ifdef qcif
@@ -419,6 +419,25 @@ void ShowPeaRule(URP_PARA_S *pstURPpara,IplImage *img)
 				}
 			}
 		}
+		
+		if (pstURPpara->stRuleSet.astRule[s32RuleIndex].u32Mode & IMP_URP_FUNC_MTRIPWIRE)
+		{
+//printf("Hello draw 3\n");
+			for (i = 0; i < IMP_URP_MAX_MTRIPWIRE_CNT;i++)
+			{
+				URP_MTRIPWIRE_S *pstMLine = pstURPpara->stRuleSet.astRule[s32RuleIndex].stPara.stMTripwireRulePara.astLines;
+				if(pstMLine[i].s32Valid)
+				{
+					pt1 = &pstMLine[i].astLine[0].stStartPt;
+					pt2 = &pstMLine[i].astLine[0].stEndPt;
+					cvLine(img, cvPoint(pt1->s16X, pt1->s16Y), cvPoint(pt2->s16X, pt2->s16Y), color, 1, 8, 0);
+					
+					pt1 = &pstMLine[i].astLine[1].stStartPt;
+					pt2 = &pstMLine[i].astLine[1].stEndPt;
+					cvLine(img, cvPoint(pt1->s16X, pt1->s16Y), cvPoint(pt2->s16X, pt2->s16Y), color, 1, 8, 0);
+				}
+			}
+		}
 
 	}
 }
@@ -483,18 +502,6 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
 				    }
 			    }
 
-
-                /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-              */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
 
         }
@@ -504,19 +511,6 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             {
 
                 zone=result->stEventSet.astEvents[i].u32Zone;
-               // printf("Target:%d perimeter procedure \n",result->stEventSet.astEvents[i].u32Id);
-
-                /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-               */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
 
 
@@ -527,25 +521,7 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             pcrRect = &(colors[2]);
              if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
-                //printf("Target:%d perimeter end \n",result->stEventSet.astEvents[i].u32Id);
 
-                 //zone = result->stEventSet.astEvents[i].u32Zone;
-				// NICE_EVT_DATA_PERIMETER *pData = (NICE_EVT_DATA_PERIMETER *)result->stEventSet.astEvents[i].au8Data;
-
-
-                /*zone=result->stEventSet.astEvents[i].u32Zone;
-
-                num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-                */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
         }
     }
@@ -587,7 +563,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 
 	//	stURPpara.stRuleSet.astRule[0].u32Enable = 0;
 	//	stURPpara.stRuleSet.astRule[0].u32Valid = 1;
-		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_TRIPWIRE;
+		stURPpara.stRuleSet.astRule[0].u32Mode = IMP_FUNC_TRIPWIRE;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeLimit = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeHuman = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeVehicle = 1;
@@ -595,34 +571,8 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32Valid=0;
-#if 0
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=200;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=280;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=190;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=0;
-#endif
+		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
 
-#if 0
-        stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=180;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=0;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=200;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=280;
-#endif
-
-#if 0
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=350;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=250;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=50;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=240;
-#endif
-
-#if 0
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=50;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=220;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=350;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=210;
-#endif
 
 #if 1
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=350;
@@ -631,26 +581,30 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=150;
 #endif
 		
-        stURPpara.stEnvironment.u32Enable = 0;
-		stURPpara.stEnvironment.s32SceneType = IMP_URP_INDOOR;
-
-		stURPpara.stFdepth.u32Enable = 0;
-		stURPpara.stFdepth.stMeasure.stFdzLines.u32NumUsed = 3;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPs.s16X = 244;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPs.s16Y = 206;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPe.s16X = 244;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPe.s16Y = 237;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].s32RefLen = 170;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPs.s16X = 70;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPs.s16Y = 153;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPe.s16X = 70;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPe.s16Y = 173;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].s32RefLen = 170;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPs.s16X = 82;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPs.s16Y = 205;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPe.s16X = 83;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPe.s16Y = 239;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].s32RefLen = 180;
+		//multi-tripwire
+		stURPpara.stRuleSet.astRule[0].u32Mode = IMP_FUNC_MTRIPWIRE;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeLimit = 1;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeHuman = 1;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeVehicle = 1;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.stLimitPara.s32DistMin=0;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.stLimitPara.s32TimeMin=0;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32IsDoubleDirection[0]=1;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32IsDoubleDirection[1]=1;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32AbnmlAngle[0]=180;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32AbnmlAngle[1]=180;
+		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].s32Valid=1;
+		
+		URP_LINE_S *pstLine = stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].astLine;
+		pstLine[0].stStartPt.s16X = 200;
+		pstLine[0].stStartPt.s16Y = 0;
+		pstLine[0].stEndPt.s16X = 150;
+		pstLine[0].stEndPt.s16Y = 288;
+		
+		pstLine[1].stStartPt.s16X = pstLine[0].stStartPt.s16X + 30;
+		pstLine[1].stStartPt.s16Y = 0;
+		pstLine[1].stEndPt.s16X = pstLine[0].stEndPt.s16X + 30;
+		pstLine[1].stEndPt.s16Y = 288;
+		
 	}
 //	IMP_PARA_Init( pstPara, NULL, NULL, s32ImgW, s32ImgH, NULL );
 	IMP_ConfigArmPeaParameter( hModule, NULL ,&stURPpara );
@@ -955,7 +909,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		}
 		else
 		{
-
+			
 		}
     }
 
@@ -1004,53 +958,22 @@ int main()
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
-#ifdef cif
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-23033-近点芦苇荡-低对比度.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11032-1.avi";
-//   IMP_S8 *fileName = "/home/zm/video/PEA/SILVER-1080.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31024-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21004-夜晚路灯-车辆逆行大灯.mpg";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31053-夜红外切换-小目标低对比.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/26P-2.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+#ifdef cif
 
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-21014-1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/yl-kjg-z.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13012.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13005.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/6.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00016.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
-//	IMP_S8 *fileName = "/home/star/video/pea/PEA-11015-校区道路行人-自然光线变化.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13022-白天行人-快速跑动.avi";
-//	IMP_S8 *fileName = "";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/cif1.y";
-    //IMP_S8 *fileName = "../../all-1-cif.avi";
-	//IMP_S8 *fileName = "../../normal.yuv";
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
 
 #ifdef d1
-//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+
     m_frame_width = 720;
 	m_frame_height = 576;
 	videoFormat = IMP_D1;
 #else
-//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;

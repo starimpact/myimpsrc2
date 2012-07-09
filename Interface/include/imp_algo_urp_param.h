@@ -152,6 +152,7 @@ typedef struct impURP_MTRIPWIRE_S
 	IMP_S32 s32Valid;					/**< 是否有效*/
 	IMP_S32 s32TimeMin;					/**< 穿越两条线的最短时间间隔(unit: s)*/
 	IMP_S32 s32TimeMax;					/**< 穿越两条线的最长时间间隔(unit: s)*/
+	IMP_S32 as32IsDoubleDirection[2];
 	IMP_S32 as32AbnmlAngle[2];			/**< 双警戒线禁止方向角度(unit: degree)*/
 	URP_LINE_S	astLine[2];				/**< 双警戒线位置(unit: pixel)*/
 } URP_MTRIPWIRE_S;

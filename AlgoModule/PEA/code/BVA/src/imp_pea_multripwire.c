@@ -141,7 +141,7 @@ static IMP_VOID ipAnalysisBehaviorDoubleTripwire( IpMTripwirePara *pstPara, IpTr
 	s32LineChoice2 = 1;
 	ipMTripwireIsBehave(pstTargetData,pstPara,s32ZoneIndex, pstTarget,s32LineChoice2,s32TimeCur );
 
-
+	printf("hello multi-tripwire!!!\n");
 	if (
 //	ipMTripwireIsAccordantType(pstPara,pstMTripwirePara,pstTarget,s32ZoneIndex)
 //		&&
@@ -233,13 +233,14 @@ static IMP_S32 ipMTripwireIsAccordantType( IpMTripwirePara *pstPara, RULE_PARA_M
 
 static IMP_S32 ipMTripwireIsSlopOver(IpMTripwirePara *pstPara, LINE_S stTripwireLine, IpTrackedTarget *pstTarget, IMP_S32 s32LineChoice);
 static IMP_S32 ipMTripwireIsThrough(IpMTripwirePara *pstPara, IMP_S32 s32TripwireForbiddenAngle, LINE_S stTripwireLine, IpTrackedTarget *pstTarget, IMP_S32 s32LineChoice);
-
+IMP_S32 ipMTripwireIsThrough2(IpMTripwirePara *pstPara, IMP_S32 s32TripwireForbiddenAngle, IMP_S32 s32IsDoubleDirection, LINE_S stTripwireLine, IpTrackedTarget *pstTarget, IMP_S32 s32LineChoice);
 
 static IMP_S32 ipMTripwireIsBehave( IpMTripwireTargetData *pstTargetData, IpMTripwirePara  *pstPara, IMP_S32 s32ZoneIndex,
 								  IpTrackedTarget *pstTarget, IMP_S32 s32LineChoice, IMP_S32 s32TimeCur)
 {
 	IMP_S32 s32Ret = 0;
 	IMP_S32 s32ForbiddenAngle;
+	IMP_S32 s32IsDoubleDirection;
 	LINE_S stTripwireLine;
 	RULE_ZONE_S *pstZone = NULL;
 	RULE_PARA_MTRIPWIRE_S *pstMTripwirePara = NULL;
@@ -251,12 +252,15 @@ static IMP_S32 ipMTripwireIsBehave( IpMTripwireTargetData *pstTargetData, IpMTri
 		for (i = 0 ; i < IMP_MAX_MTRIPWIRE_CNT; i++)
 		{
 			s32ForbiddenAngle = pstMTripwirePara->astLines[i].as32AbnmlAngle[s32LineChoice];
+			s32IsDoubleDirection = pstMTripwirePara->astLines[i].as32Bidirection[s32LineChoice];
 			stTripwireLine = pstMTripwirePara->astLines[i].astLine[s32LineChoice];
 			if (pstMTripwirePara->astLines[i].s32Valid )
 			{
 				if(!pstTargetData->astTargetData[s32LineChoice].astCrossStatus[s32ZoneIndex][i])
 				{
-					s32Ret = ipMTripwireIsThrough(pstPara,s32ForbiddenAngle,stTripwireLine,pstTarget,s32LineChoice);
+				//	s32Ret = ipMTripwireIsThrough(pstPara,s32ForbiddenAngle,stTripwireLine,pstTarget,s32LineChoice);
+					s32Ret = ipMTripwireIsThrough2(pstPara, s32ForbiddenAngle, s32IsDoubleDirection, stTripwireLine, pstTarget, s32LineChoice);
+					
 					if (s32Ret == 1)
 					{
 						pstTargetData->astTargetData[s32LineChoice].astCrossStatus[s32ZoneIndex][i] += 1;
@@ -271,10 +275,126 @@ static IMP_S32 ipMTripwireIsBehave( IpMTripwireTargetData *pstTargetData, IpMTri
 }
 
 
+
+IMP_S32 ifHasIntersection(IMP_S32 al1[4], IMP_S32 al2[4]);
+
+IMP_S32 ipMTripwireIsThroughLine(IpMTripwirePara *pstParams, IMP_S32 s32LineChoice,LINE_S stTripwireLine, IpTrackedTarget *pstTarget)
+{
+	IMP_S32 s32TrajectLen;
+	IMP_S32 s32TmpRst;
+	IMP_FLOAT f32TmpRst;
+	IpTargetPosition *pstPosCur = NULL;
+
+	IMP_FLOAT f32Ratio = 0.6f;
+	IMP_U8 u8ThroughFlag = 0;
+	
+	IMP_POINT_S stCurPt;
+	IMP_S32 s32XY1[2], s32XY2[2];
+	IMP_S32 al1[4], al2[4], minLen;
+	
+	minLen = 25;
+	s32TrajectLen = ipTargetTrajectoryGetLength(&pstTarget->stTrajectory);
+//	printf("id:%d len:%d  ", pstTarget->u32TargetId, s32TrajectLen);
+	if (s32TrajectLen <= minLen)
+		return 0;
+
+	pstPosCur = ipTargetTrajectoryGetPosition(&pstTarget->stTrajectory,0);
+	if (pstParams->astSTripwire[s32LineChoice].s32UseBottom) //using center bottom of BoundBox
+	{
+		stCurPt.s16X = (pstPosCur->stRg.s16X1 + pstPosCur->stRg.s16X2)/2;
+		stCurPt.s16Y = pstPosCur->stRg.s16Y2;
+	}
+	else
+	{
+		memcpy(&stCurPt,&pstPosCur->stPt,sizeof(IMP_POINT_S));
+	}
+	s32XY1[0] = stCurPt.s16X;
+	s32XY1[1] = stCurPt.s16Y;
+	
+	pstPosCur = ipTargetTrajectoryGetPosition(&pstTarget->stTrajectory, -minLen+1);
+
+	if (pstParams->astSTripwire[s32LineChoice].s32UseBottom)
+	{
+		stCurPt.s16X = (pstPosCur->stRg.s16X1 + pstPosCur->stRg.s16X2)/2;
+		stCurPt.s16Y = pstPosCur->stRg.s16Y2;
+	}
+	else
+	{
+		memcpy(&stCurPt,&pstPosCur->stPt,sizeof(IMP_POINT_S));
+	}
+
+	s32XY2[0] = stCurPt.s16X;
+	s32XY2[1] = stCurPt.s16Y;	
+
+	{
+		IMP_S32 dwRet;
+		al1[0] = stTripwireLine.stPs.s16X;
+		al1[1] = stTripwireLine.stPs.s16Y;
+		al1[2] = stTripwireLine.stPe.s16X;
+		al1[3] = stTripwireLine.stPe.s16Y;
+		
+		al2[0] = s32XY1[0];
+		al2[1] = s32XY1[1];
+		al2[2] = s32XY2[0];
+		al2[3] = s32XY2[1];
+		
+	//	printf("id:%d \n", pstTarget->u32TargetId);
+		dwRet = ifHasIntersection(al1, al2);
+	//	printf("-------[%d,%d,%d,%d] [%d,%d,%d,%d]\n", al1[0], al1[1], al1[2], al1[3], al2[0], al2[1], al2[2], al2[3]);
+	//	
+		if (dwRet) return 1;
+	}
+
+	return 0;
+}
+
+
+
+//added by mzhang
+IMP_S32 ipMTripwireIsThrough2(IpMTripwirePara *pstPara, IMP_S32 s32TripwireForbiddenAngle, IMP_S32 s32IsDoubleDirection, LINE_S stTripwireLine, IpTrackedTarget *pstTarget, IMP_S32 s32LineChoice)
+{
+	IpTargetPosition  *pstPos, *pstPos1;
+
+	IMP_S32 s32Ret = 0, s32Ret1;
+
+	pstPos = ipTargetTrajectoryGetPosition( &pstTarget->stTrajectory, 0 );
+
+
+	s32Ret1 = ipMTripwireIsThroughLine(pstPara, s32LineChoice, stTripwireLine, pstTarget);
+	
+	if (!s32Ret1) return 0;
+
+	if (s32IsDoubleDirection)
+	{
+		s32Ret = 1;
+	}
+	else
+	{
+        IMP_S32 sx, sy, sang, sdiff, direct;
+        
+        pstPos1 = ipTargetTrajectoryGetPosition(&pstTarget->stTrajectory, -24);
+        
+        direct = atan2(pstPos->stPt.s16Y - pstPos1->stPt.s16Y, pstPos->stPt.s16X - pstPos1->stPt.s16X) * 180 / 3.1415926f;
+        direct = direct < 0 ? direct + 360 : direct;
+        sy = stTripwireLine.stPe.s16Y - stTripwireLine.stPs.s16Y;
+        sx = stTripwireLine.stPe.s16X - stTripwireLine.stPs.s16X;
+        sang = atan2(sy, sx) * 180 / 3.1415926f; //tangent angle
+        sang = sang < 0 ? sang + 360 : sang;
+        sang = sang + 90; //normal line
+        sang = sang >= 360 ? sang - 360 : sang;
+        sdiff = abs(direct - sang);
+        sdiff = sdiff >= 180 ? 360 - sdiff : sdiff;
+ //       printf("s32ForbidenAngle:%d, s32Direction:%d, [%d, %d]\n", s32ForbidenAngle, direct, sang, sdiff);
+        if (sdiff * 2 <= s32TripwireForbiddenAngle) s32Ret = 1;
+	}
+	return s32Ret;
+}
+
+
 static IMP_S32 ipMTripwireIsThrough(IpMTripwirePara *pstPara,IMP_S32 s32TripwireForbiddenAngle,LINE_S stTripwireLine,IpTrackedTarget *pstTarget,IMP_S32 s32LineChoice)
 {
 	IMP_FLOAT fKLine,fBLine,fLineAngle = 0;
-	IMP_S32 s32TrajectLen;			£»
+	IMP_S32 s32TrajectLen;
 	IMP_S32 s32FstPosNum = 0,s32FstNegNum = 0;
 	IMP_S32 s32LastPosNum = 0, s32LastNegNum = 0;
 	IMP_S32 s32FstSign = 0, s32LastSign = 0;

@@ -220,6 +220,7 @@ IMP_S32 IMP_PEA_BVA_ProcessBvaInternal( BEHAVIOR_ANALYSIS_S *pstBva )
 #if defined(SUPPORT_MTRIPWIRE)
 	if( u32FuncCode & (IMP_FUNC_MTRIPWIRE) )
 	{
+	//	printf("if( u32FuncCode & (IMP_FUNC_MTRIPWIRE) )\n");
 		ipProcessMTripwireAnalystInternal( &pstBva->stModuleMTripwire );
 	}
 #endif
