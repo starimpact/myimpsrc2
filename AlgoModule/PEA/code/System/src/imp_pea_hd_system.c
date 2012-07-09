@@ -40,6 +40,15 @@ STATUS_E IMP_PEA_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems)
 	
 	IMP_S32 s32MemSize = 0;
 	
+	IMP_FLOAT fSlap = 41.1f;
+	IMP_S32 s32B0 = 4007104, s32A0 = 176*144;
+	IMP_S32 s32NB = 0, s32NA = pstSubMems->u32ImgH * pstSubMems->u32ImgW;
+	
+	
+	s32NB = s32B0 + (s32NA - s32A0) * fSlap;
+	s32MemSize = s32NB;
+//	printf("memsize:%d\n", s32MemSize);
+#if 0	
 	switch (pstMems->u32ImgH)
 	{
 	case 144://qcif
@@ -60,14 +69,15 @@ STATUS_E IMP_PEA_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems)
 	default:
 		pstHDInfo->s32IfQuad = 2;
 	}
-	
+#endif
+
 	if (pstHDInfo->s32IfQuad == 2)
 	{
 		return IMP_STATUS_SKIP;
 	}
 	
 	pstSubMems->stMems[IMP_MEMBLK_TYPE_SLOW].u32Size = s32MemSize;
-	printf("s32MemSize:%d\n", s32MemSize);
+//	printf("s32MemSize:%d\n", s32MemSize);
 	
 	memcpy(pstMems, pstSubMems, sizeof(MEM_SET_S));
 	pstMems->u32ImgW = s32OriW;

@@ -22,9 +22,9 @@
 #endif
 
 
-#define h2
+//#define h2
 //#define h1
-//#define d1
+#define d1
 //#define cif
 //#define qcif
 
