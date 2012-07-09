@@ -310,7 +310,7 @@ printf("ProcessWaterMarkDetector:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
-	ipPreProcessCurrentImage( pstTargetDetector );
+//	ipPreProcessCurrentImage( pstTargetDetector );
 
 #if PTDI_TIME
 gettimeofday(&t2, NULL);
@@ -343,6 +343,28 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
+
+/*
+	{
+		IMP_OutputViBe_S *pstViBe = &pstResult->stOutPutViBeModel;
+		IMP_OutputLightRemove_S *pstLR = &pstResult->stOutPutLR;
+		IMP_UCHAR *pu8img = pstLR->pu8img;
+	//	GRAY_IMAGE_S *pstImgBg = pstViBe;
+		GRAY_IMAGE_S *pstImgFg = &pstViBe->stImgFg;
+		IMP_S32 s32RI, s32CI;
+		
+		for (s32RI = 0; s32RI < s32ImgH; s32RI++)
+		{
+			for (s32CI = 0; s32CI < s32ImgW; s32CI++)
+			{
+				if (pu8img[s32RI * s32ImgW + s32CI] == 1 || pu8img[s32RI * s32ImgW + s32CI] == 3)
+				{
+					pstImgFg->pu8Data[s32RI * s32ImgW + s32CI] = 0;
+				}
+			}
+		}
+	}
+*/
 
 #endif //VIBE
 

@@ -24,8 +24,8 @@
 #endif
 
 //#define d1
-#define cif
-//#define qcif
+//#define cif
+#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
@@ -1004,53 +1004,20 @@ int main()
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
-#ifdef cif
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-23033-近点芦苇荡-低对比度.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11032-1.avi";
-//   IMP_S8 *fileName = "/home/zm/video/PEA/SILVER-1080.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31024-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21004-夜晚路灯-车辆逆行大灯.mpg";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31053-夜红外切换-小目标低对比.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/26P-2.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-21014-1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/yl-kjg-z.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13012.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13005.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/6.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00016.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
-//	IMP_S8 *fileName = "/home/star/video/pea/PEA-11015-校区道路行人-自然光线变化.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13022-白天行人-快速跑动.avi";
-//	IMP_S8 *fileName = "";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/cif1.y";
-    //IMP_S8 *fileName = "../../all-1-cif.avi";
-	//IMP_S8 *fileName = "../../normal.yuv";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+	
+#ifdef cif
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
 
 #ifdef d1
-//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
     m_frame_width = 720;
 	m_frame_height = 576;
 	videoFormat = IMP_D1;
 #else
-//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;

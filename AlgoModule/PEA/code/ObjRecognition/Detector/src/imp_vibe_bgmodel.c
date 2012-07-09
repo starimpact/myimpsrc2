@@ -170,7 +170,7 @@ IMP_S32 IMP_ReleaseViBe( IMP_MODULE_HANDLE hModule )
 	ppu8Bkgs = pstModule->ppu8Bkgs;
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, ppu8Bkgs[0]);
 	for (dwI = 0; dwI < s32Width * s32Height; dwI++)
-	{	
+	{
 		ppu8Bkgs[dwI] = 0;
 	}
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, ppu8Bkgs);
@@ -315,8 +315,10 @@ IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 	PEA_DETECTED_REGIONSET_S *pRegionSet = &pstResult->stDRegionSet;
 
 	
-//	IMP_U8 *pubyEdge = pRegionSet->pstImgInEdge->pu8Data;
-//	ipShowBinImage(s32Width, s32Height, pubyEdge, "ViBe_Edge");
+//	IMP_OutputLightRemove_S *pstOutputLR =&pstResult->stOutPutLR;
+//	IMP_U8 *pu8Illum = pstOutputLR->pu8img;
+//	ipShowBinImage(s32Width, s32Height, pu8Illum, "illum");
+	
 	
 	IMP_U16 u16Val = 0, u16Val2;
 #if VIBE_SHW_TIME
@@ -333,8 +335,11 @@ gettimeofday(&t1, NULL);
 			pu8Tmp1 = ppu8Bkgs[s32Oft];
 		
 			s32GNum = 0;			
-			if (abs(pu8Tmp1[0] - u8GrayVal) < s32R || abs(pu8Tmp1[1] - u8GrayVal) < s32R) s32GNum = 1;
-			
+			if (
+			//	pu8Illum[s32Oft] || 
+				abs(pu8Tmp1[0] - u8GrayVal) < s32R || abs(pu8Tmp1[1] - u8GrayVal) < s32R
+			) s32GNum = 1;
+
 			if (s32GNum == 0)
 			{
 				pu8Fg[s32Oft] = 1;
@@ -381,15 +386,6 @@ gettimeofday(&t1, NULL);
 				{
 					pu8FgTmp[s32Oft]++;
 				}
-			}
-			
-			if (s32BkgUR > 1 && //disable it when 1
-				u16Val2 > 0 && u16Val2 < 9 && 
-				u8Diff < s32R && 
-				!pu8Fg[s32Oft] 
-				)
-			{
-				if (pu8FgTmp[s32Oft] < 127) pu8FgTmp[s32Oft]++; //increasing slowly, useless	
 			}
 			
 			if (!pu8Fg[s32Oft] || u8Diff > s32R)
@@ -474,7 +470,11 @@ gettimeofday(&t1, NULL);
 			pu8Tmp1 = ppu8Bkgs[s32Oft];
 			
 			//update background value
-			if ((!pu8Fg[s32Oft] && 1) || (pu8FgTmp[s32Oft] >= pstModule->s32BkgUR2 && pu8Fg[s32Oft])) //illumination background update
+			if (
+		//	(!pu8Fg[s32Oft] && 1) || 
+		//	pu8Illum[s32Oft] || 
+			(pu8FgTmp[s32Oft] >= pstModule->s32BkgUR2 && pu8Fg[s32Oft])
+			) //illumination background update
 			{
 				u16Val = (u8GrayVal * 50 + pu8Tmp1[0] * (128 - 50) + 64) >> 7;
 				u8GrayVal = u16Val > 255 ? 255 : u16Val;
@@ -488,15 +488,8 @@ gettimeofday(&t1, NULL);
 				u16Val = (u8GrayVal * 16 + u8Bkg * (128 - 16) + 64) >> 7; //can prevent the dust
 				u8GrayVal = u16Val > 255 ? 255 : u16Val;
 				pu8Tmp1[1] = u8GrayVal;
-			//	
-				if (pu8FgTmp[s32Oft] >= s32BkgUR && s32BkgUR > 1) //only diffuse on the stable contour point, has been disabled when s32BkgUR > 1
-				{
-					s32Rnd2 = impRand(8);
-					ppu8Bkgs[s32Oft + as32Oft[s32Rnd2]][1] = u8GrayVal;
-				}
 			}
 		}
-
 	}
 #if VIBE_SHW_TIME
 gettimeofday(&t2, NULL);
