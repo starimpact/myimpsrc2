@@ -586,15 +586,17 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeLimit = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeHuman = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeVehicle = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.stLimitPara.s32DistMin=0;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.stLimitPara.s32TimeMin=0;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32IsDoubleDirection[0]=1;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32IsDoubleDirection[1]=1;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32AbnmlAngle[0]=180;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].as32AbnmlAngle[1]=180;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].s32Valid=1;
+		URP_MTRIPWIRE_S *pstMLines = &stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0];
+			
+		pstMLines->as32IsDoubleDirection[0]=1;
+		pstMLines->as32IsDoubleDirection[1]=1;
+		pstMLines->as32AbnmlAngle[0]=180;
+		pstMLines->as32AbnmlAngle[1]=180;
+		pstMLines->s32Valid=1;
+		pstMLines->s32TimeMin=50;
+		pstMLines->s32TimeMax=1000;
 		
-		URP_LINE_S *pstLine = stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0].astLine;
+		URP_LINE_S *pstLine = pstMLines->astLine;
 		pstLine[0].stStartPt.s16X = 200;
 		pstLine[0].stStartPt.s16Y = 0;
 		pstLine[0].stEndPt.s16X = 150;

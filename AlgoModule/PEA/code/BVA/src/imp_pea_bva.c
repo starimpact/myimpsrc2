@@ -545,7 +545,7 @@ static IMP_VOID ipForceInnerPara2AnaylstPara( INNER_PARA_S *pstInnerPara, IpAnal
 	pstUsrAdvPara = (USR_ADV_PARA_S*)pRule->u8AdvParaData;
 
 	// s32FrmDura
-	pstAnalystPara->s32FrmDura = pstGlPara->s32TimeUnit;
+	pstAnalystPara->s32FrmDura = 1; //pstGlPara->s32TimeUnit;
 
 //	if (pstResult->s32ModuleSwitch & 2)
 	{

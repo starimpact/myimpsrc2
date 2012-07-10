@@ -162,22 +162,27 @@ static IMP_S32 ipMTripwireIsAccordantConstrain( IpMTripwirePara *pstPara, RULE_P
 	IMP_S32 s32Time1 = 0;
 	IMP_S32 s32Time2 = 0;
     IMP_S32	s32Life = 0;
+    IMP_S32 s32TimeMin, s32TimeMax;
 	IpMTripwireTargetData *pstTargetData;
 	IMP_U32 u32Type = pstTarget->stTargetInfo.u32Type;
 	MTRIPWIRE_LMT_PARA_S *pstMTripwireLmtPara = &pstMTripwirePara->stLmtPara;
 	pstTargetData = ipGetMTripwireTargetData( pstTarget->stPrivateData.pDataAnalyst );
-
+	MTRIPWIRE_S *pstMLines = 0;
 
 	for (i = 0 ; i < IMP_MAX_MTRIPWIRE_CNT; i++)
 	{
-		if (pstMTripwirePara->astLines[i].s32Valid )
+		pstMLines = &pstMTripwirePara->astLines[i];
+		if (pstMLines->s32Valid )
 		{
 			s32Time1 = pstTargetData->astTargetData[0].s32TypeTime[s32ZoneIndex][i];
 			s32Time2 = pstTargetData->astTargetData[1].s32TypeTime[s32ZoneIndex][i];
 			s32Life = abs(s32Time2 - s32Time1);
+			s32TimeMin = pstMLines->s32TimeMin;
+			s32TimeMax = pstMLines->s32TimeMax;
+			printf("objid_%d_lineindex_%d_time(%d,%d)_Life:%d(timemin:%d, timemax:%d)\n", pstTarget->u32TargetId, i, s32Time1, s32Time2, s32Life, s32TimeMin, s32TimeMax);
 			if (pstTargetData->astTargetData[0].astCrossStatus[s32ZoneIndex][i] > MTRIPWIRE_CROSS_NONE
 				&&pstTargetData->astTargetData[1].astCrossStatus[s32ZoneIndex][i] > MTRIPWIRE_CROSS_NONE
-				&& s32Life >= pstMTripwireLmtPara->s32TimeMin
+				&& s32Life <= s32TimeMax && s32Life >= s32TimeMin
 				)
 			{
 				pstTargetData->as32LineIndex[s32ZoneIndex] = i;
