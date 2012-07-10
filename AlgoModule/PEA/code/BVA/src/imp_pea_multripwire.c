@@ -141,7 +141,7 @@ static IMP_VOID ipAnalysisBehaviorDoubleTripwire( IpMTripwirePara *pstPara, IpTr
 	s32LineChoice2 = 1;
 	ipMTripwireIsBehave(pstTargetData,pstPara,s32ZoneIndex, pstTarget,s32LineChoice2,s32TimeCur );
 
-	printf("hello multi-tripwire!!!\n");
+//	printf("hello multi-tripwire!!!\n");
 	if (
 //	ipMTripwireIsAccordantType(pstPara,pstMTripwirePara,pstTarget,s32ZoneIndex)
 //		&&
@@ -179,7 +179,7 @@ static IMP_S32 ipMTripwireIsAccordantConstrain( IpMTripwirePara *pstPara, RULE_P
 			s32Life = abs(s32Time2 - s32Time1);
 			s32TimeMin = pstMLines->s32TimeMin;
 			s32TimeMax = pstMLines->s32TimeMax;
-			printf("objid_%d_lineindex_%d_time(%d,%d)_Life:%d(timemin:%d, timemax:%d)\n", pstTarget->u32TargetId, i, s32Time1, s32Time2, s32Life, s32TimeMin, s32TimeMax);
+		//	printf("objid_%d_lineindex_%d_time(%d,%d)_Life:%d(timemin:%d, timemax:%d)\n", pstTarget->u32TargetId, i, s32Time1, s32Time2, s32Life, s32TimeMin, s32TimeMax);
 			if (pstTargetData->astTargetData[0].astCrossStatus[s32ZoneIndex][i] > MTRIPWIRE_CROSS_NONE
 				&&pstTargetData->astTargetData[1].astCrossStatus[s32ZoneIndex][i] > MTRIPWIRE_CROSS_NONE
 				&& s32Life <= s32TimeMax && s32Life >= s32TimeMin

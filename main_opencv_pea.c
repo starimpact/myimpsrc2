@@ -588,8 +588,8 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeVehicle = 1;
 		URP_MTRIPWIRE_S *pstMLines = &stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0];
 			
-		pstMLines->as32IsDoubleDirection[0]=1;
-		pstMLines->as32IsDoubleDirection[1]=1;
+		pstMLines->as32IsDoubleDirection[0]=0;
+		pstMLines->as32IsDoubleDirection[1]=0;
 		pstMLines->as32AbnmlAngle[0]=180;
 		pstMLines->as32AbnmlAngle[1]=180;
 		pstMLines->s32Valid=1;
