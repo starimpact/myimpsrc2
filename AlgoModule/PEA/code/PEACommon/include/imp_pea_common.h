@@ -600,12 +600,21 @@ IMP_VOID IMP_PEA_StatusClear( PEA_STATUS_S *pstStatus );
 typedef RESULT_S IMP_OUTPUT;
 
 
+//output information for Gray Gaussian module
+typedef struct impOutputGrayGaussian_S
+{
+	GRAY_IMAGE_S *pstBkg;
+	GRAY_IMAGE_S *pstFilter;
+}IMP_OutputGrayGaussian_S;
+
+
 //ViBe输出信息
 typedef struct impOutputViBe_S
 {
 	GRAY_IMAGE_S stImgBg; //background image
 	GRAY_IMAGE_S stImgFg; //binary image
 }IMP_OutputViBe_S;
+
 
 //light remove
 typedef struct impOutputLightRemove_S
@@ -639,7 +648,8 @@ typedef struct impPEA_RESULT_S
 	YUV_IMAGE422_S *pstImageYUV;
 	EVT_MGR_S stEvtMgr;
 	
-	IMP_OutputViBe_S stOutPutViBeModel; //
+	IMP_OutputGrayGaussian_S stOutPutGG; //
+	IMP_OutputViBe_S stOutPutViBeModel;  //
 	IMP_OutputLightRemove_S stOutPutLR;
 	
 } PEA_RESULT_S;

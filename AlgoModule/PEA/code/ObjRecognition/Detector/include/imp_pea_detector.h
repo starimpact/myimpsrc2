@@ -62,6 +62,7 @@ typedef struct impPEA_TARGET_DETECTOR_S
 	PEA_DETECTOR_PARA_S stPara;
 	PEA_DETECTOR_DATA_S stData;
 
+	IMP_MODULE_HANDLE hGGModel; //gray gaussian Model
 	IMP_MODULE_HANDLE hViBeModel; //ViBe Model
 	IMP_MODULE_HANDLE hOSCDModel; //OSCD Model
 	IMP_MODULE_HANDLE hLFModel; //Light Filter Model

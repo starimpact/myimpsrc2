@@ -21,11 +21,14 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	s32Height = pstResult->s32Height;
 	s32Width = pstResult->s32Width;
 	pstTargetDetector->pstResult = pstResult;
-
-	//create and init ViBe model
-	pstTargetDetector->hViBeModel = IMP_CreateViBe( pstResult, pHwResouce );
 	
-	pstTargetDetector->hOSCDModel = IMP_CreateOSCD( pstResult, pHwResouce );
+	
+	pstTargetDetector->hGGModel = IMP_CreateGrayGaussian(pstResult, pHwResouce);
+	
+	//create and init ViBe model
+	pstTargetDetector->hViBeModel = IMP_CreateViBe(pstResult, pHwResouce);
+	
+	pstTargetDetector->hOSCDModel = IMP_CreateOSCD(pstResult, pHwResouce);
 	
 	pstTargetDetector->hLFModel = IMP_CreateLightRemove(pstResult, pHwResouce);
 
@@ -185,6 +188,8 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	
 	IMP_ReleaseLightRemove(pstTargetDetector->hLFModel);
 	
+	IMP_ReleaseGrayGaussian(pstTargetDetector->hGGModel);
+	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
 
@@ -272,7 +277,6 @@ IMP_S32 ipProcessTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	
 	int s32ImgW, s32ImgH;
 	
-
 	PEA_REGION_EXTRACT_MODULE_S *pstRgExtract = &pstTargetDetector->stRgExtract;
 	GRAY_IMAGE_S *pstImgIn = &pstTargetDetector->pstResult->stImgInGray;
 #ifndef IMP_ARM_PEA
@@ -287,7 +291,7 @@ IMP_S32 ipProcessTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	
 	s32ImgW = pstTargetDetector->pstResult->s32Width;
 	s32ImgH = pstTargetDetector->pstResult->s32Height;
-
+	
 #if PTDI_TIME
 struct timeval t1, t2;
 #endif
@@ -329,9 +333,9 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
-
-
-
+	
+	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
+	
 #if 1 //VIBE
 
 #if PTDI_TIME
@@ -339,6 +343,7 @@ gettimeofday(&t1, NULL);
 #endif
 	//process ViBe
 	IMP_ProcessViBe(pstTargetDetector->hViBeModel);
+	
 #if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
