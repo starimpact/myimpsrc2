@@ -224,6 +224,7 @@ history:
 ****************************************************/
 IMP_S32 IMP_ProcessViBe( IMP_MODULE_HANDLE hModule )
 {
+	printf("hello ProcessViBe.\n");
 	return impProcessViBe0(hModule);
 }
 
@@ -315,8 +316,8 @@ IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 	PEA_DETECTED_REGIONSET_S *pRegionSet = &pstResult->stDRegionSet;
 
 	
-//	IMP_OutputLightRemove_S *pstOutputLR =&pstResult->stOutPutLR;
-//	IMP_U8 *pu8Illum = pstOutputLR->pu8img;
+	IMP_OutputLightRemove_S *pstOutputLR =&pstResult->stOutPutLR;
+	IMP_U8 *pu8Illum = pstOutputLR->pu8img;
 //	ipShowBinImage(s32Width, s32Height, pu8Illum, "illum");
 	
 	
@@ -336,7 +337,7 @@ gettimeofday(&t1, NULL);
 		
 			s32GNum = 0;			
 			if (
-			//	pu8Illum[s32Oft] || 
+			//	pu8Illum[s32Oft] != 1 || 
 				abs(pu8Tmp1[0] - u8GrayVal) < s32R || abs(pu8Tmp1[1] - u8GrayVal) < s32R
 			) s32GNum = 1;
 
@@ -410,7 +411,7 @@ gettimeofday(&t1, NULL);
 	s32NowPixelNum = 0;
 	for (s32RI = 0; s32RI < s32Width * s32Height; s32RI++)
 	{
-		if (pu8Fg[s32RI]) 
+		if (pu8Fg[s32RI])
 		{
 			pu8Fg[s32RI] = 255;
 			s32NowPixelNum++;
@@ -471,8 +472,7 @@ gettimeofday(&t1, NULL);
 			
 			//update background value
 			if (
-		//	(!pu8Fg[s32Oft] && 1) || 
-		//	pu8Illum[s32Oft] || 
+			(!pu8Fg[s32Oft] && pu8Illum[s32Oft] != 1) || 
 			(pu8FgTmp[s32Oft] >= pstModule->s32BkgUR2 && pu8Fg[s32Oft])
 			) //illumination background update
 			{

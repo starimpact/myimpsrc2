@@ -118,9 +118,9 @@ IMP_MODULE_HANDLE IMP_CreateLightRemove(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_
 			(pstModule->pu8N+i1*s32W)[j1]=0;
 			(pstModule->pu8T+i1*s32W)[j1]=0;
 		}
-	pstModule->fthesh1=6;//10;
+	pstModule->fthesh1=10;
 	pstModule->fthesh2=2;
-	pstModule->fdelay=80;//20;
+	pstModule->fdelay=20;
 	
 	pstOutput->pu8img = pstModule->pu8img;
 	hModule = (IMP_MODULE_HANDLE)pstModule;
@@ -250,7 +250,7 @@ IMP_S32 IMP_ProcessLightRemove(IMP_MODULE_HANDLE hModule)
 				{ 
 					if(abs((appfqueue1[8]+i2*s32W)[j2]-(appfqueue1[0]+i2*s32W)[j2])>fthesh1)
 					{
-					//	(pu8img+i2*s32W)[j2]=1;
+						(pu8img+i2*s32W)[j2]=1;
 						(pu8H+i2*s32W)[j2]=0;
 						(pu8M+i2*s32W)[j2]=0;
 					}

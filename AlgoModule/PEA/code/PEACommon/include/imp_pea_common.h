@@ -603,8 +603,8 @@ typedef RESULT_S IMP_OUTPUT;
 //output information for Gray Gaussian module
 typedef struct impOutputGrayGaussian_S
 {
-	GRAY_IMAGE_S *pstBkg;
-	GRAY_IMAGE_S *pstFilter;
+	GRAY_IMAGE_S stBkg;
+	GRAY_IMAGE_S stFilter;
 }IMP_OutputGrayGaussian_S;
 
 

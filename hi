@@ -12,4 +12,4 @@ In file included from /usr/local/include/opencv2/core/core_c.h:47,
 /usr/local/include/opencv2/core/types_c.h:272:1: warning: this is the location of the previous definition
 main_opencv_pea.c: In function ‘IMP_OpencvExample’:
 main_opencv_pea.c:806: warning: ‘return’ with a value, in function returning void
-main_opencv_pea.c:983: warning: ‘return’ with a value, in function returning void
+main_opencv_pea.c:988: warning: ‘return’ with a value, in function returning void

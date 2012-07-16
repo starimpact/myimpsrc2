@@ -937,8 +937,13 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         cvShowImage("foreground", pFrImg);
         //time increase
         stImage.u32Time += s32SubSampleT;
-
+		
         key = cvWaitKey(10);
+        
+        if (nFrmNum == 2139)
+        {
+			cvWaitKey(0);
+	    }
 
 		if (key == 's')//鍗曟
 		{
@@ -1004,8 +1009,8 @@ int main()
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 	
 #ifdef cif
 	m_frame_width = 352;

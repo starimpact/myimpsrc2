@@ -292,7 +292,7 @@ IMP_S32 ipProcessTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	s32ImgW = pstTargetDetector->pstResult->s32Width;
 	s32ImgH = pstTargetDetector->pstResult->s32Height;
 	
-#if PTDI_TIME
+#if PTDI_TIME || 1
 struct timeval t1, t2;
 #endif
 
@@ -306,7 +306,7 @@ gettimeofday(&t1, NULL);
 
 #if PTDI_TIME
 gettimeofday(&t2, NULL);
-printf("ProcessWaterMarkDetector:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);	
+printf("ProcessWaterMarkDetector:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);	
 #endif
 
 #endif
@@ -335,18 +335,20 @@ printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 	
 	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
+
+	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
 	
 #if 1 //VIBE
 
-#if PTDI_TIME
+#if PTDI_TIME || 1
 gettimeofday(&t1, NULL);
 #endif
 	//process ViBe
 	IMP_ProcessViBe(pstTargetDetector->hViBeModel);
 	
-#if PTDI_TIME
+#if PTDI_TIME || 1
 gettimeofday(&t2, NULL);
-printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 
 /*
@@ -373,7 +375,7 @@ printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 
 #endif //VIBE
 
-	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
+	
 
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
