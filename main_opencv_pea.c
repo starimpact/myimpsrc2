@@ -940,7 +940,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		
         key = cvWaitKey(10);
         
-        if (nFrmNum == 2139)
+        if (nFrmNum == 420)
         {
 			cvWaitKey(0);
 	    }
