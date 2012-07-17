@@ -74,6 +74,7 @@ typedef struct
 	IpOscPara *pstPara;
 } IpOscAnalyst;
 
+
 IMP_VOID ipCreateOscAnalysti( IpOscAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource );
 IMP_VOID ipReleaseOscAnalysti( IpOscAnalyst *pstAnalyst );
 IMP_VOID ipConfigOscAnalysti( IpOscAnalyst *pstAnalyst, IpOscPara *pstPara );
