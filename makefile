@@ -80,6 +80,7 @@ PEA_OBJS := AlgoModule/ALGO_PARA/Para/imp_para.o \
 			AlgoModule/PEA/code/ObjRecognition/Detector/imp_osc_detect_out.o \
 			AlgoModule/PEA/code/ObjRecognition/Detector/imp_lightremove.o \
 			AlgoModule/PEA/code/ObjRecognition/Detector/imp_graygaussian.o \
+			AlgoModule/PEA/code/ObjRecognition/Detector/imp_swing.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_common.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_cs.o \

@@ -623,6 +623,12 @@ typedef struct impOutputLightRemove_S
 }IMP_OutputLightRemove_S;
 
 
+typedef struct impOutputSwing_S
+{
+	IMP_S32 s32Tmp;
+} IMP_OutputSwing_S;
+
+
 typedef struct impPEA_RESULT_S
 {
 	IMP_S32 s32Width;
@@ -651,6 +657,7 @@ typedef struct impPEA_RESULT_S
 	IMP_OutputGrayGaussian_S stOutPutGG; //
 	IMP_OutputViBe_S stOutPutViBeModel;  //
 	IMP_OutputLightRemove_S stOutPutLR;
+	IMP_OutputSwing_S stOutPutSwing;
 	
 } PEA_RESULT_S;
 

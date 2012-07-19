@@ -64,6 +64,7 @@ typedef struct impPEA_TARGET_DETECTOR_S
 
 	IMP_MODULE_HANDLE hGGModel; //gray gaussian Model
 	IMP_MODULE_HANDLE hViBeModel; //ViBe Model
+	IMP_MODULE_HANDLE hSwingModel; //ViBe Model
 	IMP_MODULE_HANDLE hOSCDModel; //OSCD Model
 	IMP_MODULE_HANDLE hLFModel; //Light Filter Model
 	

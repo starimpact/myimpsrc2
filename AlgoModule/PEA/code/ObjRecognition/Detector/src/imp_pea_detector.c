@@ -23,10 +23,12 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	pstTargetDetector->pstResult = pstResult;
 	
 	
-	pstTargetDetector->hGGModel = IMP_CreateGrayGaussian(pstResult, pHwResouce);
+//	pstTargetDetector->hGGModel = IMP_CreateGrayGaussian(pstResult, pHwResouce);
 	
 	//create and init ViBe model
 	pstTargetDetector->hViBeModel = IMP_CreateViBe(pstResult, pHwResouce);
+	
+	pstTargetDetector->hSwingModel = IMP_CreateSwing(pstResult, pHwResouce);
 	
 	pstTargetDetector->hOSCDModel = IMP_CreateOSCD(pstResult, pHwResouce);
 	
@@ -184,11 +186,13 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	//release image
 	IMP_ReleaseViBe(pstTargetDetector->hViBeModel);
 	
+	IMP_ReleaseSwing(pstTargetDetector->hSwingModel);
+	
 	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
 	
 	IMP_ReleaseLightRemove(pstTargetDetector->hLFModel);
 	
-	IMP_ReleaseGrayGaussian(pstTargetDetector->hGGModel);
+//	IMP_ReleaseGrayGaussian(pstTargetDetector->hGGModel);
 	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
@@ -334,7 +338,7 @@ gettimeofday(&t2, NULL);
 printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 	
-	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
+//	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
 
 	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
 	
@@ -350,7 +354,9 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
-
+	
+	IMP_ProcessSwing(pstTargetDetector->hSwingModel);
+	
 /*
 	{
 		IMP_OutputViBe_S *pstViBe = &pstResult->stOutPutViBeModel;
