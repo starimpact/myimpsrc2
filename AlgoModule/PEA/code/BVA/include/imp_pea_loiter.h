@@ -17,8 +17,12 @@ typedef struct impLoiterPara_S
 
 typedef struct impLoiterTgtInfo_S
 {
+	IMP_S32 s32Used;
 	IMP_U32	u32TargetId;
-	IMP_U32 u32Used;
+	IMP_POINT32S_S stPosMean;
+	IMP_POINT32S_S stPosVar;
+	IMP_S32 s32Time;
+//	IMP_S32 s32LoiterTime;
 	IMP_S32 as32DrtHist[8];
 } IMP_LoiterTgtInfo_S;
 

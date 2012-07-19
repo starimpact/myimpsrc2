@@ -415,6 +415,8 @@ extern IMP_VOID ipFillTargetEventDataMTripwire( EVT_ITEM_S *pstEvt, IpTrackedTar
 
 extern IMP_VOID ipFillTargetEventDataOSC( EVT_ITEM_S *pstEvent, IpTrackedTarget *pstTarget, RULE_S *pstRule );
 
+extern IMP_VOID imp_FillTargetEventDataLoiter(EVT_ITEM_S *pstEvent, IpTrackedTarget *pstTarget, RULE_S *pstRule);
+
 static IMP_VOID ipFillTargetEventData( EVT_ITEM_S *pstEvt, IpTrackedTarget *pstTarget, RULE_S *pstRule )
 {
 	switch( pstEvt->u32Type )
@@ -438,6 +440,10 @@ static IMP_VOID ipFillTargetEventData( EVT_ITEM_S *pstEvt, IpTrackedTarget *pstT
 		ipFillTargetEventDataMTripwire( pstEvt, pstTarget, pstRule );
 #endif
 	    break;
+	case IMP_EVT_TYPE_AlarmLoiter:
+	//	printf("\033[32m=========================================\033[0m\n");
+		imp_FillTargetEventDataLoiter(pstEvt, pstTarget, pstRule);
+		break;
 	default:
 	    break;
 	}

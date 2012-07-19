@@ -64,6 +64,8 @@ if (pstResult->s32ModuleSwitch & 2)
 		ipCreateOscAnalysti( &pstBva->stModuleOSC, pstResult, pHwResouce );
 	}
 	
+	imp_CreateLoiter(&pstBva->stModuleLoiter, pstResult, pHwResouce);
+	
 	ipCreateTargetEvtMgr( &pstBva->stTargetEvtMgr, pstResult );
 
 }
@@ -94,6 +96,8 @@ IMP_VOID ipReleaseAnalystInternal( BEHAVIOR_ANALYSIS_S *pstBva )
 		ipReleaseOscAnalysti( &pstBva->stModuleOSC );
 		IMP_MMFree( pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstBva->pstAnalystOSC );
 	}
+	
+	imp_ReleaseLoiter(&pstBva->stModuleLoiter);
 
 	// TARDAT
 	{
@@ -172,7 +176,9 @@ pstRulePara = &pstZone->stPara;
 		pstBva->stPara.stOscPara.pstRule = pstBva->stPara.pstRule;
 		ipConfigOscAnalysti( &pstBva->stModuleOSC, &pstBva->stPara.stOscPara );
 	}
-
+	
+	pstBva->stPara.stLoiterPara.pstRule = pstBva->stPara.pstRule;
+	imp_ConfigLoiter(&pstBva->stModuleLoiter, &pstBva->stPara.stLoiterPara);
 }
 
 
@@ -231,7 +237,9 @@ IMP_S32 IMP_PEA_BVA_ProcessBvaInternal( BEHAVIOR_ANALYSIS_S *pstBva )
 		{
 			ipProcessOscAnalysti( &pstBva->stModuleOSC );
 		}
-	}	
+	}
+	
+	imp_ProcessLoiter(&pstBva->stModuleLoiter);
 
 	ipProcessBehaviorAanalystInternalEnd( pstBva );
 	ipProcessTargetEvtMgr( &pstBva->stTargetEvtMgr );

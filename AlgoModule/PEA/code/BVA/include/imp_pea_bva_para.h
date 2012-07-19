@@ -10,6 +10,7 @@
 #include "imp_pea_bva_common.h"
 #include "imp_pea_static.h"
 #include "imp_pea_osc.h"
+#include "imp_pea_loiter.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -28,6 +29,8 @@ typedef struct
 	IpTripwirePara stTripwirePara;
 	IpMTripwirePara stMTripwirePara;
 	IpOscPara stOscPara;
+	IMP_LoiterPara_S stLoiterPara;
+	
 	IMP_S32 s32InitEventLife;
 	IMP_S32 s32OutputEvents;
 

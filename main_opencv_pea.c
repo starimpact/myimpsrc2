@@ -316,7 +316,6 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 		//IP_PIXVAL *pcr = &(colors[target->id%12]);
 		TGT_MOTION_ITEM_S *item_data = (TGT_MOTION_ITEM_S*)(target->au8Data);
 		TGT_TRAJECT_S *traject = &item_data->stTraject;
-
 		
 		if(target->u32Event !=0)
 		{
@@ -540,52 +539,66 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 	{
 		stURPpara.stConfigPara.s32ImgW = 352;
 		stURPpara.stConfigPara.s32ImgH = 288;
-		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
-		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
-		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_PERIMETER;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeLimit = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeHuman = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeVehicle = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32DirectionLimit = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32ForbiddenDirection = 180;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinDist = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinTime = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.s32BoundaryPtNum = 4;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16X = 340;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16X = 340;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16Y = 270;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 270;
+		
+		URP_RULE_S *pstRule = &stURPpara.stRuleSet.astRule[0];
+		
+		pstRule->u32Enable = 1;
+		pstRule->u32Valid = 1;
+		pstRule->u32Mode = IMP_FUNC_LOITER;
+		pstRule->stPara.stLoiterRulePara.s32TypeLimit = 0;
+		pstRule->stPara.stLoiterRulePara.s32TimeMin = 40*5;
+		
+//////////////////////////////////////////////////////////		
+		
+		pstRule = &stURPpara.stRuleSet.astRule[1];
+		
+		pstRule->u32Enable = 0;
+		pstRule->u32Valid = 0;
+		pstRule->u32Mode = IMP_FUNC_PERIMETER;//IMP_FUNC_LOITER;
+		pstRule->stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
+		pstRule->stPara.stPerimeterRulePara.s32TypeLimit = 0;
+		pstRule->stPara.stPerimeterRulePara.s32TypeHuman = 1;
+		pstRule->stPara.stPerimeterRulePara.s32TypeVehicle = 1;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32DirectionLimit = 0;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32ForbiddenDirection = 180;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32MinDist = 0;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32MinTime = 0;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.s32BoundaryPtNum = 4;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 10;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 10;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16X = 340;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 10;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16X = 340;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16Y = 270;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 270;
 
-	//	stURPpara.stRuleSet.astRule[0].u32Enable = 0;
-	//	stURPpara.stRuleSet.astRule[0].u32Valid = 1;
-		stURPpara.stRuleSet.astRule[0].u32Mode = IMP_FUNC_TRIPWIRE;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeLimit = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeHuman = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeVehicle = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
+#if 0
+	//	pstRule->u32Enable = 0;
+	//	pstRule->u32Valid = 1;
+		pstRule->u32Mode = IMP_FUNC_TRIPWIRE;
+		pstRule->stPara.stTripwireRulePara.s32TypeLimit = 1;
+		pstRule->stPara.stTripwireRulePara.s32TypeHuman = 1;
+		pstRule->stPara.stTripwireRulePara.s32TypeVehicle = 1;
+		pstRule->stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
+		pstRule->stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
+		pstRule->stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
+		pstRule->stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
+		pstRule->stPara.stTripwireRulePara.astLines[0].s32Valid=1;
 
 
 #if 1
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=350;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=150;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=50;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=150;
+		pstRule->stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=350;
+		pstRule->stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=150;
+		pstRule->stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=50;
+		pstRule->stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=150;
 #endif
 		
 		//multi-tripwire
-		stURPpara.stRuleSet.astRule[0].u32Mode = IMP_FUNC_MTRIPWIRE;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeLimit = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeHuman = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.s32TypeVehicle = 1;
+		pstRule->u32Mode = IMP_FUNC_MTRIPWIRE;
+		pstRule->stPara.stMTripwireRulePara.s32TypeLimit = 1;
+		pstRule->stPara.stMTripwireRulePara.s32TypeHuman = 1;
+		pstRule->stPara.stMTripwireRulePara.s32TypeVehicle = 1;
 		URP_MTRIPWIRE_S *pstMLines = &stURPpara.stRuleSet.astRule[0].stPara.stMTripwireRulePara.astLines[0];
 			
 		pstMLines->as32IsDoubleDirection[0]=0;
@@ -606,7 +619,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		pstLine[1].stStartPt.s16Y = 0;
 		pstLine[1].stEndPt.s16X = pstLine[0].stEndPt.s16X + 30;
 		pstLine[1].stEndPt.s16Y = 288;
-		
+#endif
 	}
 //	IMP_PARA_Init( pstPara, NULL, NULL, s32ImgW, s32ImgH, NULL );
 	IMP_ConfigArmPeaParameter( hModule, NULL ,&stURPpara );

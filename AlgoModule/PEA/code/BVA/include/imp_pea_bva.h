@@ -14,6 +14,7 @@
 #include "imp_pea_bva_common.h"
 #include "imp_pea_static.h"
 #include "imp_pea_osc.h"
+#include "imp_pea_loiter.h"
 
 
 #ifdef __cplusplus
@@ -91,6 +92,8 @@ typedef struct impBEHAVIOR_ANALYSIS_S
 #endif
 
 	IpOscAnalyst stModuleOSC;
+	
+	IMP_Loiter_S stModuleLoiter;
 
 	IpTargetEvtMgr stTargetEvtMgr;
 
