@@ -21,8 +21,8 @@
     #include <sys/time.h>
 #endif
 
-//#define h2
-#define h1
+#define h2
+//#define h1
 //#define d1
 //#define cif
 //#define qcif
@@ -49,7 +49,7 @@
 
 #ifdef h2
 #define Y_WIDTH 1920
-#define Y_HEIGHT 1080
+#define Y_HEIGHT 1088
 #endif
 
 #define U_WIDTH (Y_WIDTH/2)
