@@ -1010,7 +1010,9 @@ int main()
 	colors[13] = CV_RGB(0,0,255);
 
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 	
 #ifdef cif
 	m_frame_width = 352;
