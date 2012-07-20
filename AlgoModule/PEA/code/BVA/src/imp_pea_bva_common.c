@@ -16,16 +16,22 @@ IMP_S32 ipIsAcoordantAngleRange( IMP_S32 s32Angle, IMP_S32 s32Direction, IMP_S32
 {
 	IMP_S32 s32AngleDiff;
 
-	s32AngleDiff = s32Direction - s32Angle;
+//	s32AngleDiff = s32Direction - s32Angle;
 
-	if (s32AngleDiff < 0)
-		s32AngleDiff += 360;
-	else if (s32AngleDiff > 360)
-		s32AngleDiff -= 360;
+//	if (s32AngleDiff < 0)
+//		s32AngleDiff += 360;
+//	else if (s32AngleDiff > 360)
+//		s32AngleDiff -= 360;
 
-	if (s32AngleDiff > 180)
-		s32AngleDiff = 360 - s32AngleDiff;
+//	if (s32AngleDiff > 180)
+//		s32AngleDiff = 360 - s32AngleDiff;
 
+//	return (s32AngleDiff <= s32Tolerance);
+	
+	s32AngleDiff = abs(s32Direction - s32Angle);
+	
+	if (s32AngleDiff > 180) s32AngleDiff = 360 - s32AngleDiff;
+	
 	return (s32AngleDiff <= s32Tolerance);
 }
 

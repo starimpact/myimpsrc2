@@ -606,6 +606,7 @@ static IMP_S32 ipPerimeterIsAccordantConstraint( IpPerimeterPara *pstParams, PER
 			}
 		}
 
+	//	printf("s32AngleTolerance:%d\n", s32AngleTolerance);
 		ipGetObjectDirectionByTrajectory(pstTarget,&s32Dir);
 		if (pstPeriLmtPara->s32DirectionLmt)
 		{

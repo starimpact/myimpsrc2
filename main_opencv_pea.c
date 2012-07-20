@@ -542,7 +542,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		
 		URP_RULE_S *pstRule = &stURPpara.stRuleSet.astRule[0];
 		
-		pstRule->u32Enable = 1;
+		pstRule->u32Enable = 0;
 		pstRule->u32Valid = 1;
 		pstRule->u32Mode = IMP_FUNC_LOITER;
 		pstRule->stPara.stLoiterRulePara.s32TypeLimit = 0;
@@ -552,14 +552,14 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		
 		pstRule = &stURPpara.stRuleSet.astRule[1];
 		
-		pstRule->u32Enable = 0;
-		pstRule->u32Valid = 0;
+		pstRule->u32Enable = 1;
+		pstRule->u32Valid = 1;
 		pstRule->u32Mode = IMP_FUNC_PERIMETER;//IMP_FUNC_LOITER;
 		pstRule->stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
 		pstRule->stPara.stPerimeterRulePara.s32TypeLimit = 0;
 		pstRule->stPara.stPerimeterRulePara.s32TypeHuman = 1;
 		pstRule->stPara.stPerimeterRulePara.s32TypeVehicle = 1;
-		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32DirectionLimit = 0;
+		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32DirectionLimit = 1;
 		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32ForbiddenDirection = 180;
 		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32MinDist = 0;
 		pstRule->stPara.stPerimeterRulePara.stLimitPara.s32MinTime = 0;
