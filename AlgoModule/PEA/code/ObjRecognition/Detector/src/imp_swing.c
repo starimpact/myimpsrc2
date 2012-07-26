@@ -1,4 +1,3 @@
-
 #include "imp_swing.h"
 #include "time.h"
 #include "stdlib.h"
@@ -39,13 +38,8 @@ IMP_S32 IMP_ShowImg(IMP_UCHAR*srcGray,IMP_S32 Height,IMP_S32 Width,IMP_UCHAR*wid
 IMP_S32 IMP_BinaryImg(IMP_UCHAR *srcGray,IMP_UCHAR *BinMask,IMP_S32 val,IMP_S32 Lenght)
 {
 	IMP_S32 lenght;
-	if (!srcGray||!BinMask)
-	{
-		printf("The input of IMP_BinaryImg is wrong!\n");
-		return 0;
-	}
-
 	lenght=Lenght;
+	
 	while(lenght--)
 	{
 		if (srcGray[lenght]>val)
@@ -59,41 +53,48 @@ IMP_S32 IMP_BinaryImg(IMP_UCHAR *srcGray,IMP_UCHAR *BinMask,IMP_S32 val,IMP_S32 
 	}
 	return 1;
 }
-IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 ImgW)
+
+IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 ImgW)//chengfa xuyao gaijin 
 {
-	//è¯¥æ“ä½œä¹‹å‰éœ€è¦å¯¹statiImgå›¾åƒè¿›è¡Œå½’é›¶
-	//srcGrayå›¾åƒä¸­åƒç´ å€¼ä¸æ˜¯0ï¼Œåˆ™statiImgç›¸åº”ä½ç½®åº”è¯¥+1ï¼›
-	//srcGrayå›¾åƒä¸­åƒç´ å€¼ä¸º0ï¼Œåˆ™statiImgç›¸åº”ä½ç½®åº”è¯¥-1
-	//å½“æ•°å€¼å¤§äº255æ—¶ï¼ŒstatiImgèµ‹å€¼ä¸º255
-	//å½“æ•°å€¼å°é›¨0ï¼ŒstatiImgèµ‹å€¼ä¸º0
+	//¸Ã²Ù×÷Ö®Ç°ĞèÒª¶ÔstatiImgÍ¼Ïñ½øĞĞ¹éÁã
+	//srcGrayÍ¼ÏñÖĞÏñËØÖµ²»ÊÇ0£¬ÔòstatiImgÏàÓ¦Î»ÖÃÓ¦¸Ã+1£»
+	//srcGrayÍ¼ÏñÖĞÏñËØÖµÎª0£¬ÔòstatiImgÏàÓ¦Î»ÖÃÓ¦¸Ã-1
+	//µ±ÊıÖµ´óÓÚ255Ê±£¬statiImg¸³ÖµÎª255
+	//µ±ÊıÖµĞ¡Óê0£¬statiImg¸³ÖµÎª0
 	IMP_U8 *P1;
 	IMP_U8 *P2;
 	IMP_S32 Num;
 	IMP_S32 width;
 	IMP_S32 height;
-	IMP_S32 OffNeg[9]={-ImgW-1,-ImgW,-ImgW+1, -1 ,0 ,1, ImgW-1, ImgW,-ImgW+1};
-	if (!srcGray||!statiImg)
-	{
-		printf("The input of IMP_StatiPix is wrong!\n");
-		return 0;
-	}
+	IMP_S32 OffNeg[6]={-ImgW-1,-ImgW,-ImgW+1, ImgW-1, ImgW,-ImgW+1};
+	
+	//if (!srcGray||!statiImg)
+	//{
+	//	printf("The input of IMP_StatiPix is wrong!\n");
+	//	return 0;
+	//}
 
+	P1=srcGray;
+	P2=statiImg;
 	for(height=1;height<ImgH-1;height++)
 	{
-	  P1=srcGray+height*ImgW;
-	  P2=statiImg+height*ImgW;
+	  //P1=srcGray+height*ImgW;
+	  //P2=statiImg+height*ImgW;
+	  P1+=ImgW;
+	  P2+=ImgW;
 	  for(width=1;width<ImgW-1;width++)
 	  {
 	    Num=0;
-	    Num+=(P1[width-ImgW-1]>0)?1:0;
-        Num+=(P1[width-ImgW]>0)?1:0;
-	    Num+=(P1[width-ImgW+1]>0)?1:0;
-        Num+=(P1[width-1]>0)?1:0;
-        Num+=(P1[width]>0)?1:0;
-	    Num+=(P1[width+1]>0)?1:0;
-	    Num+=(P1[width+ImgW-1]>0)?1:0;
-        Num+=(P1[width+ImgW]>0)?1:0;
-	    Num+=(P1[width+ImgW+1]>0)?1:0;
+	    Num+=P1[width+OffNeg[0]];
+        Num+=P1[width+OffNeg[1]];
+	    Num+=P1[width+OffNeg[2]];
+        Num+=P1[width+OffNeg[3]];
+        Num+=P1[width+OffNeg[4]];
+        Num+=P1[width+OffNeg[5]];
+        Num+=P1[width-1];
+        Num+=P1[width];
+	    Num+=P1[width+1];
+	 
 	    if(Num>3||P1[width])
 	    {
 	      if(P2[width]<255)
@@ -115,7 +116,7 @@ IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 I
 }
 IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_UCHAR*proMat2,IMP_S32 Length)
 {
-	/*å¾—åˆ°ä¸¤å›¾åƒåƒç´ æ¯”å€¼ï¼Œå­˜æ”¾ä¸propotMatä¸­ï¼ŒLengthæ˜¯å›¾åƒçš„å†…å­˜é•¿åº¦*/
+	/*µÃµ½Á½Í¼ÏñÏñËØ±ÈÖµ£¬´æ·ÅÓëpropotMatÖĞ£¬LengthÊÇÍ¼ÏñµÄÄÚ´æ³¤¶È*/
 	
 	IMP_S32 length;
 	length=Length;
@@ -141,7 +142,7 @@ IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_
 }
 
 //IMP_S32 IMP_RectSum(IMP_UCHAR*srcGray,IMP_RECT_S widow,IMP_S32 Height,IMP_S32 Width)
-//{/*å¾—åˆ°å›¾åƒç›¸åº”æ–¹å½¢çš„åƒç´ å’Œï¼ŒHeightå’ŒWidthæ˜¯å›¾åƒçš„å®½å’Œé«˜*/
+//{/*µÃµ½Í¼ÏñÏàÓ¦·½ĞÎµÄÏñËØºÍ£¬HeightºÍWidthÊÇÍ¼ÏñµÄ¿íºÍ¸ß*/
 //	IMP_UCHAR*p;
 //	IMP_S32 width;
 //	IMP_S32 widS;
@@ -172,27 +173,30 @@ IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_
 //}
 
 IMP_S32 IMP_RectSum(IMP_UCHAR*srcGray,IMP_RECT_S widow,IMP_S32 Height,IMP_S32 Width)
-{/*å¾—åˆ°å›¾åƒç›¸åº”æ–¹å½¢çš„åƒç´ å’Œï¼ŒHeightå’ŒWidthæ˜¯å›¾åƒçš„å®½å’Œé«˜*/
+{/*µÃµ½Í¼ÏñÏàÓ¦·½ĞÎµÄÏñËØºÍ£¬HeightºÍWidthÊÇÍ¼ÏñµÄ¿íºÍ¸ß*/
 	IMP_UCHAR*p;
 	IMP_S32 width;
 	IMP_S32 height;
 	IMP_S32 Ret=0;
 	
+	p=srcGray+widow.s16Y1*Width;
 	for (height=widow.s16Y1;height<widow.s16Y2;height++)
 	{
-		p=srcGray+height*Width;
+		//p=srcGray+height*Width;
 		for (width=widow.s16X1;width<widow.s16X2;width++)
 		{
 			Ret+=p[width];
 		}
+		p+=Width;
 	}
 	return Ret;
 }
 
 IMP_S32 IMP_GetSadImg(IMP_Swing_S*PsModel)
 {
-	//struct timeval tvStart,tvEnd;//delete
-	//double linStart = 0,linEnd = 0,lTime = 0;//delete
+//
+	struct timeval tvStart,tvEnd;//delete
+	double linStart = 0,linEnd = 0,lTime = 0;//delete
 	IMP_S32 i;
 	IMP_S32 j;
 	IMP_S32 ImgH;
@@ -264,19 +268,20 @@ IMP_S32 IMP_GetSadImg(IMP_Swing_S*PsModel)
 	Pgray=PsModel->pstResult->stImgInGray.pu8Data;
 	FoImg=PsModel->pstResult->stDRegionSet.pstImgFgOrg->pu8Data;
 	Pbck=PsModel->pstResult->stDRegionSet.pstImgBgGray->pu8Data;
-	Length=ImgH*ImgW;
-	IMP_ShowImg( Pbck,ImgH,ImgW,"dd");
+	//Length=ImgH*ImgW;
+	//IMP_ShowImg( Pbck,ImgH,ImgW,"dd");
 
-	if(!PsModel)
-	{
-		printf("The inPut of GetSadImg is wrong!\n");
-		return 0;
-	}
+	//if(!PsModel)
+	//{
+	//	printf("The inPut of GetSadImg is wrong!\n");
+	//	return 0;
+	//}
 	
-	
+	Length=0;
 	for(height=1;height<ImgH-1;height++)
 	{
-		Length=height*ImgW;
+		//Length=height*ImgW;
+		Length+=ImgW;
 		P=Pgray+Length;
 		Pz11=(XY22+Length);
 		Pg11=(Pbck+Length+ImgW);
@@ -313,11 +318,15 @@ IMP_S32 IMP_GetSadImg(IMP_Swing_S*PsModel)
 		}
 	}
 	
-    //gettimeofday (&tvStart,"usec");//delete
+   // gettimeofday (&tvStart,"usec");//delete
+    Pzsad=(zSadMin+ImgW);
+	Pvsad=(vSadMin+ImgW);
 	for(height=2;height<ImgH-2;height++)
 	{	
-		Pzsad=(zSadMin+height*ImgW);
-		Pvsad=(vSadMin+height*ImgW);
+		//Pzsad=(zSadMin+height*ImgW);
+		//Pvsad=(vSadMin+height*ImgW);
+		Pzsad+=ImgW;
+	    Pvsad+=ImgW;
 		for (width=2;width<ImgW-2;width++)
 		{
 			vminVal=1000;
@@ -462,12 +471,411 @@ IMP_S32 IMP_GetSadImg(IMP_Swing_S*PsModel)
 	
 	//gettimeofday (&tvEnd,"usec");//delete
 	//linStart = (double)tvStart.tv_usec;  //unit S
-   // linEnd = (double)tvEnd.tv_usec;        //unit S
+    //linEnd = (double)tvEnd.tv_usec;        //unit S
+    //lTime = linEnd-linStart;
+    //printf("swing=%3.1lfms  \n",lTime/1000);
+	
+	return 1;
+}
+
+
+
+
+
+
+
+
+IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
+{
+	//½«Ô­ÏÈµÄÍ¼ÏñÔö¼ÓÒ»¸öÍ¨µÀ
+	//Ôö¼ÓµÄÒ»¸öÍ¨µÀÓÃÀ´´æ·Å¸Ã
+	//ÏñËØ¶ÔÓ¦µÄÎ»ÖÃµÄ°ËÁÚÓòµÄ
+	//ÖµÖ®ºÍĞÅÏ¢
+	struct timeval tvStart,tvEnd;//delete
+	double linStart = 0,linEnd = 0,lTime = 0;//delete
+	IMP_S32 i;
+	IMP_S32 j;
+	IMP_S32 ImgH;
+	IMP_S32 ImgW;
+	IMP_S32 Wstep;
+	IMP_S32 Hstep;
+	IMP_S32 Length1;
+	IMP_S32 Length2;
+	IMP_S32 zminVal;
+	IMP_S32 vminVal;
+	IMP_S32 width;
+	IMP_S32 height;
+
+	IMP_UCHAR*P;
+	IMP_UCHAR*Pgray;
+	IMP_UCHAR*Pbck;
+	IMP_UCHAR*FoImg;
+	IMP_UCHAR*Pzsad;
+	IMP_UCHAR*Pvsad;
+	IMP_UCHAR*zSadMin;
+	IMP_UCHAR*vSadMin;
+	
+	IMP_UCHAR*Pz11;
+	IMP_UCHAR*Pz10;
+	IMP_UCHAR*Pz1_1;
+	IMP_UCHAR*Pz01;
+	IMP_UCHAR*Pz00;
+	IMP_UCHAR*Pz0_1;
+	IMP_UCHAR*Pz_11;
+	IMP_UCHAR*Pz_10;
+	IMP_UCHAR*Pz_1_1;
+
+
+	IMP_UCHAR*Pg11;
+	IMP_UCHAR*Pg10;
+	IMP_UCHAR*Pg1_1;
+	IMP_UCHAR*Pg01;
+	IMP_UCHAR*Pg00;
+	IMP_UCHAR*Pg0_1;
+	IMP_UCHAR*Pg_11;
+	IMP_UCHAR*Pg_10;
+	IMP_UCHAR*Pg_1_1;
+	
+	IMP_UCHAR*XY00;
+	IMP_UCHAR*XY01;
+	IMP_UCHAR*XY02;
+	IMP_UCHAR*XY10;
+	IMP_UCHAR*XY11;
+	IMP_UCHAR*XY12;
+	IMP_UCHAR*XY20;
+	IMP_UCHAR*XY21;
+	IMP_UCHAR*XY22;
+
+	XY00=PsModel->p00;
+	XY01=PsModel->p01;
+	XY02=PsModel->p02;
+	XY10=PsModel->p10;
+	XY11=PsModel->p11;
+	XY12=PsModel->p12;
+	XY20=PsModel->p20;
+	XY21=PsModel->p21;
+	XY22=PsModel->p22;
+	
+	//gettimeofday (&tvStart,"usec");//delete
+	zSadMin=PsModel->zSadmin;
+	vSadMin=PsModel->vSadmin;
+	ImgH=PsModel->pstResult->s32Height;
+	ImgW=PsModel->pstResult->s32Width;
+	Pgray=PsModel->pstResult->stImgInGray.pu8Data;
+	FoImg=PsModel->pstResult->stDRegionSet.pstImgFgOrg->pu8Data;
+	Pbck=PsModel->pstResult->stDRegionSet.pstImgBgGray->pu8Data;
+	
+	
+	Length1=0;
+	Length2=0;
+	Wstep=ImgW+ImgW;
+	for(height=1;height<ImgH-1;height++)
+	{
+		//Length=height*ImgW;
+		Length1+=ImgW;
+		Length2+=Wstep;
+		P=Pgray+Length1;
+		Pz11=(XY22+Length2);
+		Pg11=(Pbck+Length1+ImgW);
+		Pz10=(XY21+Length2);
+		Pg10=(Pbck+Length1);
+		Pz1_1=((XY20+Length2));
+		Pg1_1=(Pbck+Length1-ImgW);
+		Pz01=((XY12+Length2));
+		Pg01=Pbck+Length1+ImgW;
+		Pz00=(XY11+Length2);
+		Pg00=(Pbck+Length1);
+		Pz0_1=((XY10+Length2));
+		Pg0_1=(Pbck+Length1-ImgW);
+		Pz_11=((XY02+Length2));
+		Pg_11=(Pbck+Length1+ImgW);
+		Pz_10=((XY01+Length2));
+		Pg_10=(Pbck+Length1);
+		Pz_1_1=((XY00+Length2));
+		Pg_1_1=(Pbck+Length1-ImgW);
+
+		for(width=1;width<ImgW-1;width++)
+		{
+		    Hstep=width+width;
+		    
+			Pz11[Hstep]=abs(Pg11[width+1]-P[width]);
+			Pz10[Hstep]=abs(Pg10[width+1]-P[width]);
+			Pz1_1[Hstep]=abs(Pg1_1[width+1]-P[width]);
+
+			Pz01[Hstep]=abs(Pg01[width]-P[width]);
+			Pz00[Hstep]=abs(Pg00[width]-P[width]);
+			Pz0_1[Hstep]=abs(Pg0_1[width]-P[width]);
+		
+			Pz_11[Hstep]=abs(Pg_11[width-1]-P[width]);
+			Pz_10[Hstep]=abs(Pg_10[width-1]-P[width]);
+			Pz_1_1[Hstep]=abs(Pg_1_1[width-1]-P[width]);
+		}
+	}
+	
+	
+	
+	P=XY22;
+	Length1=ImgW+ImgW;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+		    +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY21;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY20;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY12;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY11;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY10;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY02;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY01;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)//P 3
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	P=XY00;
+	for(height=1;height<ImgH-1;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		P+=Length1;
+		for(width=1;width<ImgW-1;width++)
+		{
+			P[Wstep+1]=(P[Wstep+2]+P[Wstep]+P[Wstep-2]+P[Wstep+Length1+2]+P[Wstep+Length1]
+			  +P[Wstep+Length1-2]+P[Wstep-Length1+2]+P[Wstep-Length1]+P[Wstep-Length1-2])/9;
+			Wstep+=2;
+		}
+	}
+	
+	Pzsad=zSadMin+ImgW;
+	Pvsad=vSadMin+ImgW;
+	Length1=ImgW+ImgW;
+	Length2=Length1;
+	for(height=2;height<ImgH-2;height++)
+	{
+	    Wstep=0;
+		Wstep+=2;
+		Pzsad+=ImgW;
+		Pvsad+=ImgW;
+		Length2+=Length1;
+		
+		for(width=2;width<ImgW-2;width++)
+		{
+			zminVal=1000;
+			vminVal=1000;
+		
+			Wstep+=2;	
+				
+			if(XY22[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY22[Length2+Wstep+1];
+			}
+			
+			if(XY21[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY21[Length2+Wstep+1];
+			}
+			
+			if(XY20[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY20[Length2+Wstep+1];
+			}
+			
+			if(XY12[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY12[Length2+Wstep+1];
+			}
+			
+			if(XY11[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY11[Length2+Wstep+1];
+			}
+			
+			if(XY10[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY10[Length2+Wstep+1];
+			}
+			
+			if(XY02[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY02[Length2+Wstep+1];
+			}
+			
+			if(XY01[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY01[Length2+Wstep+1];
+			}
+			
+			if(XY00[Length2+Wstep+1]<zminVal)
+			{
+				zminVal=XY00[Length2+Wstep+1];
+			}
+			Pzsad[width]=zminVal;
+			
+			
+			
+			if(XY22[Length2-Length1+Wstep-1]<vminVal)
+			{
+				vminVal=XY22[Length2-Length1+Wstep-1];
+			}
+			
+			if(XY21[Length2+Wstep-1]<vminVal)
+			{
+				vminVal=XY21[Length2+Wstep-1];
+			}
+			
+			if(XY20[Length2+Length1+Wstep-1]<vminVal)
+			{
+				vminVal=XY20[Length2+Length1+Wstep-1];
+			}
+			
+			if(XY12[Length2-Length1+Wstep+1]<vminVal)
+			{
+				vminVal=XY12[Length2-Length1+Wstep+1];
+			}
+			
+			if(XY11[Length2+Wstep+1]<vminVal)
+			{
+				vminVal=XY11[Length2+Wstep+1];
+			}
+			
+			if(XY10[Length2+Length1+Wstep+1]<vminVal)
+			{
+				vminVal=XY10[Length2+Length1+Wstep+1];
+			}
+			
+			if(XY02[Length2-Length1+Wstep+3]<vminVal)
+			{
+				vminVal=XY02[Length2-Length1+Wstep+3];
+			}
+			
+			if(XY01[Length2+Wstep+3]<vminVal)
+			{
+				vminVal=XY01[Length2+Wstep+3];
+			}
+			
+			if(XY00[Length2+Length1+Wstep+3]<vminVal)
+			{
+				vminVal=XY00[Length2+Length1+Wstep+3];
+			}
+			Pvsad[width]=vminVal;
+
+		}
+	}
+	//gettimeofday (&tvEnd,"usec");//delete
+	//linStart = (double)tvStart.tv_usec;  //unit S
+    //linEnd = (double)tvEnd.tv_usec;        //unit S
    // lTime = linEnd-linStart;
    // printf("swing=%3.1lfms  \n",lTime/1000);
 	
 	return 1;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 IMP_S32 IMP_GetMemSizeSwingModel( PEA_RESULT_S *pstResult)
 {
@@ -476,6 +884,7 @@ IMP_S32 IMP_GetMemSizeSwingModel( PEA_RESULT_S *pstResult)
 	IMP_S32 size =sizeof(IMP_Swing_S)+(14)*height*width; 	
 	return size;
 }
+
 IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource)
 {
 	IMP_MODULE_HANDLE hModule = NULL;
@@ -488,15 +897,15 @@ IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 	pstModule->pstHwResource = pstHwResource; 
 
 
-	pstModule->p00=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p01=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p02=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p10=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p11=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p12=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p20=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p21=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	pstModule->p22=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
+	pstModule->p00=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p01=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p02=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p10=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p11=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p12=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p20=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p21=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
+	pstModule->p22=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
 	pstModule->inMask=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 	pstModule->swImg=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 	pstModule->zSadmin=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
@@ -535,14 +944,9 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_UCHAR * pc6;
 
 	IMP_UCHAR * p00;
-	IMP_UCHAR * p01;
-	IMP_UCHAR * p02;
-	IMP_UCHAR * p10;
 	IMP_UCHAR * p11;
-	IMP_UCHAR * p12;
-	IMP_UCHAR * p20;
-	IMP_UCHAR * p21;
 	IMP_UCHAR * p22;
+	
 	IMP_UCHAR * srcGray;
 	IMP_UCHAR * bckGray;
 	IMP_UCHAR * forGray;
@@ -551,14 +955,10 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_UCHAR * inMask;
 	IMP_UCHAR * swImg;
 
-	
+	gettimeofday (&tvStart,"usec");//delete
 	pstModule = (IMP_Swing_S*)hModule;
 	p00=pstModule->p00;
-	p01=pstModule->p01;
-	p02=pstModule->p02;
-	p10=pstModule->p10;
 	p11=pstModule->p11;
-	p12=pstModule->p12;
 	p22=pstModule->p22;
 	//pff=pstModule->pff;
 	swImg=pstModule->swImg;
@@ -573,15 +973,17 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	//bckGray=pstModule->bkImg;
 	bckGray=pstResult->stDRegionSet.pstImgBgGray->pu8Data;
 	forGray=pstResult->stDRegionSet.pstImgFgOrg->pu8Data;
-	gettimeofday (&tvStart,"usec");//delete
+	
 	//IMP_Proporte(bckGray,srcGray,p11,Lenght);
-	IMP_GetSadImg(pstModule);
+	IMP_GetSadImg1(pstModule);
+	//IMP_GetSadImg(pstModule);
 	IMP_Proporte(bckGray,srcGray,p11,p22,Lenght);
 	
-	//å°†å‰æ™¯çš„æ‘‡æ‘†åŒºåŸŸå»é™¤
+	//½«Ç°¾°µÄÒ¡°ÚÇøÓòÈ¥³ı
+	Step=0;
 	for (height=1;height<ImgH-1;height++)
 	{
-	    Step=height*ImgW;
+	    Step+=ImgW;
 		pc1=(p00+Step);
 		pc2=(zSadmin+Step);
 		pc3=(vSadmin+Step);
@@ -592,9 +994,9 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 		
 		for (width=1;width<ImgW-1;width++)
 		{	
-			LowNum=0;
 			UpNum=0;
-			
+			LowNum=0;
+				
 			UpNum+=(p11+Step-ImgW)[width-1];
 			UpNum+=(p11+Step-ImgW)[width];
 			UpNum+=(p11+Step-ImgW)[width+1];
@@ -611,11 +1013,10 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 			LowNum+=(p22+Step+ImgW)[width-1];
 			LowNum+=(p22+Step+ImgW)[width];
 			LowNum+=(p22+Step+ImgW)[width+1];
-			//printf("\n %d %d \n",UpNum,LowNum);
-			if (pc2[width]>2&&pc2[width]<20)
+			if (pc2[width]>2&&pc2[width]<20)//2
 			{
 				if (abs(pc2[width]-pc3[width])<6&&abs(LowNum-UpNum)<6)
-					pc1[width]=255;
+					pc1[width]=1;
 				else
 					pc1[width]=0;
 			}
@@ -624,21 +1025,16 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 				pc1[width]=0;
 			}		
 
-		//	if (abs(LowNum-UpNum)>=6)
-		//	{
-		//		pc1[width]=0;
-		//	}
 
 			if(pc6[width])
 			{
-				if (pc5[width]!=0&&pc2[width]<25)//&&pc2[width]<30
+				if (pc5[width]!=0&&pc2[width]<30)//&&pc2[width]<30
 				{
 					pc6[width]=0;
 				}
 			}
 			
 		}
-		//IMP_ShowImg(p00,ImgH,ImgW,"midmid");
 	}
 	
 	gettimeofday (&tvEnd,"usec");//delete
@@ -647,7 +1043,7 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
     lTime = linEnd-linStart;
     printf("swing=%3.1lfms  \n",lTime/1000);
 
-
+	IMP_ShowImg(p00,ImgH,ImgW,"p00");
 	IMP_StatiPix(p00,inMask,ImgH,ImgW);
 	IMP_BinaryImg(inMask,swImg,40,Lenght);
 	IMP_ShowImg(forGray,ImgH,ImgW,"result");
@@ -665,11 +1061,11 @@ IMP_S32 IMP_ReleaseSwing(IMP_MODULE_HANDLE hModule)
 	pstModule = (IMP_Swing_S*)hModule;
 	pstMemMgr = &pstModule->pstHwResource->stMemMgr;
 
-	//IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->pstOutput);
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p00);
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p01);
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p02);
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p10);
+
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p11);
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p12);
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->p20);
@@ -682,8 +1078,6 @@ IMP_S32 IMP_ReleaseSwing(IMP_MODULE_HANDLE hModule)
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule);
 	return 1;
 }
-
-
 
 
 

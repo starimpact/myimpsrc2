@@ -12,7 +12,10 @@ typedef struct impGrayGaussian_S
     PEA_RESULT_S *pstResult;
     IMP_OutputGrayGaussian_S *pstOutput; 
 	IMP_S32 *pstCod;
-	IMP_U8 *pu8Dilate;
+	GRAY_IMAGE_S stSub1;
+	GRAY_IMAGE_S stSub2;
+	GRAY_IMAGE_S stSub1_dilate;
+	GRAY_IMAGE_S stSub2_dilate;	
 	IMP_S32	s32H;
 	IMP_S32 s32W;
 	IMP_S32 s32Alpha;       //模型学习率
@@ -21,10 +24,10 @@ typedef struct impGrayGaussian_S
 
 IMP_S32 IMP_GetMemSizeGrayGaussian(PEA_RESULT_S *pstResult)
 {
-	IMP_S32 width = pstResult->s32Width ;
-	IMP_S32 height = pstResult->s32Height ;
-	IMP_S32 size = sizeof(IMP_GrayGaussian_S)+4*height*width ; 	
-	return size ;
+	IMP_S32 width = pstResult->s32Width;
+	IMP_S32 height = pstResult->s32Height;
+	IMP_S32 size = sizeof(IMP_GrayGaussian_S)+6*height*width; 	
+	return size;
 }
 
 IMP_MODULE_HANDLE IMP_CreateGrayGaussian(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource) //创建内存
@@ -43,14 +46,17 @@ IMP_MODULE_HANDLE IMP_CreateGrayGaussian(PEA_RESULT_S *pstResult, GA_HARDWARE_RS
    	IMP_S32 s32row;
    	IMP_S32 s32col;
 	pstModule->pstCod = (IMP_S32 *) IMP_MMAlloc( &pstHwResource->stMemMgr,IMP_MEMBLK_TYPE_SLOW,s32H*s32W*4);
-	pstModule->pu8Dilate = (IMP_U8 *) IMP_MMAlloc( &pstHwResource->stMemMgr,IMP_MEMBLK_TYPE_SLOW,4*s32H*s32W*1);
+	IMP_GrayImageCreate( &pstModule->stSub1, s32W, s32H, &pstHwResource->stMemMgr );
+	IMP_GrayImageCreate( &pstModule->stSub2, s32W, s32H, &pstHwResource->stMemMgr );
+	IMP_GrayImageCreate( &pstModule->stSub1_dilate, s32W, s32H, &pstHwResource->stMemMgr );
+	IMP_GrayImageCreate( &pstModule->stSub2_dilate, s32W, s32H, &pstHwResource->stMemMgr );	
 	IMP_GrayImageCreate( &pstOutput->stBkg, s32W, s32H, &pstHwResource->stMemMgr );
     IMP_GrayImageCreate( &pstOutput->stFilter, s32W, s32H, &pstHwResource->stMemMgr );
 	hModule = (IMP_MODULE_HANDLE)pstModule;
 	return hModule;
 }
 IMP_VOID filter(IMP_GrayGaussian_S *pstModule);
-IMP_VOID DilateImage ( IMP_U8 *src, IMP_U16 width, IMP_U16 height);
+IMP_VOID DilateImage ( IMP_U8 *src, IMP_U8 *dst, IMP_U16 width, IMP_U16 height);
 
 IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 {
@@ -67,7 +73,10 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 	IMP_S32 *ps32Codval = pstModule->pstCod;
 	IMP_U8 *pu8Scence = pstModule->pstResult->stImgInGray.pu8Data;
 	IMP_U8 *pu8Bkg = pstModule->pstOutput->stBkg.pu8Data;
-	IMP_U8 *pu8Sub = pstModule->pu8Dilate ;
+	IMP_U8 *pu8Sub1 = pstModule->stSub1.pu8Data;
+	IMP_U8 *pu8Sub2 = pstModule->stSub2.pu8Data;
+	IMP_U8 *pu8Sub1_dilate = pstModule->stSub1_dilate.pu8Data;
+	IMP_U8 *pu8Sub2_dilate = pstModule->stSub2_dilate.pu8Data;
 	IMP_S32 s32d = pstModule->pstResult->u32FrmTimeCur;  //帧号
 	if(s32d-2<=0)                                       //取第一帧信息
 	{
@@ -89,44 +98,57 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 		IMP_S32 s32weight;       
 		IMP_U8 u8tmp;
 		IMP_S32 s32sumval;
+		IMP_U8 *ptr_sub1 = pu8Sub1;
+		IMP_U8 *ptr_sub2 = pu8Sub2;
 		for(s32row=s32H-1;s32row>=0;s32row--)
 		{
-			IMP_S32 *ptr_tmp = (IMP_S32*)(ps32Codval+s32row*s32W) ;
-			IMP_U8 *ptr_scence = (IMP_U8*)(pu8Scence+s32row*s32W) ;
-			IMP_U8 *ptr_sub = (IMP_U8*)(pu8Sub+s32row*s32W*4) ;
+			IMP_S32 *ptr_tmp = (IMP_S32*)(ps32Codval+s32row*s32W);
+			IMP_U8 *ptr_scence = (IMP_U8*)(pu8Scence+s32row*s32W);
+			IMP_U8 *ptr_sub1 = (IMP_U8*)(pu8Sub1+s32row*s32W);
+			IMP_U8 *ptr_sub2 = (IMP_U8*)(pu8Sub2+s32row*s32W);
 			for(s32col=s32W-1;s32col>=0;s32col--)
 			{
 				s32sumval = ptr_tmp[s32col];
-				s32model1 = (s32sumval&0xFF00)>>8 ;
+				s32model1 = (s32sumval&0xFF00)>>8;
 				s32model2 = s32sumval&0x00FF;
 				s32Distance_model1 = abs(s32model1-ptr_scence[s32col]);
 				s32Distance_model2 = abs(s32model2-ptr_scence[s32col]);
 				if(s32Distance_model1-10<0)
-					ptr_sub[(s32col<<2)+0] = 0 ;
+					ptr_sub1[s32col] = 0;
 				else
-					ptr_sub[(s32col<<2)+0] = 255 ;					
+					ptr_sub1[s32col] = 255;					
 				if(s32Distance_model2-10<0)
-					ptr_sub[(s32col<<2)+1] = 0 ;
+					ptr_sub2[s32col] = 0;
 				else
-					ptr_sub[(s32col<<2)+1] = 255 ;	
-				//ptr_sub[(s32col<<2)+2] = 0 ;	
-				//ptr_sub[(s32col<<2)+3] = 0 ;		
+					ptr_sub2[s32col] = 255;				
 			}		
 		}
-		DilateImage( pu8Sub, s32W, s32H);
-		for(s32row=s32H-1;s32row>=0;s32row--)
+		DilateImage( pu8Sub1, pu8Sub1_dilate, s32W, s32H);
+		DilateImage( pu8Sub1_dilate, pu8Sub1, s32W, s32H);
+		DilateImage( pu8Sub2, pu8Sub2_dilate, s32W, s32H);
+		DilateImage( pu8Sub2_dilate, pu8Sub2, s32W, s32H);
+		ipShowGrayImage(s32W, s32H, pu8Sub1, "sub1");
+		/*printf("\n hello sub1:\n");
+		for( s32row = 170; s32row <173; s32row++)
 		{
-			IMP_U8 *ptr_sub = (IMP_U8*)(pu8Sub+s32row*s32W*4) ;
-			for(s32col=s32W-1;s32col>=0;s32col--)
-			{
-				ptr_sub[(s32col<<2)+0]=ptr_sub[(s32col<<2)+2];
-				ptr_sub[(s32col<<2)+1]=ptr_sub[(s32col<<2)+3];
-			}
+			for( s32col=168; s32col<171; s32col++)
+				{					
+					printf("%d %d ----",(pu8Sub1+s32row*s32W)[s32col],(pu8Sub1_dilate+s32row*s32W)[s32col]);
+				}
+		}	
+		printf("\n hello sub2:\n");
+		for( s32row = 170; s32row <173; s32row++)
+		{
+			for( s32col=168; s32col<171; s32col++)
+				{					
+					printf("%d %d ----",(pu8Sub2+s32row*s32W)[s32col],(pu8Sub2_dilate+s32row*s32W)[s32col]);
+				}
 		}
-		DilateImage( pu8Sub, s32W, s32H);	
+		*/		
 		for( s32row = s32H-1; s32row >= 0; s32row--)
 		{
-			IMP_U8 *ptr_sub = (IMP_U8*)(pu8Sub+s32row*s32W*4) ;
+			IMP_U8 *ptr_sub1_dilate = (IMP_U8*)(pu8Sub1_dilate+s32row*s32W);
+			IMP_U8 *ptr_sub2_dilate = (IMP_U8*)(pu8Sub2_dilate+s32row*s32W);
 			IMP_S32 *ptr_tmp = (IMP_S32*)(ps32Codval+s32row*s32W);
 			IMP_U8 *ptr_scence = (IMP_U8*)(pu8Scence+s32row*s32W);
 			IMP_U8 *ptr_bkg = (IMP_U8*)(pu8Bkg+s32row*s32W);
@@ -137,7 +159,7 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 				s32weight2 = (s32sumval&0x00FF0000)>>16;
 				s32model1 = (s32sumval&0xFF00)>>8;
 				s32model2 =  s32sumval&0x00FF;		
-				if(ptr_sub[(s32col<<2)+2]==0)
+				if(ptr_sub1_dilate[s32col]==0)
 				{
 					//if(s32row==171&&s32col==172)
 						//printf("hello distance1!\n");
@@ -146,7 +168,7 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 					s32model1 = ((s32model1<<7)+s32Alpha*(ptr_scence[s32col]-s32model1) +64 )>>7;
 				}
 				s32weight2 = 255-s32weight1;
-				if(ptr_sub[(s32col<<2)+3]==0)
+				if(ptr_sub2_dilate[s32col]==0)
 				{
 					//if(s32row==171&&s32col==172)
 						//printf("hello distance2!\n");
@@ -154,7 +176,7 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 						s32weight2++;
 					s32model2=((s32model2<<7)+s32Alpha*(ptr_scence[s32col]-s32model2) +64 )>>7;
 				}
-				if((ptr_sub[(s32col<<2)+2]&ptr_sub[(s32col<<2)+3])==255)
+				if((ptr_sub1_dilate[s32col]&ptr_sub2_dilate[s32col])==255)
 				{
 					//if(s32row==171&&s32col==172)
 						//printf("neither both of us!\n");
@@ -199,7 +221,10 @@ IMP_S32 IMP_ReleaseGrayGaussian(IMP_MODULE_HANDLE hModule)
 	GA_HARDWARE_RS_S *pstHwResource; 
 	IMP_GrayImageDestroy( &pstModule->pstOutput->stFilter, &pstHwResource->stMemMgr );   //释放内存
 	IMP_GrayImageDestroy( &pstModule->pstOutput->stBkg, &pstHwResource->stMemMgr );
-	IMP_MMFree(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->pu8Dilate);	
+	IMP_GrayImageDestroy( &pstModule->stSub2_dilate, &pstHwResource->stMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stSub1_dilate, &pstHwResource->stMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stSub2, &pstHwResource->stMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stSub1, &pstHwResource->stMemMgr );
 	IMP_MMFree(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule->pstCod);
     IMP_MMFree(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule);
 }
@@ -233,51 +258,43 @@ IMP_VOID filter(IMP_GrayGaussian_S *pstModule)
 	}
 }
 
-IMP_VOID DilateImage ( IMP_U8 *src, IMP_U16 width, IMP_U16 height)
+IMP_VOID DilateImage ( IMP_U8 *src, IMP_U8 *dst, IMP_U16 width, IMP_U16 height)
 {
-	IMP_S32 x, y, result1, result2 ;
+	IMP_S32 x, y, result;
 
 	IMP_S32 widthM1 = width - 1;
 	IMP_S32 heightM1 = height - 1;
-	IMP_U8 *ps;
-	ps = src;
+	IMP_U8 *p1, *p2;
+	p1 = src;
+	p2 = dst;
 
 	// skip one stride
-	ps = ps +(width<<2);
+	p1 += width;
+	p2 += width;
 
 	// for each line
 	for ( y = 1; y < heightM1; y++ )
 	{
 		// skip one pixel
-		ps +=4 ;								
+		p1++;
+		p2++;
 		// for each pixel
-		for ( x = 1; x < widthM1; x++)
+		for ( x = 1; x < widthM1; x++, p1++, p2++ )
 		{
-			result1 = 0;
-			result1 |= *(ps - ((width-1)<<2));
-			result1 |= *(ps - (width<<2));
-			result1 |= *(ps - ((width+1)<<2));
-			result1 |= *(ps - 4);
-			result1 |= *(ps);
-			result1 |= *(ps + 4);
-			result1 |= *(ps + ((width-1)<<2));
-			result1 |= *(ps + (width<<2));
-			result1 |= *(ps + ((width+1)<<2));
-			(*(ps+2)) = (result1 !=0? 255 : 0);			
-			result2 = 0;
-			result2 |= *((ps+1) - ((width-1)<<2));
-			result2 |= *((ps+1) - (width<<2));
-			result2 |= *((ps+1) - ((width+1)<<2));
-			result2 |= *((ps+1) - 4);
-			result2 |= * (ps+1);
-			result2 |= *((ps+1) + 4);
-			result2 |= *((ps+1) + ((width-1)<<2));
-			result2 |= *((ps+1) + (width<<2));
-			result2 |= *((ps+1) + ((width+1)<<2));
-			(*(ps+3)) = (result2 !=0? 255 : 0);
-			ps +=4 ;	
+			result = 0;
+			result |= *(p1 - width - 1);
+			result |= *(p1 - width);
+			result |= *(p1 - width + 1);
+			result |= *(p1 - 1);
+			result |= *(p1);
+			result |= *(p1 + 1);
+			result |= *(p1 + width - 1);
+			result |= *(p1 + width);
+			result |= *(p1 + width + 1);
+			(*p2) = (result !=0? 255 : 0);
 		}
-		ps +=4 ;
+		p1 ++;
+		p2 ++;
 	}
 }
 

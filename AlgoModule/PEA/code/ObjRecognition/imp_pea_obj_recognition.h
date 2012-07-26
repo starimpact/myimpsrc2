@@ -3,6 +3,7 @@
 
 #include "imp_pea_detector.h"
 #include "imp_pea_tracker.h"
+#include "imp_tracker.h"
 #include "imp_pea_classify.h"
 
 #ifdef __cplusplus
@@ -14,6 +15,7 @@ typedef struct impPEA_ModuleObjRecognition
 {
 	IMP_MODULE_HANDLE hDetector;
 	IMP_MODULE_HANDLE hTracker;
+	IMP_MODULE_HANDLE hNewTracker;
 	IMP_MODULE_HANDLE hClassifier;
 	PEA_RESULT_S *pstResult;
 	GA_HARDWARE_RS_S *pstHwResouce;

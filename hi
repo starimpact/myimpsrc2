@@ -10,6 +10,8 @@ In file included from /usr/local/include/opencv2/core/core_c.h:47,
                  from /usr/local/include/opencv/cv.h:63,
                  from main_opencv_pea.c:2:
 /usr/local/include/opencv2/core/types_c.h:272:1: warning: this is the location of the previous definition
+main_opencv_pea.c: In function ‘ReadImage’:
+main_opencv_pea.c:139: warning: ignoring return value of ‘fread’, declared with attribute warn_unused_result
 main_opencv_pea.c: In function ‘IMP_OpencvExample’:
-main_opencv_pea.c:806: warning: ‘return’ with a value, in function returning void
-main_opencv_pea.c:988: warning: ‘return’ with a value, in function returning void
+main_opencv_pea.c:775: warning: ‘return’ with a value, in function returning void
+main_opencv_pea.c:946: warning: ‘return’ with a value, in function returning void

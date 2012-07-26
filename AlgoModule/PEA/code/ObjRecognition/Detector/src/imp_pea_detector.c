@@ -23,7 +23,7 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	pstTargetDetector->pstResult = pstResult;
 	
 	
-//	pstTargetDetector->hGGModel = IMP_CreateGrayGaussian(pstResult, pHwResouce);
+	pstTargetDetector->hGGModel = IMP_CreateGrayGaussian(pstResult, pHwResouce);
 	
 	//create and init ViBe model
 	pstTargetDetector->hViBeModel = IMP_CreateViBe(pstResult, pHwResouce);
@@ -32,7 +32,7 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	
 	pstTargetDetector->hOSCDModel = IMP_CreateOSCD(pstResult, pHwResouce);
 	
-	pstTargetDetector->hLFModel = IMP_CreateLightRemove(pstResult, pHwResouce);
+//	pstTargetDetector->hLFModel = IMP_CreateLightRemove(pstResult, pHwResouce);
 
 #ifdef USE_WATERMARK_DETECOTR
 	ipCreateWaterMarkDetector(&pstTargetDetector->stWaterMarkDetector,pstResult,pHwResouce);
@@ -190,9 +190,9 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	
 	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
 	
-	IMP_ReleaseLightRemove(pstTargetDetector->hLFModel);
+//	IMP_ReleaseLightRemove(pstTargetDetector->hLFModel);
 	
-//	IMP_ReleaseGrayGaussian(pstTargetDetector->hGGModel);
+	IMP_ReleaseGrayGaussian(pstTargetDetector->hGGModel);
 	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
@@ -330,19 +330,33 @@ gettimeofday(&t1, NULL);
 #endif	
 	//noise estimation
 	
-//	ipNoiseEstimateByBox(pstImgIn, pstImgFrmDiff, &pstTargetDetector->pstResult->s32Noise);
 	ipNoiseEstimateByBox_25(pstImgIn, pstImgFrmDiff, &pstTargetDetector->pstResult->s32Noise);
 //	pstTargetDetector->pstResult->s32Noise = 10;
+	printf("noise:%d\n", pstTargetDetector->pstResult->s32Noise);
 #if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
-	
-//	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
 
-	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
+#if 1
+#if PTDI_TIME || 1
+gettimeofday(&t1, NULL);
+#endif
+	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
 	
-#if 1 //VIBE
+	IMP_GrayImageClone(&pstResult->stOutPutGG.stFilter, pstResult->stDRegionSet.pstImgFgRgn);
+	IMP_GrayImageClone(&pstResult->stOutPutGG.stFilter, pstResult->stDRegionSet.pstImgFgOrg);
+	IMP_GrayImageClone(&pstResult->stOutPutGG.stBkg, pstResult->stDRegionSet.pstImgBgGray);
+	
+#if PTDI_TIME || 1
+gettimeofday(&t2, NULL);
+printf("ProcessGrayGaussian:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
+#endif
+//	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
+#endif
+	
+	
+#if 0 //VIBE
 
 #if PTDI_TIME || 1
 gettimeofday(&t1, NULL);
@@ -354,9 +368,20 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
-	
+
+#endif //VIBE
+
+#if PTDI_TIME || 1
+gettimeofday(&t1, NULL);
+#endif	
 	IMP_ProcessSwing(pstTargetDetector->hSwingModel);
 	
+	IMP_GrayImageClone(pstResult->stDRegionSet.pstImgFgOrg, pstResult->stDRegionSet.pstImgFgRgn);
+	
+#if PTDI_TIME || 1
+gettimeofday(&t2, NULL);
+printf("ProcessSwing:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
+#endif
 /*
 	{
 		IMP_OutputViBe_S *pstViBe = &pstResult->stOutPutViBeModel;
@@ -379,7 +404,7 @@ printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 	}
 */
 
-#endif //VIBE
+
 
 	
 

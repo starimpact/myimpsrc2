@@ -1453,11 +1453,13 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 	IMP_S32 s32TrjDist2 = (s32TrajectDist * s32TrajectDist);
 
 	k = pstTargetSet->s32TargetNum;
+//	printf("OutputTargetSet target num:%d\n", pstTTargetSet->s32UsedTotal);
 	for( i = 0, j = 0; i < IMP_MAX_TGT_CNT; i++ )
 	{
 		if( !ipTrackedTargetIsActive( &pstTTarget[i] ) )
 			continue;
-
+		
+	//	printf("hello:%d,%d\n", i,j);
 		if( s32TrjDist2 )
 		{
 			IMP_S32 m, s32Num;
@@ -1507,6 +1509,8 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 			&& ( s32OutputAllTgts==1 || ( s32OutputAllTgts==2 && ipTrackedTargetIsActiveMeasuredMtrend(&pstTTarget[i]) ) || pstTTarget[i].stTargetInfo.u32TgtEvent!=IMP_TGT_EVENT_UNKNOWN )
 			)
 		{
+		//	printf("hahahaha:%d,%d\n", i,j);
+			
 			pstTarget[k].u32Id= pstTTarget[i].u32TargetId;
 			pstTarget[k].u32Type = pstTTarget[i].stTargetInfo.u32Type;
 			pstTarget[k].u32Event = pstTTarget[i].stTargetInfo.u32TgtEvent;

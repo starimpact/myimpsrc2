@@ -588,14 +588,14 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 	//	stURPpara.stRuleSet.astRule[0].u32Enable = 0;
 	//	stURPpara.stRuleSet.astRule[0].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_TRIPWIRE;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeLimit = 1;
+		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeLimit = 0;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeHuman = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeVehicle = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32Valid=0;
+		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
 #if 0
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=200;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=280;
@@ -630,27 +630,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=50;
 		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=150;
 #endif
-		
-        stURPpara.stEnvironment.u32Enable = 0;
-		stURPpara.stEnvironment.s32SceneType = IMP_URP_INDOOR;
 
-		stURPpara.stFdepth.u32Enable = 0;
-		stURPpara.stFdepth.stMeasure.stFdzLines.u32NumUsed = 3;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPs.s16X = 244;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPs.s16Y = 206;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPe.s16X = 244;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].stRefLine.stPe.s16Y = 237;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[0].s32RefLen = 170;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPs.s16X = 70;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPs.s16Y = 153;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPe.s16X = 70;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].stRefLine.stPe.s16Y = 173;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[1].s32RefLen = 170;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPs.s16X = 82;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPs.s16Y = 205;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPe.s16X = 83;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].stRefLine.stPe.s16Y = 239;
-		stURPpara.stFdepth.stMeasure.stFdzLines.stLines[2].s32RefLen = 180;
 	}
 //	IMP_PARA_Init( pstPara, NULL, NULL, s32ImgW, s32ImgH, NULL );
 	IMP_ConfigArmPeaParameter( hModule, NULL ,&stURPpara );
@@ -713,18 +693,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	IMP_MODULE_HANDLE hDetector;
 	PEA_TARGET_DETECTOR_S *pDetector;
 #endif
-#ifdef DEBUG_OBJRECG_TRACKER
-	IMP_MODULE_HANDLE hTracker;
-	IpTargetTracker *pTracker;
-#endif
-#ifdef DEBUG_OBJRECG_CLASSIFIER
-	IMP_MODULE_HANDLE hClassifier;
-	IpTargetClassifier *pClassifier ;
-#endif
-#ifdef DEBUG_OBJRECG_ANALYST
-	IMP_MODULE_HANDLE hAnalyst ;
-	BEHAVIOR_ANALYSIS_S* pAnalyst ;
-#endif
+
 #endif
 
 	PEA_MODULE *pPEA ;
@@ -897,18 +866,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		hDetector = pObjRecg->hDetector;
 		pDetector = (PEA_TARGET_DETECTOR_S*)(*(IMP_U32*)hDetector);
 #endif
-#ifdef DEBUG_OBJRECG_TRACKER
-		hTracker = pObjRecg->hTracker;
-		pTracker = (IpTargetTracker*)(*(IMP_U32*)hTracker);
-#endif
-#ifdef DEBUG_OBJRECG_CLASSIFIER
-		hClassifier = pObjRecg->hClassifier;
-		pClassifier = (IpTargetClassifier*)(*(IMP_U32*)hClassifier);
-#endif
-#ifdef DEBUG_OBJRECG_ANALYST
-		hAnalyst = pEvtAnls->hAnalyst;
-		pAnalyst = (BEHAVIOR_ANALYSIS_S*) (*(IMP_U32*) hAnalyst);
-#endif
+
 #endif
 
 		memcpy(pFrImg->imageData,pDetector->stImgFgRgnMotion.pu8Data,s32ImgW*s32ImgH);
@@ -1011,8 +969,16 @@ int main()
 
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21019-白天户外-小目标行驶.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31029-夜红外树丛-小目标低对比.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
 	
 #ifdef cif
 	m_frame_width = 352;

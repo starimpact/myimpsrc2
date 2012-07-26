@@ -29,6 +29,8 @@ typedef struct impViBe_S
 	GRAY_IMAGE_S stImgFg; //binary image
 	GRAY_IMAGE_S stImgFgTmp; //tmporary binary image
 	
+	GRAY_IMAGE_S stImgFgDilate; //Dilate binary image
+	
 	GRAY_IMAGE_S stImgPreGray; //pre gray image
 	
 	IMP_S32 s32Width;
@@ -129,6 +131,7 @@ IMP_MODULE_HANDLE IMP_CreateViBe( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 	
 	IMP_GrayImageCreate( &pstModule->stImgBg, s32Width, s32Height, pstMemMgr );
 	IMP_GrayImageCreate( &pstModule->stImgFg, s32Width, s32Height, pstMemMgr );
+	IMP_GrayImageCreate( &pstModule->stImgFgDilate, s32Width, s32Height, pstMemMgr );
 	IMP_GrayImageCreate( &pstModule->stImgFgTmp, s32Width, s32Height, pstMemMgr );
 	IMP_GrayImageCreate( &pstModule->stImgPreGray, s32Width, s32Height, pstMemMgr );
 //	memset(pstModule->stImgFgTmp, 0, s32Height * s32Width);
@@ -178,6 +181,7 @@ IMP_S32 IMP_ReleaseViBe( IMP_MODULE_HANDLE hModule )
 	
 	IMP_GrayImageDestroy( &pstModule->stImgBg, pstMemMgr );
 	IMP_GrayImageDestroy( &pstModule->stImgFg, pstMemMgr );
+	IMP_GrayImageDestroy( &pstModule->stImgFgDilate, pstMemMgr );
 	IMP_GrayImageDestroy( &pstModule->stImgFgTmp, pstMemMgr );
 	IMP_GrayImageDestroy( &pstModule->stImgPreGray, pstMemMgr );
 	
@@ -237,7 +241,7 @@ IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 	IMP_S32 s32RI, s32CI, s32PI;
 	IMP_S32 s32Oft, s32Oft2;
 	IMP_ViBe_S *pstModule = (IMP_ViBe_S*)hModule;
-	IMP_U8 **ppu8Bkgs = 0, *pu8InGray = 0, *pu8PreGray = 0, *pu8Fg = 0, *pu8FgTmp = 0, *pu8Bkg = 0, *pu8Tmp1;
+	IMP_U8 **ppu8Bkgs = 0, *pu8InGray = 0, *pu8PreGray = 0, *pu8Fg = 0, *pu8FgDilate = 0, *pu8FgTmp = 0, *pu8Bkg = 0, *pu8Tmp1;
 	IMP_U8 u8GrayVal;
 	IMP_S32 as32Oft[9];
 	IMP_S32 s32N; //number of samples per pixel, default value:10
@@ -281,6 +285,7 @@ IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 	pu8InGray = pstInGray->pu8Data;
 	pu8Bkg = pstModule->stImgBg.pu8Data;
 	pu8Fg = pstModule->stImgFg.pu8Data;
+	pu8FgDilate = pstModule->stImgFgDilate.pu8Data;
 	pu8FgTmp = pstModule->stImgFgTmp.pu8Data;
 	pu8PreGray = pstModule->stImgPreGray.pu8Data;
 	
@@ -316,8 +321,8 @@ IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 	PEA_DETECTED_REGIONSET_S *pRegionSet = &pstResult->stDRegionSet;
 
 	
-	IMP_OutputLightRemove_S *pstOutputLR =&pstResult->stOutPutLR;
-	IMP_U8 *pu8Illum = pstOutputLR->pu8img;
+//	IMP_OutputLightRemove_S *pstOutputLR =&pstResult->stOutPutLR;
+//	IMP_U8 *pu8Illum = pstOutputLR->pu8img;
 //	ipShowBinImage(s32Width, s32Height, pu8Illum, "illum");
 	
 	
@@ -404,6 +409,11 @@ printf("vibe-contour:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 
 #endif	//cat
 
+	IMP_U8 au8Mask[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+	memset(pu8FgDilate, 0, s32Width * s32Height);
+	ipMorphDilateImage(pu8Fg, s32Width, pu8FgDilate, s32Width, s32Width, s32Height, au8Mask);
+	ipShowGrayImage(s32Width, s32Height, pu8FgDilate, "FgDilate");
+	
 #if VIBE_SHW_TIME
 gettimeofday(&t1, NULL);
 #endif
@@ -472,7 +482,7 @@ gettimeofday(&t1, NULL);
 			
 			//update background value
 			if (
-			(!pu8Fg[s32Oft] && pu8Illum[s32Oft] != 1) || 
+			(!pu8Fg[s32Oft] && !pu8FgDilate[s32Oft]) || 
 			(pu8FgTmp[s32Oft] >= pstModule->s32BkgUR2 && pu8Fg[s32Oft])
 			) //illumination background update
 			{

@@ -88,6 +88,7 @@ PEA_OBJS := AlgoModule/ALGO_PARA/Para/imp_para.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_motion.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_para.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_static.o \
+			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_tracker.o \
 			AlgoModule/PEA/code/ObjRecognition/imp_pea_obj_recognition.o \
 			AlgoModule/PEA/code/PEACommon/imp_pea_common.o \
 			AlgoModule/PEA/code/System/imp_osc_system.o \

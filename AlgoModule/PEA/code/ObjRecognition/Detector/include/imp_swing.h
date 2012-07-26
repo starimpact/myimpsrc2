@@ -11,7 +11,7 @@ extern "C"
 {
 #endif
 
-//算法配置参数
+//�㷨���ò���
 typedef struct impSwingPara_S
 {
 	IMP_S32 s32Tmp; 
@@ -32,6 +32,7 @@ typedef struct impswing_S
 	IMP_UCHAR * p20;
 	IMP_UCHAR * p21;
 	IMP_UCHAR * p22;
+	//IMP_UCHAR * Img[9];
 	IMP_UCHAR * zSadmin;
 	IMP_UCHAR * vSadmin;
 	IMP_UCHAR * inMask;
@@ -42,36 +43,36 @@ typedef struct impswing_S
 IMP_S32 IMP_ShowImg(IMP_UCHAR*srcGray,IMP_S32 Height,IMP_S32 Width,IMP_UCHAR*widoName);
 
 IMP_S32 IMP_BinaryImg(IMP_UCHAR *srcGray,IMP_UCHAR *BinMask,IMP_S32 val,IMP_S32 Lenght);
-/*/得到srcGray的二值图,经大于val的赋值为255，其他的赋值为0，保存在BinMask中，Length是图像的“高X宽”/*/
+/*/�õ�srcGray�Ķ�ֵͼ,������val�ĸ�ֵΪ255�������ĸ�ֵΪ0��������BinMask�У�Length��ͼ��ġ���X����/*/
 
 IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 ImgW);
-/*/得到srcGray的累计图，/*/
-/*/该操作之前需要对statiImg图像进行归零/*/
-/*/srcGray图像中像素值不是0，则statiImg相应位置应该+1/*/
-/*/srcGray图像中像素值为0，则statiImg相应位置应该-1/*/
-/*/当数值大于255时，statiImg赋值为255/*/
-/*/当数值小雨0，statiImg赋值为0/*/
+/*/�õ�srcGray���ۼ�ͼ��/*/
+/*/�ò���֮ǰ��Ҫ��statiImgͼ����й���/*/
+/*/srcGrayͼ��������ֵ����0����statiImg��Ӧλ��Ӧ��+1/*/
+/*/srcGrayͼ��������ֵΪ0����statiImg��Ӧλ��Ӧ��-1/*/
+/*/����ֵ����255ʱ��statiImg��ֵΪ255/*/
+/*/����ֵС��0��statiImg��ֵΪ0/*/
 
 IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_UCHAR*proMat2,IMP_S32 Length);
-/*/得到图像像素值的比值图，Length是图像数据内存的总长度/*/
+/*/�õ�ͼ������ֵ�ı�ֵͼ��Length��ͼ�������ڴ���ܳ���/*/
 
 IMP_S32 IMP_RectSum(IMP_UCHAR*srcGray,IMP_RECT_S widow,IMP_S32 Height,IMP_S32 Width);
-/*/图像srcGray在矩形框widow中的像素总和/*/
+/*/ͼ��srcGray�ھ��ο�widow�е������ܺ�/*/
 
 IMP_S32 IMP_GetSadImg(IMP_Swing_S*PsModel);
-/*/得到正反操作的SAD的图像，分别存放于输入指针对应的zSadMin和vSadMin中/*/
+/*/�õ�����������SAD��ͼ�񣬷ֱ���������ָ���Ӧ��zSadMin��vSadMin��/*/
 
 IMP_S32 IMP_GetMemSizeSwingModel( PEA_RESULT_S *pstResult);
-/*/得到该算法所有需要内存总和,已经包含了内部申请的图像内存/*/
+/*/�õ����㷨������Ҫ�ڴ��ܺ�,�Ѿ��������ڲ������ͼ���ڴ�/*/
 
 IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource);
-/*/算法内部需要的所有参数的建立和内存的申请的建立/*/
+/*/�㷨�ڲ���Ҫ�����в����Ľ������ڴ������Ľ���/*/
 
 IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule);
-/*/算法的处理过程,算法的核心，封装在此/*/
+/*/�㷨�Ĵ�������,�㷨�ĺ��ģ���װ�ڴ�/*/
 
 IMP_S32 IMP_ReleaseSwing(IMP_MODULE_HANDLE hModule);
-/*/释放算法的内存/*/
+/*/�ͷ��㷨���ڴ�/*/
 
 
 
@@ -80,6 +81,4 @@ IMP_S32 IMP_ReleaseSwing(IMP_MODULE_HANDLE hModule);
 #endif
 
 #endif
-
-
 
