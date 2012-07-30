@@ -973,6 +973,8 @@ int main()
 	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
+
+
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21019-白天户外-小目标行驶.avi";
