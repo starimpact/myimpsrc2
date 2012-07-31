@@ -299,7 +299,7 @@ typedef struct
 } IpTargetPosition;
 
 
-#define IMP_MAX_TRAJECTORY_LEN		256
+#define IMP_MAX_TRAJECTORY_LEN	128//	256
 
 
 typedef struct

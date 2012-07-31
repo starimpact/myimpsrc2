@@ -523,7 +523,7 @@ typedef struct impTGT_ITEM_S
 } TGT_ITEM_S;
 
 /** 目标的最大个数 */
-#define IMP_MAX_TGT_CNT			64
+#define IMP_MAX_TGT_CNT 32 // 64
 
 /** 目标集合 */
 typedef struct impTGT_SET_S

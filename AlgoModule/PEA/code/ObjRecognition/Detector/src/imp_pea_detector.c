@@ -306,7 +306,7 @@ printf("ProcessWaterMarkDetector:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
-	ipPreProcessCurrentImage( pstTargetDetector );
+//	ipPreProcessCurrentImage( pstTargetDetector );
 
 #if PTDI_TIME
 gettimeofday(&t2, NULL);
@@ -456,6 +456,7 @@ IMP_S32 IMP_PEA_ProcessDetector( IMP_MODULE_HANDLE hModule )
 //printf("ProcessDetector\n");
 	return ipProcessTargetDetectorInternal( pDetector );
 }
+
 
 IMP_S32 ipPostProcessDetector( IMP_MODULE_HANDLE hModule )
 {

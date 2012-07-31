@@ -255,6 +255,7 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 #if DBG_SHW_MEMSIZE	
 	printf("Result structure used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
 	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+	printf("reg:%d, tts:%d(%d(%d),%d,%d)\n", sizeof(PEA_DETECTED_REGIONSET_S), sizeof(IpTrackedTargetSet), sizeof(IpTrackedTarget), sizeof(IpTargetTrajectory), sizeof(IpClassFeature), IMP_MAX_TGT_CNT);
 #endif
 
 	IMP_PEA_ResultInit( pModule->pstResult, s32ImgW, s32ImgH, pMemMgr );
