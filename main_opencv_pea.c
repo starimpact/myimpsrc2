@@ -800,7 +800,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
             }
 				
          //	if (nFrmNum < 1400) continue;
-	     if (nFrmNum < 10) continue;
+	     if (nFrmNum < 40) continue;
 		
             if(nFrmNum % s32SubSampleT != 0) continue;
             
@@ -970,13 +970,14 @@ int main()
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
 
 
+
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21019-白天户外-小目标行驶.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31029-夜红外树丛-小目标低对比.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
