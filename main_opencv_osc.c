@@ -971,7 +971,8 @@ int main(int argc,char *argv[])
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
-	IMP_S8 *fileName = "/home/zm/video/OSC/OSC_1004_1.MTS";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC_1004_1.MTS";
+	IMP_S8 *fileName = "/home/zm/video/OSC/4.avi";
 	
 #ifdef cif
 	m_frame_width = 352;
