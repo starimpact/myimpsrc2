@@ -221,17 +221,23 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 
 	// init result
 	pModule->pstResult = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_RESULT_S) );
-		
+	
 	IMP_PEA_ResultInit( pModule->pstResult, s32ImgW, s32ImgH, pMemMgr );
 	
 	pModule->pstResult->s32ModuleSwitch = 1;
 	
+	printf("head used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
 	// init module( object recognition )
 	pModule->hObjRecg = IMP_PEA_CreateObjRecognition( pModule->pstResult, &pModule->stHwRes ); //memory allocation error
-
+	
+	printf("CreateObjRecognition used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+	
 	// init module( event analysis )
  	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
-
+ 	
+ 	printf("CreateBehaviorAnalysis used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+	
+	exit(0);
 	return IMP_STATUS_OK;
 }
 

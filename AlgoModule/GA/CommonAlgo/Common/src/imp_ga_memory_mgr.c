@@ -140,6 +140,7 @@ static IMP_VOID *IMP_MemMgrAlloc( MEM_MGR_S *pstMgr, IMP_S32 sz )
 	else
 		printf( "general memory allocation failed!\n" );
 
+	
 	return res;
 }
 
