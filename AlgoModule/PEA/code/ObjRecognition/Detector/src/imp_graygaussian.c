@@ -66,6 +66,10 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 	IMP_S32 s32Alpha = pstModule->s32Alpha ;
    	IMP_S32 s32w_Alpha = pstModule->s32w_Alpha ;
 	IMP_S32 *ps32Codval = pstModule->pstCod ;
+	IMP_S32 s32threshold = 0;
+	s32threshold = pstModule->pstResult->s32Noise;
+	s32threshold = ((s32threshold<<1)+s32threshold)>>1;
+	printf("s32threshold:%d\n",s32threshold);
 	IMP_U8 u8Scenceval;
 	IMP_U8 *pu8Scence = pstModule->pstResult->stImgInGray.pu8Data ;
 	IMP_U8 *pu8Bkg = pstModule->pstOutput->stBkg.pu8Data ;
@@ -101,11 +105,11 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 			s32model2 = s32sumval&0x00FF;
 			s32Distance_model1 = abs(s32model1-ptr_scence[s32col]);
 			s32Distance_model2 = abs(s32model2-ptr_scence[s32col]);
-			if(s32Distance_model1-10<0)
+			if(s32Distance_model1-s32threshold<0)
 				ptr_sub[(s32col<<2)+0] = 0 ;
 			else
 				ptr_sub[(s32col<<2)+0] = 255 ;					
-			if(s32Distance_model2-10<0)
+			if(s32Distance_model2-s32threshold<0)
 				ptr_sub[(s32col<<2)+1] = 0 ;
 			else
 				ptr_sub[(s32col<<2)+1] = 255 ;	
@@ -144,14 +148,13 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 				}
 				s32model2=((s32model2<<7)+s32Alpha*(ptr_scence[s32col]-s32model2) +64 )>>7;
 			}
-			if((ptr_sub[(s32col<<2)+0]==255)&&(ptr_sub[(s32col<<2)+3]==255))
+			if((ptr_sub[(s32col<<2)+0]&ptr_sub[(s32col<<2)+3])==255)
 			{
-				s32weight2 = s32w_Alpha;
+				if(s32weight2>3)
+				s32weight2 -=3;
 				s32model2 = ptr_scence[s32col];
 			}
 			s32weight1 = 255 -s32weight2;
-			if(s32row==60&&s32col==171)
-					printf(" weight1: %d--weight2: %d--model1:%d--model2:%d\n",s32weight1,s32weight2,s32model1,s32model2);
 			if(s32weight2-s32weight1>0)
 			{
 				s32weight = 0;
@@ -192,9 +195,6 @@ IMP_VOID filter(IMP_GrayGaussian_S *pstModule)
 	IMP_S32 s32W = pstModule->pstResult->s32Width;
 	IMP_S32 s32H = pstModule->pstResult->s32Height;
 	IMP_U8 *pu8Scence=pstModule->pstResult->stImgInGray.pu8Data;
-	IMP_S32 s32threshold = 0;
-	s32threshold = pstModule->pstResult->s32Noise;
-	s32threshold = ((s32threshold<<1)+s32threshold)>>1;
 	IMP_U8 *pu8Bkg = pstModule->pstOutput->stBkg.pu8Data;
 	IMP_U8 *pu8Filter = pstModule->pstOutput->stFilter.pu8Data;
 	IMP_S32 s32row;
@@ -208,7 +208,7 @@ IMP_VOID filter(IMP_GrayGaussian_S *pstModule)
 		for(s32col=s32W-1;s32col>=0;s32col--)
 		{	
 			s32Intensity_sub =abs(ptr_scence[s32col]-ptr_bkg[s32col]);
-			if(s32Intensity_sub-s32threshold<0)
+			if(s32Intensity_sub-12<0)
 			{
 				ptr_filter[s32col]=0;
 				continue;
@@ -238,8 +238,6 @@ IMP_VOID SCAN( IMP_U8 *src,IMP_U16 width, IMP_U16 height)
 		psplur +=8 ;							
 		for ( x = 2; x < widthM1; x++)
 		{
-			if((*ps)==255)
-			{
 				result1 = 0;
 				result1 |= *(psneg -4);
 				result1 |= *(psnegr);
@@ -250,9 +248,6 @@ IMP_VOID SCAN( IMP_U8 *src,IMP_U16 width, IMP_U16 height)
 				result1 |= *(psplur);
 				result1 |= *(psplu +4);
 				(*(ps+2)) = result1&(*ps);
-			}
-			if((*(ps+1))==255)
-			{
 				result2 = 0;
 				result2 |= *((psneg +1) -4);
 				result2 |= *(psnegr +1);
@@ -263,8 +258,6 @@ IMP_VOID SCAN( IMP_U8 *src,IMP_U16 width, IMP_U16 height)
 				result2 |= *(psplur+1);
 				result2 |= *((psplu+1) +4);
 				(*(ps+3)) = result2&(*(ps+1));
-			}
-			
 			psnegr +=4 ;
 			psneg +=4 ;
 			ps +=4 ;
