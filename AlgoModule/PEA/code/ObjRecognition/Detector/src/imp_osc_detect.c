@@ -413,8 +413,8 @@ IMP_S32 impProcessOSCD0(IMP_MODULE_HANDLE hModule)
     GA_HARDWARE_RS_S  *pstHwResource = pstModule->pstHwResource; //系统硬件资源
 	PEA_RESULT_S      *pstResult = pstModule->pstResult; //系统公共数据
 	
-	PEA_DETECTED_REGIONSET_S *pstDRS_OSC = &pstResult->stDRegionSetOsc;
-	IpTrackedTargetSet *pstTTS_OSC = &pstResult->stTrackedTargetSetOsc;
+//	PEA_DETECTED_REGIONSET_S *pstDRS_OSC = &pstResult->stDRegionSetOsc;
+//	IpTrackedTargetSet *pstTTS_OSC = &pstResult->stTrackedTargetSetOsc;
 	
 	GRAY_IMAGE_S *pstInGray = &pstResult->stImgInGray;
 	IMP_S32 s32Width = pstResult->s32Width, s32Height = pstResult->s32Height;

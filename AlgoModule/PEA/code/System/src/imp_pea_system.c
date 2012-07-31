@@ -198,6 +198,11 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	s32ImgH = pstMems->u32ImgH;
 	memset( pModule, 0, sizeof(PEA_MODULE) );
 
+#define DBG_SHW_MEMSIZE 1
+
+#if DBG_SHW_MEMSIZE
+	IMP_S32 s32PreSize = 0;
+#endif
 	// init memory
 	sNReq.au32NodNum[IMP_MEMBLK_TYPE_FAST] = FAST_RAM_NODE_NUM;
 	sNReq.au32NodNum[IMP_MEMBLK_TYPE_SLOW] = SLOW_RAM_NODE_NUM;
@@ -206,38 +211,81 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	sNReq.pNodMem = pMReqs->stMems[IMP_MEMBLK_TYPE_MMGR].pMem;
 	IMP_MMInit( pMemMgr, &sNReq, pMReqs );
 
+#if DBG_SHW_MEMSIZE
+	printf("1 used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif
+
 	// init module( rule modeling )
 	pModule->pstInnerPara = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(INNER_PARA_S) );
 
+#if DBG_SHW_MEMSIZE	
+	printf("2 used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif
+
  	pModule->pstInnerPara->pRule = IMP_RULE_Alloc( s32ImgW, s32ImgH, pMemMgr );
+
+#if DBG_SHW_MEMSIZE 	
+ 	printf("3 used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif
+ 	
  	IMP_RULE_AdvParaAlloc( &pModule->pstInnerPara->stAdvance, IMP_VPARAADVBUFNUM_MAX,
 					IMP_PARA_ADVBUF_BUFLEN, pMemMgr );
 	IMP_RULE_InitParaPea( pModule->pstInnerPara, pMemMgr );
+
+#if DBG_SHW_MEMSIZE	
+	printf("4 used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif
 
 	// init parameter
 	pModule->pstSysPara = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_SYSTEM_PARA_S) );
 
 	memset( pModule->pstSysPara, 0, sizeof(PEA_SYSTEM_PARA_S) );
 
+#if DBG_SHW_MEMSIZE	
+	printf("5 used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif	
 	// init result
 	pModule->pstResult = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_RESULT_S) );
-	
+
+#if DBG_SHW_MEMSIZE	
+	printf("Result structure used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif
+
 	IMP_PEA_ResultInit( pModule->pstResult, s32ImgW, s32ImgH, pMemMgr );
 	
 	pModule->pstResult->s32ModuleSwitch = 1;
 	
-	printf("head used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+#if DBG_SHW_MEMSIZE	
+	printf("Result content used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif
+	
 	// init module( object recognition )
 	pModule->hObjRecg = IMP_PEA_CreateObjRecognition( pModule->pstResult, &pModule->stHwRes ); //memory allocation error
 	
-	printf("CreateObjRecognition used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
-	
+#if DBG_SHW_MEMSIZE	
+	printf("CreateObjRecognition used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+	s32PreSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+#endif	
+
 	// init module( event analysis )
  	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
  	
- 	printf("CreateBehaviorAnalysis used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+#if DBG_SHW_MEMSIZE	
+ 	printf("CreateBehaviorAnalysis used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax - s32PreSize);
+#endif
+
+#if DBG_SHW_MEMSIZE	
+ 	printf("total used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+#endif
 	
-	exit(0);
+//	exit(0);
 	return IMP_STATUS_OK;
 }
 
@@ -1386,13 +1434,13 @@ static IMP_VOID IMP_PEA_OutputTargets( PEA_MODULE *pModule )
 		IMP_OutputTargetSet( &pResult->stTrackedTargetSet, &pOutput->stTargetSet,
 						pSysPara->s32OutputAllTgts, pSysPara->s32OutputPredicted, pSysPara->s32TrajectDist );
 
-//#ifdef SUPPORT_OSC
+#if 0 //SUPPORT_OSC
 	if (pResult->s32ModuleSwitch & 2)
 	{
 		IMP_OutputTargetSetOsc( &pResult->stTrackedTargetSetOsc, &pOutput->stTargetSet,
 						pSysPara->s32OutputAllTgts,pSysPara->s32OutputPredicted, 0 );
 	}
-//#endif
+#endif
 	}
 }
 

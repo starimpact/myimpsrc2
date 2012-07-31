@@ -161,15 +161,15 @@ static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PRO
 	cvInitFont( &font1, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA );
 
 
-	if( enFlag == IMP_PROCESS_CHG)
-	{
-		rgs = &rs->stDRegionSetChg;
-	}
-	if(enFlag == IMP_PROCESS_OSC)
-	{
-		rgs = &rs->stDRegionSetOsc;
-	}
-	else
+//	if( enFlag == IMP_PROCESS_CHG)
+//	{
+//		rgs = &rs->stDRegionSetChg;
+//	}
+//	if(enFlag == IMP_PROCESS_OSC)
+//	{
+//		rgs = &rs->stDRegionSetOsc;
+//	}
+//	else
 	{
 		rgs = &rs->stDRegionSet;
 	}
@@ -213,7 +213,7 @@ static void draw_motion_trajectory_ttarget( PEA_RESULT_S *rs,IplImage *img, IMP_
 	IpTrackedTargetSet *tts;
 	IpTrackedTarget *target;
 	
-	tts = &rs->stTrackedTargetSetOsc;
+//	tts = &rs->stTrackedTargetSetOsc;
 	target = tts->astTargets;
 	cnt = tts->s32UsedTotal;
     line_thickness=1;

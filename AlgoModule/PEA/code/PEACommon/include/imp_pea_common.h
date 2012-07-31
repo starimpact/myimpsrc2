@@ -622,12 +622,12 @@ typedef struct impPEA_RESULT_S
 	IMP_S32 s32VideoAbnrmlStatus;
 
 	PEA_DETECTED_REGIONSET_S stDRegionSet;
-	PEA_DETECTED_REGIONSET_S stDRegionSetChg;
-	PEA_DETECTED_REGIONSET_S stDRegionSetOsc; //OSC Detected Region Set
+//	PEA_DETECTED_REGIONSET_S stDRegionSetChg;
+//	PEA_DETECTED_REGIONSET_S stDRegionSetOsc; //OSC Detected Region Set
 
 	IpTrackedTargetSet stTrackedTargetSet; 
-	IpTrackedTargetSet stTrackedTargetSetChg;
-	IpTrackedTargetSet stTrackedTargetSetOsc; //OSC TrackedTarget Set
+//	IpTrackedTargetSet stTrackedTargetSetChg;
+//	IpTrackedTargetSet stTrackedTargetSetOsc; //OSC TrackedTarget Set
 
 	IMP_OUTPUT stOutput;
 	YUV_IMAGE422_S *pstImageYUV;

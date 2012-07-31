@@ -144,6 +144,11 @@ STATUS_E IMP_OSC_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	// init module( event analysis )
  	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
 
+#define DBG_SHW_MEMSIZE 1
+#if DBG_SHW_MEMSIZE	
+ 	printf("total used mem:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+#endif
+
 	return IMP_STATUS_OK;
 }
 
@@ -312,6 +317,7 @@ STATUS_E IMP_OSC_ConfigParameter( IMP_HANDLE hModule, EXTERNAL_PARA_S *pstExtnal
 
 	IMP_PEA_ConfigObjRecognition( pModule->hObjRecg, pstInnerPara );
 	IMP_PEA_BVA_ConfigBehaviorAnalysis( pModule->hEvtAnls, pstInnerPara );
+
 
 	return enRet;
 }
@@ -1258,13 +1264,13 @@ static IMP_VOID IMP_OSC_OutputTargets( PEA_MODULE *pModule )
 		IMP_OSC_OutputTargetSet( &pResult->stTrackedTargetSet, &pOutput->stTargetSet,
 						pSysPara->s32OutputAllTgts, pSysPara->s32OutputPredicted, pSysPara->s32TrajectDist );
 
-//#ifdef SUPPORT_OSC
+#if 0 //SUPPORT_OSC
 	if (pResult->s32ModuleSwitch & 2)
 	{
 		IMP_OSC_OutputTargetSetOsc( &pResult->stTrackedTargetSetOsc, &pOutput->stTargetSet,
 						pSysPara->s32OutputAllTgts,pSysPara->s32OutputPredicted, 0 );
 	}
-//#endif
+#endif
 	}
 }
 

@@ -63,7 +63,7 @@ IMP_S32 ipProcessRegionExtract( PEA_REGION_EXTRACT_MODULE_S *pModule )
 		ipCalcDRegionChange( pModule );
 #endif
 
-
+#if 0
 //Calc Detect Region ON OSC, just need to copy regions of stDRegionSet
 	if (pstResult->s32ModuleSwitch & 2)
 	{
@@ -93,7 +93,7 @@ IMP_S32 ipProcessRegionExtract( PEA_REGION_EXTRACT_MODULE_S *pModule )
 		}
 	}
 //	ipCalcDRegionOnOsc( pModule );
-
+#endif
 
 	return 0; 
 }
@@ -240,6 +240,7 @@ static IMP_VOID ipRegionFillHole(PEA_REGION_EXTRACT_MODULE_S *pModule)
 					if( x1>rl_e )
 						memset( &(pu8DatCur[rl_s]), 128, rl_e - rl_s + 1 );
 
+
 				} while( x <= ru_x );
 				pu8DatPre = pu8DatCur;
 				pu8DatCur += w;
@@ -325,6 +326,7 @@ static IMP_VOID ipRegionExtractOnMotion( PEA_REGION_EXTRACT_MODULE_S *pModule )
 }
 
 
+#if 0
 //Calc Detect Region On OSC
 static IMP_VOID ipCalcDRegionOnOsc( PEA_REGION_EXTRACT_MODULE_S *pModule )
 {
@@ -366,6 +368,7 @@ static IMP_VOID ipCalcDRegionOnOsc( PEA_REGION_EXTRACT_MODULE_S *pModule )
 
 	IMP_PEA_RGE_RemoveAbnormalRegions( &pstPara->stRmAbnmlPara, pstRgs );
 }
+#endif
 
 static IMP_VOID ipLightRegionsProcess( PEA_REGION_EXTRACT_MODULE_S *pModule )
 {

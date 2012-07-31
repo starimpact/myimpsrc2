@@ -33,7 +33,7 @@ IMP_VOID ipCreateAnalystInternal( BEHAVIOR_ANALYSIS_S *pstBva, PEA_RESULT_S *pst
 		}
 	}
 
-
+#if 0
 if (pstResult->s32ModuleSwitch & 2)
 {
 	pstBva->pstAnalystOSC = (TARGET_DATA_ANALYST_OSC_S*)IMP_MMAlloc( pstMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(TARGET_DATA_ANALYST_OSC_S)*IMP_MAX_TGT_CNT );
@@ -46,6 +46,7 @@ if (pstResult->s32ModuleSwitch & 2)
 		pstTarget++; pstTarData++;
 	}
 }
+#endif
 
 #if defined(SUPPORT_PERIMETER) | defined(SUPPORT_ABNORMALVEL) | defined(SUPPORT_CONVERSE)
 	ipCreatePerimeterAnalysti( &pstBva->stModulePerimeter, pstResult, pHwResouce );
@@ -58,12 +59,14 @@ if (pstResult->s32ModuleSwitch & 2)
 #if defined(SUPPORT_MTRIPWIRE)
 	ipCreateMTripwireAnalysti( &pstBva->stModuleMTripwire, pstResult, pHwResouce );
 #endif
-	
+
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipCreateOscAnalysti( &pstBva->stModuleOSC, pstResult, pHwResouce );
 	}
-	
+#endif
+
 	ipCreateTargetEvtMgr( &pstBva->stTargetEvtMgr, pstResult );
 
 }
@@ -89,11 +92,13 @@ IMP_VOID ipReleaseAnalystInternal( BEHAVIOR_ANALYSIS_S *pstBva )
 	ipReleaseMTripwireAnalysti( &pstBva->stModuleMTripwire );
 #endif
 
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipReleaseOscAnalysti( &pstBva->stModuleOSC );
 		IMP_MMFree( pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstBva->pstAnalystOSC );
 	}
+#endif
 
 	// TARDAT
 	{
@@ -167,12 +172,13 @@ pstRulePara = &pstZone->stPara;
 	ipConfigMTripwireAnalysti( &pstBva->stModuleMTripwire, &pstBva->stPara.stMTripwirePara );
 #endif
 
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		pstBva->stPara.stOscPara.pstRule = pstBva->stPara.pstRule;
 		ipConfigOscAnalysti( &pstBva->stModuleOSC, &pstBva->stPara.stOscPara );
 	}
-
+#endif
 }
 
 
@@ -224,6 +230,7 @@ IMP_S32 IMP_PEA_BVA_ProcessBvaInternal( BEHAVIOR_ANALYSIS_S *pstBva )
 	}
 #endif
 
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		if( u32FuncCode & (IMP_FUNC_OSC) )
@@ -231,6 +238,7 @@ IMP_S32 IMP_PEA_BVA_ProcessBvaInternal( BEHAVIOR_ANALYSIS_S *pstBva )
 			ipProcessOscAnalysti( &pstBva->stModuleOSC );
 		}
 	}	
+#endif 
 
 	ipProcessBehaviorAanalystInternalEnd( pstBva );
 	ipProcessTargetEvtMgr( &pstBva->stTargetEvtMgr );
@@ -287,11 +295,14 @@ static IMP_VOID ipProcessBehaviorAanalystInternalStart( BEHAVIOR_ANALYSIS_S *pst
 	PEA_RESULT_S *pstResult = pstBva->pstResult;
 
 	process_behavior_analyst_i_start_helper( pstBva, &pstBva->pstResult->stTrackedTargetSet );
-
+	
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		process_behavior_analyst_i_start_helper( pstBva, &pstBva->pstResult->stTrackedTargetSetOsc );
 	}
+#endif
+
 }
 
 static const IMP_U32 au32EvtCodes[] =
@@ -392,11 +403,12 @@ static IMP_VOID ipProcessBehaviorAanalystInternalEnd( BEHAVIOR_ANALYSIS_S *pstBv
 	PEA_RESULT_S *pstResult = pstBva->pstResult;
 
 	ipProcessBehaviorAnalystInternalEndHelper( pstBva, &pstBva->pstResult->stTrackedTargetSet );
-
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipProcessBehaviorAnalystInternalEndHelper( pstBva, &pstBva->pstResult->stTrackedTargetSetOsc );
 	}
+#endif
 }
 
 
@@ -432,11 +444,13 @@ IpMTripwireTargetData* ipGetMTripwireTargetData( IMP_VOID *pData )
 #endif
 
 
+#if 0
 IpOscTargetData* ipGetOscTargetData( IMP_VOID *pData )
 {
 	TARGET_DATA_ANALYST_OSC_S *pstTarData = (TARGET_DATA_ANALYST_OSC_S*)pData;
 	return &pstTarData->stDataOSC;
 }
+#endif
 
 IMP_MODULE_HANDLE ipCreateAnalyst( PEA_RESULT_S *pResult, GA_HARDWARE_RS_S *pHwResouce )
 {
@@ -546,10 +560,12 @@ static IMP_VOID ipForceInnerPara2AnaylstPara( INNER_PARA_S *pstInnerPara, IpAnal
 	// s32FrmDura
 	pstAnalystPara->s32FrmDura = pstGlPara->s32TimeUnit;
 
+#if 0
 //	if (pstResult->s32ModuleSwitch & 2)
 	{
 		pstAnalystPara->stOscPara.s32FrmDura = pstAnalystPara->s32FrmDura;
 	}
+#endif
 
 	// u32FuncCode
 	pstAnalystPara->u32FuncCode = pstGlPara->s32FuncCode;

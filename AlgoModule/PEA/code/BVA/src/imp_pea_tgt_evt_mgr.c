@@ -382,13 +382,13 @@ static IMP_VOID ipCollectTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstE
 	if( s32Flag == 0 )
 	{
 		ipCollectTargetEventEvery( pstEvtMgr, pstEvts, &pstResult->stTrackedTargetSet, pstEvtMgr->astRecords );
-		ipCollectTargetEventEvery( pstEvtMgr, pstEvts, &pstResult->stTrackedTargetSetOsc, pstEvtMgr->astRecordsOsc ); //fill osc event 
+//		ipCollectTargetEventEvery( pstEvtMgr, pstEvts, &pstResult->stTrackedTargetSetOsc, pstEvtMgr->astRecordsOsc ); //fill osc event 
 
 	}
 	else
 	{
 		ipCollectTargetEventWhole( pstEvtMgr, pstEvts, &pstResult->stTrackedTargetSet );
-		ipCollectTargetEventWhole( pstEvtMgr, pstEvts, &pstResult->stTrackedTargetSetOsc ); //fill osc event 
+//		ipCollectTargetEventWhole( pstEvtMgr, pstEvts, &pstResult->stTrackedTargetSetOsc ); //fill osc event 
 	}
 }
 

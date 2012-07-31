@@ -48,6 +48,7 @@ IMP_VOID ipParseAnaystParaData(IpAnalystPara *pstPara )
 	pstPara->stMTripwirePara.astSTripwire[1].s32AwayDistance = IMP_ANALYST_MTRIPWIRE_AWAY_DISTANCE2;
 	pstPara->stMTripwirePara.astSTripwire[1].s32SegLength = IMP_ANALYST_MTRIPWIRE_SEG_LEN2;
 
+#if 0
 	//OSC parameter
 	pstPara->stOscPara.s32InitTime = 5000;
 	pstPara->stOscPara.s32InitBgEdgeRatioTh = 50;
@@ -65,7 +66,7 @@ IMP_VOID ipParseAnaystParaData(IpAnalystPara *pstPara )
 	pstPara->stOscPara.s32SpclMinTime = IMP_ANALYST_SPCL_MIN_TIME;
 	pstPara->stOscPara.s32TrgnTrajectLen = 25;
 	pstPara->stOscPara.s32TrgnTrajectRatio = 90;
-
+#endif
 
 	pstPara->s32InitEventLife = IMP_ANALYST_INIT_EVENT_LIFE;
 	pstPara->s32OutputEvents = IMP_ANALYST_OUTPUT_EVENT;

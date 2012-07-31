@@ -15,10 +15,12 @@ IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_
 	}
 //#ifdef SUPPORT_OSC
 //create static tracker for OSC
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipCreateStaticTrackerInternal( &pstTarget->stStaticModuleOsc, pstTarget->pstHwResource, pstTarget->pstResult, IMP_PROCESS_OSC );
 	}
+#endif
 //#endif
 
 	if (pstResult->s32ModuleSwitch & 1)
@@ -28,10 +30,12 @@ IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_
 
 //#ifdef SUPPORT_OSC
 //start Static Tracker for OSC
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipStartStaticTrakerInternal( &pstTarget->stStaticModuleOsc );
 	}
+#endif
 //#endif
 }
 
@@ -45,10 +49,12 @@ IMP_VOID ipReleaseTargetTrackerInternal( IpTargetTracker *pstTarget )
 	}
 //#ifdef SUPPORT_OSC
 //release OSC module
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipReleaseStaticTrackerInternal( &pstTarget->stStaticModuleOsc );
 	}
+#endif
 //#endif
 
 	memset( pstTarget, 0, sizeof(IpTargetTracker) );
@@ -71,10 +77,12 @@ IMP_VOID ipConfigTargetTrackerInternal( IpTargetTracker *pstTarget, IpTrackerPar
 	}
 	
 //#ifdef SUPPORT_OSC	
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipConfigStaticTrackerInternal( &pstTarget->stStaticModuleOsc, &pstTarget->stPara );
 	}
+#endif
 //#endif
 }
 
@@ -91,10 +99,12 @@ IMP_S32 ipProcessTargetTrackerInternal( IpTargetTracker *pstTarget )
 
 //#ifdef SUPPORT_OSC
 //process static tracker on OSC
+#if 0
 	if (pstResult->s32ModuleSwitch & 2)
 	{
 		ipProcessStaticTrackerInternal( &pstTarget->stStaticModuleOsc, IMP_PROCESS_OSC);
 	}
+#endif
 //#endif
 
 	ipCalcRegionsActualArea( &pstTarget->stPara, &pstTarget->pstResult->stDRegionSet );

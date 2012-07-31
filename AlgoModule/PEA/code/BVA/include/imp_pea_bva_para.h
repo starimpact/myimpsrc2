@@ -9,7 +9,7 @@
 #include "imp_pea_tgt_evt_mgr.h"
 #include "imp_pea_bva_common.h"
 #include "imp_pea_static.h"
-#include "imp_pea_osc.h"
+//#include "imp_pea_osc.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -27,7 +27,7 @@ typedef struct
 	IpPerimeterPara stPerimeterPara;
 	IpTripwirePara stTripwirePara;
 	IpMTripwirePara stMTripwirePara;
-	IpOscPara stOscPara;
+//	IpOscPara stOscPara;
 	IMP_S32 s32InitEventLife;
 	IMP_S32 s32OutputEvents;
 
