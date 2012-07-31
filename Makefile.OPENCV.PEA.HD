@@ -9,7 +9,6 @@ OTH_INCLUDES:=-I$(ALGODIR)/PEA/code/PEACommon/include -I$(ALGODIR)/PEA/code/Syst
 	-I$(ALGODIR)/GA/EventManager/include -I$(ALGODIR)/PEA/code/ObjRecognition \
 	-I$(ALGODIR)/PEA/code/ObjRecognition/Detector/include -I$(ALGODIR)/AVD/include \
 	-I$(ALGODIR)/GA/WaterMark/include -I$(ALGODIR)/PEA/code/ObjRecognition/Tracker/include \
-	-I$(ALGODIR)/PEA/code/ObjRecognition/Classify/include -I$(ALGODIR)/PEA/code/ObjRecognition/Classify/svmlight601 \
 	-I$(ALGODIR)/PEA/code/BVA/include
 
 CV_LIBS:=-lopencv_core -lopencv_highgui -lopencv_ml -lopencv_imgproc

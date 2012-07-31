@@ -299,7 +299,7 @@ typedef struct
 } IpTargetPosition;
 
 
-#define IMP_MAX_TRAJECTORY_LEN		256
+#define IMP_MAX_TRAJECTORY_LEN	128//	256
 
 
 typedef struct
@@ -622,12 +622,8 @@ typedef struct impPEA_RESULT_S
 	IMP_S32 s32VideoAbnrmlStatus;
 
 	PEA_DETECTED_REGIONSET_S stDRegionSet;
-	PEA_DETECTED_REGIONSET_S stDRegionSetChg;
-	PEA_DETECTED_REGIONSET_S stDRegionSetOsc; //OSC Detected Region Set
 
 	IpTrackedTargetSet stTrackedTargetSet; 
-	IpTrackedTargetSet stTrackedTargetSetChg;
-	IpTrackedTargetSet stTrackedTargetSetOsc; //OSC TrackedTarget Set
 
 	IMP_OUTPUT stOutput;
 	YUV_IMAGE422_S *pstImageYUV;

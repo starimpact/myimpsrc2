@@ -13,7 +13,6 @@
 #include "imp_pea_bva_para.h"
 #include "imp_pea_bva_common.h"
 #include "imp_pea_static.h"
-#include "imp_pea_osc.h"
 
 
 #ifdef __cplusplus
@@ -52,19 +51,12 @@ typedef struct impTARDAT_ANALYST_S
 typedef struct impTARGET_DATA_ANALYST_OSC_S
 {
 	PEA_BVA_TGT_EVT_DATA_S stEventData;
-
-	IpOscTargetData stDataStatic;
-	IpOscTargetData stDataOSC;
-
 } TARGET_DATA_ANALYST_OSC_S;
 
 
 typedef struct impTARGET_DATA_ANALYST_STATIC_S
 {
 	PEA_BVA_TGT_EVT_DATA_S stEventData;
-
-
-
 } TARGET_DATA_ANALYST_STATIC_S;
 
 
@@ -89,8 +81,6 @@ typedef struct impBEHAVIOR_ANALYSIS_S
 #if defined(SUPPORT_MTRIPWIRE)
 	IpMTripwireAnalyst stModuleMTripwire;
 #endif
-
-	IpOscAnalyst stModuleOSC;
 
 	IpTargetEvtMgr stTargetEvtMgr;
 

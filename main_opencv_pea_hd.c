@@ -21,11 +21,11 @@
     #include <sys/time.h>
 #endif
 
-#define h2
+//#define h2
 //#define h1
 //#define d1
 //#define cif
-//#define qcif
+#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
@@ -37,9 +37,13 @@
 #define Y_HEIGHT 288
 #endif
 
+//700*576
+//600*476
+//500*476
+//500*400,500*300 have problem.
 #ifdef d1
-#define Y_WIDTH 704
-#define Y_HEIGHT 576
+#define Y_WIDTH 500
+#define Y_HEIGHT 300
 #endif
 
 #ifdef h1

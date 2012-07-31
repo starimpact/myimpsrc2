@@ -13,26 +13,14 @@ IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_
 	{
 		ipCreateMotionTrackerInternal( &pstTarget->stMotionModule, pstTarget->pstHwResource, pstTarget->pstResult );
 	}
-//#ifdef SUPPORT_OSC
-//create static tracker for OSC
-	if (pstResult->s32ModuleSwitch & 2)
-	{
-		ipCreateStaticTrackerInternal( &pstTarget->stStaticModuleOsc, pstTarget->pstHwResource, pstTarget->pstResult, IMP_PROCESS_OSC );
-	}
-//#endif
+
 
 	if (pstResult->s32ModuleSwitch & 1)
 	{
 		ipStartMotionTrackerInternal( &pstTarget->stMotionModule );
 	}
 
-//#ifdef SUPPORT_OSC
-//start Static Tracker for OSC
-	if (pstResult->s32ModuleSwitch & 2)
-	{
-		ipStartStaticTrakerInternal( &pstTarget->stStaticModuleOsc );
-	}
-//#endif
+
 }
 
 IMP_VOID ipReleaseTargetTrackerInternal( IpTargetTracker *pstTarget )
@@ -43,13 +31,7 @@ IMP_VOID ipReleaseTargetTrackerInternal( IpTargetTracker *pstTarget )
 	{
 		ipReleaseMotionTrackerInternal( &pstTarget->stMotionModule );
 	}
-//#ifdef SUPPORT_OSC
-//release OSC module
-	if (pstResult->s32ModuleSwitch & 2)
-	{
-		ipReleaseStaticTrackerInternal( &pstTarget->stStaticModuleOsc );
-	}
-//#endif
+
 
 	memset( pstTarget, 0, sizeof(IpTargetTracker) );
 }
@@ -70,12 +52,7 @@ IMP_VOID ipConfigTargetTrackerInternal( IpTargetTracker *pstTarget, IpTrackerPar
 		ipConfigMotionTrackerInternal( &pstTarget->stMotionModule, &pstTarget->stPara );
 	}
 	
-//#ifdef SUPPORT_OSC	
-	if (pstResult->s32ModuleSwitch & 2)
-	{
-		ipConfigStaticTrackerInternal( &pstTarget->stStaticModuleOsc, &pstTarget->stPara );
-	}
-//#endif
+
 }
 
 
@@ -89,13 +66,7 @@ IMP_S32 ipProcessTargetTrackerInternal( IpTargetTracker *pstTarget )
 
 	pstStatus->u32TrackerStatus = IMP_MOUDLE_STATUS_SUCCESS;
 
-//#ifdef SUPPORT_OSC
-//process static tracker on OSC
-	if (pstResult->s32ModuleSwitch & 2)
-	{
-		ipProcessStaticTrackerInternal( &pstTarget->stStaticModuleOsc, IMP_PROCESS_OSC);
-	}
-//#endif
+
 
 	ipCalcRegionsActualArea( &pstTarget->stPara, &pstTarget->pstResult->stDRegionSet );
 //printf("ModuleSwitch:%d\n", pstResult->s32ModuleSwitch);
