@@ -136,6 +136,8 @@ IMP_MODULE_HANDLE IMP_CreateViBe( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 	IMP_GrayImageCreate( &pstModule->stImgPreGray, s32Width, s32Height, pstMemMgr );
 //	memset(pstModule->stImgFgTmp, 0, s32Height * s32Width);
 	
+//	printf("create-vibe-bkg:%x\n", pstModule->stImgBg.pu8Data);
+	
 	pstOutput->stImgBg = pstModule->stImgBg;
 	pstOutput->stImgFg = pstModule->stImgFg;
 	
@@ -178,6 +180,8 @@ IMP_S32 IMP_ReleaseViBe( IMP_MODULE_HANDLE hModule )
 	}
 	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, ppu8Bkgs);
 	ppu8Bkgs = 0;
+	
+//	printf("release-vibe-bkg:%x\n", pstModule->stImgBg.pu8Data);
 	
 	IMP_GrayImageDestroy( &pstModule->stImgBg, pstMemMgr );
 	IMP_GrayImageDestroy( &pstModule->stImgFg, pstMemMgr );

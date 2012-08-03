@@ -48,25 +48,6 @@ IMP_VOID ipParseAnaystParaData(IpAnalystPara *pstPara )
 	pstPara->stMTripwirePara.astSTripwire[1].s32AwayDistance = IMP_ANALYST_MTRIPWIRE_AWAY_DISTANCE2;
 	pstPara->stMTripwirePara.astSTripwire[1].s32SegLength = IMP_ANALYST_MTRIPWIRE_SEG_LEN2;
 
-	//OSC parameter
-	pstPara->stOscPara.s32InitTime = 5000;
-	pstPara->stOscPara.s32InitBgEdgeRatioTh = 50;
-	pstPara->stOscPara.s32AddWeight = 1;
-	pstPara->stOscPara.s32SubWeight = 3;
-	pstPara->stOscPara.s32LeftAccumLevel = 8;
-	pstPara->stOscPara.s32RemovedAccumLevel = 8;
-	pstPara->stOscPara.s32MinArea = 15;
-	pstPara->stOscPara.s32MinConnectivity = 2;
-	pstPara->stOscPara.s32BgUpdateTime = IMP_ANALYST_BG_UPDATE_TIME;
-	pstPara->stOscPara.s32LeaveLimit = IMP_ANALYST_LEAVE_LIMIT;
-	pstPara->stOscPara.s32UseBorderConstrain = 1;
-	pstPara->stOscPara.s32BorderWidth = 8;
-	pstPara->stOscPara.s32DoSpecialRegionProcess = IMP_ANALYST_DO_SPCL_RG_PROCESS;
-	pstPara->stOscPara.s32SpclMinTime = IMP_ANALYST_SPCL_MIN_TIME;
-	pstPara->stOscPara.s32TrgnTrajectLen = 25;
-	pstPara->stOscPara.s32TrgnTrajectRatio = 90;
-
-
 	pstPara->s32InitEventLife = IMP_ANALYST_INIT_EVENT_LIFE;
 	pstPara->s32OutputEvents = IMP_ANALYST_OUTPUT_EVENT;
 

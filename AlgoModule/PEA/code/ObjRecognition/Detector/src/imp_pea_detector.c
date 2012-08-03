@@ -25,14 +25,16 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	
 	pstTargetDetector->hGGModel = IMP_CreateGrayGaussian(pstResult, pHwResouce);
 	
+	
 	//create and init ViBe model
 	pstTargetDetector->hViBeModel = IMP_CreateViBe(pstResult, pHwResouce);
 	
 	pstTargetDetector->hSwingModel = IMP_CreateSwing(pstResult, pHwResouce);
-	
+
+if (pstResult->s32ModuleSwitch & 2)
+{	
 	pstTargetDetector->hOSCDModel = IMP_CreateOSCD(pstResult, pHwResouce);
-	
-//	pstTargetDetector->hLFModel = IMP_CreateLightRemove(pstResult, pHwResouce);
+}
 
 #ifdef USE_WATERMARK_DETECOTR
 	ipCreateWaterMarkDetector(&pstTargetDetector->stWaterMarkDetector,pstResult,pHwResouce);
@@ -133,6 +135,7 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector )
 {
 	MEM_MGR_ARRAY_S *pstMemMgr = &pstTargetDetector->pstHwResource->stMemMgr;
+	PEA_RESULT_S *pstResult = pstTargetDetector->pstResult;
 	
 #ifdef ACCUM_BGEDGE
 	IMP_GrayImageDestroy( &pstTargetDetector->pstImgBgEdgeG, pstMemMgr );
@@ -183,19 +186,21 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	ipReleaseWaterMarkDetector(&pstTargetDetector->stWaterMarkDetector);
 #endif
 	
+	IMP_ReleaseSwing(pstTargetDetector->hSwingModel);
+
+if (pstResult->s32ModuleSwitch & 2)
+{
+	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
+}
+	
 	//release image
 	IMP_ReleaseViBe(pstTargetDetector->hViBeModel);
-	
-	IMP_ReleaseSwing(pstTargetDetector->hSwingModel);
-	
-	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
-	
-//	IMP_ReleaseLightRemove(pstTargetDetector->hLFModel);
-	
+		
 	IMP_ReleaseGrayGaussian(pstTargetDetector->hGGModel);
 	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
+
 
 IMP_VOID ipConfigTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector, PEA_DETECTOR_PARA_S *pstPara )
 {
@@ -203,10 +208,14 @@ IMP_VOID ipConfigTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	PEA_DETECTOR_PARA_S *pstDetPara = &pstTargetDetector->stPara;
 	PEA_DETECTOR_DATA_S *pstDetData = &pstTargetDetector->stData;
 	IMP_OSCDPara_S stOSCDPara;
-	
+	PEA_RESULT_S *pstResult = pstTargetDetector->pstResult;
+
+if (pstResult->s32ModuleSwitch & 2)
+{
 	stOSCDPara.pstRule = pstPara->pstRule;
 	
 	IMP_ConfigOSCD(pstTargetDetector->hOSCDModel, &stOSCDPara);
+}
 	
 	memcpy( pstDetPara, pstPara, sizeof(PEA_DETECTOR_PARA_S) );
 	{
@@ -352,7 +361,6 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("ProcessGrayGaussian:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
-//	IMP_ProcessLightRemove(pstTargetDetector->hLFModel);
 #endif
 	
 	
@@ -371,6 +379,7 @@ printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 
 #endif //VIBE
 
+#if 1
 #if PTDI_TIME || 1
 gettimeofday(&t1, NULL);
 #endif	
@@ -382,32 +391,10 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("ProcessSwing:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
-/*
-	{
-		IMP_OutputViBe_S *pstViBe = &pstResult->stOutPutViBeModel;
-		IMP_OutputLightRemove_S *pstLR = &pstResult->stOutPutLR;
-		IMP_UCHAR *pu8img = pstLR->pu8img;
-	//	GRAY_IMAGE_S *pstImgBg = pstViBe;
-		GRAY_IMAGE_S *pstImgFg = &pstViBe->stImgFg;
-		IMP_S32 s32RI, s32CI;
-		
-		for (s32RI = 0; s32RI < s32ImgH; s32RI++)
-		{
-			for (s32CI = 0; s32CI < s32ImgW; s32CI++)
-			{
-				if (pu8img[s32RI * s32ImgW + s32CI] == 1 || pu8img[s32RI * s32ImgW + s32CI] == 3)
-				{
-					pstImgFg->pu8Data[s32RI * s32ImgW + s32CI] = 0;
-				}
-			}
-		}
-	}
-*/
-
-
-
+#endif
 	
-
+if (pstResult->s32ModuleSwitch & 2)
+{
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
@@ -416,7 +403,7 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("IMP_ProcessOSCD:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
-
+}
 
 if (pstResult->s32ModuleSwitch & 1)
 {

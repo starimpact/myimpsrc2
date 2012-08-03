@@ -1258,13 +1258,7 @@ static IMP_VOID IMP_OSC_OutputTargets( PEA_MODULE *pModule )
 		IMP_OSC_OutputTargetSet( &pResult->stTrackedTargetSet, &pOutput->stTargetSet,
 						pSysPara->s32OutputAllTgts, pSysPara->s32OutputPredicted, pSysPara->s32TrajectDist );
 
-//#ifdef SUPPORT_OSC
-	if (pResult->s32ModuleSwitch & 2)
-	{
-		IMP_OSC_OutputTargetSetOsc( &pResult->stTrackedTargetSetOsc, &pOutput->stTargetSet,
-						pSysPara->s32OutputAllTgts,pSysPara->s32OutputPredicted, 0 );
-	}
-//#endif
+
 	}
 }
 

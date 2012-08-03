@@ -64,37 +64,6 @@ IMP_S32 ipProcessRegionExtract( PEA_REGION_EXTRACT_MODULE_S *pModule )
 #endif
 
 
-//Calc Detect Region ON OSC, just need to copy regions of stDRegionSet
-	if (pstResult->s32ModuleSwitch & 2)
-	{
-//	printf("hi,\n");
-		PEA_RESULT_S *pstResult = pModule->pstResult;
-		
-	//	printf("stDRegionSetOsc.astDrg:%x\n", &pstResult->stDRegionSetOsc.astDrg);
-		memcpy(&pstResult->stDRegionSetOsc, &pstResult->stDRegionSet, sizeof(PEA_DETECTED_REGIONSET_S));
-		
-		//only keep the type left region
-		int ri;
-		PEA_DETECTED_REGION_S *pstDrg; 
-		for (ri = 0; ri < IMP_MAX_TGT_CNT; ri++)
-		{
-			pstDrg = &pstResult->stDRegionSetOsc.astDrg[ri];
-		//	if (IMP_DRG_IS_STATIC_L(pstDrg->u8Used) + IMP_DRG_IS_STATIC_R(pstDrg->u8Used) == 0)
-			if (!IMP_DRG_IS_STATIC_L(pstDrg->u8Used))
-			{
-				
-		//		IMP_DRG_SET_UNUSED(pstDrg->u8Used);
-			}
-			
-			if (pstDrg->u8Used)
-			{
-//				if (pstDrg->s32AreaPixel > 500) printf("%d: L:%d R:%d\n", pstDrg->s32AreaPixel, IMP_DRG_IS_STATIC_L(pstDrg->u8Used), IMP_DRG_IS_STATIC_R(pstDrg->u8Used));
-			}
-		}
-	}
-//	ipCalcDRegionOnOsc( pModule );
-
-
 	return 0; 
 }
 
@@ -240,6 +209,7 @@ static IMP_VOID ipRegionFillHole(PEA_REGION_EXTRACT_MODULE_S *pModule)
 					if( x1>rl_e )
 						memset( &(pu8DatCur[rl_s]), 128, rl_e - rl_s + 1 );
 
+
 				} while( x <= ru_x );
 				pu8DatPre = pu8DatCur;
 				pu8DatCur += w;
@@ -325,47 +295,6 @@ static IMP_VOID ipRegionExtractOnMotion( PEA_REGION_EXTRACT_MODULE_S *pModule )
 }
 
 
-//Calc Detect Region On OSC
-static IMP_VOID ipCalcDRegionOnOsc( PEA_REGION_EXTRACT_MODULE_S *pModule )
-{
-	PEA_REGION_EXTRACT_PARA_S *pstPara = &pModule->stPara;
-	PEA_RESULT_S *pstResult = pModule->pstResult;
-	IMP_S32 s32Width = pstResult->s32Width;
-	IMP_S32 s32Height = pstResult->s32Height;
-	PEA_DETECTED_REGIONSET_S *pstRgs = &pstResult->stDRegionSetOsc;
-	IMP_RECT_S stRectLabel;
-	
-	ipDetectedRegionSetClear( pstRgs );
-	
-	IMP_SET_RECT( stRectLabel, 0, 0, s32Width - 1, s32Height - 1 );
-		
-//	ipShowGrayImage(s32Width, s32Height, pstRgs->pstImgFgRgn->pu8Data, "pstImgFgRgn");
-		
-	IMP_PEA_RGE_ExtractRegionSetFromFgImage(&pstPara->stLabelPara, pstRgs, &stRectLabel, IMP_FALSE, NULL );
-//printf("\nBefore------\n");
-	ipLabelRegionSetTypeChange( &pstPara->stTypePara, pstRgs );
-//printf("\nAfter------\n");
-#if 0
-	{
-		int ri;
-		PEA_DETECTED_REGION_S *pstDrg; //[IMP_MAX_TGT_CNT];
-		
-		for (ri = 0; ri < IMP_MAX_TGT_CNT; ri++)
-		{
-			pstDrg = &pstRgs->astDrg[ri];
-		//	printf("fuck!!!%x\n", pstDrg->u8Used);
-			if (IMP_DRG_IS_STATIC_L(pstDrg->u8Used))
-			{
-			//	printf("fuck!!!\n");
-				pstRgs->pstImgFgRgn->pu8Data[pstDrg->stRect.s16Y1 * s32Width + pstDrg->stRect.s16X1] = 255;
-			}
-		}
-	//	ipShowGrayImage(s32Width, s32Height, pstRgs->pstImgFgRgn->pu8Data, "pstImgBgGray");
-	}
-#endif
-
-	IMP_PEA_RGE_RemoveAbnormalRegions( &pstPara->stRmAbnmlPara, pstRgs );
-}
 
 static IMP_VOID ipLightRegionsProcess( PEA_REGION_EXTRACT_MODULE_S *pModule )
 {

@@ -175,14 +175,8 @@ static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PRO
 	cvInitFont( &font1, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA );
 
 
-	if( enFlag == IMP_PROCESS_CHG)
-	{
-		rgs = &rs->stDRegionSetChg;
-	}
-	else
-	{
-		rgs = &rs->stDRegionSet;
-	}
+
+	rgs = &rs->stDRegionSet;
 
 	for( i=1; i<IMP_MAX_TGT_CNT-1; i++ )
 	{
@@ -921,7 +915,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
 		}
     }
-
+	
 //	IMP_Stop( hIMP, &stResult );
 	IMP_Release( hIMP );
 	IMP_MemsFree( &stMems );
@@ -970,14 +964,15 @@ int main()
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
 
 
 
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31024-1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21019-白天户外-小目标行驶.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31029-夜红外树丛-小目标低对比.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";

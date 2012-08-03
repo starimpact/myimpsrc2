@@ -9,8 +9,6 @@
 
 #define IMP_MIN_TGT_AREA          40
 #define IMP_STABLE_THRESHOLD      20
-#define IMP_MAX_TRAJECTORY_LEN    256
-#
 
 typedef struct impTgtPosition_S
 {
@@ -180,8 +178,10 @@ IMP_S32 IMP_ReleaseTracker( IMP_MODULE_HANDLE hModule )
 	IMP_U8 **ppu8Bkgs = 0;
 	MEM_MGR_ARRAY_S *pstMemMgr;	
 	s32Width = pstModule->s32Width;
-	s32Height = pstModule->s32Height;	
+	s32Height = pstModule->s32Height;
 	pstMemMgr = &pstModule->pstHwResource->stMemMgr;
+	
+	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule);
 
 	return 0;
 }

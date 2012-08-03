@@ -35,6 +35,9 @@ typedef struct impswing_S
 	//IMP_UCHAR * Img[9];
 	IMP_UCHAR * zSadmin;
 	IMP_UCHAR * vSadmin;
+	IMP_UCHAR * srcGray;
+	IMP_UCHAR * forImg;
+	IMP_UCHAR * bckImg;
 	IMP_UCHAR * inMask;
 	IMP_UCHAR * swImg;
 
@@ -44,6 +47,21 @@ IMP_S32 IMP_ShowImg(IMP_UCHAR*srcGray,IMP_S32 Height,IMP_S32 Width,IMP_UCHAR*wid
 
 IMP_S32 IMP_BinaryImg(IMP_UCHAR *srcGray,IMP_UCHAR *BinMask,IMP_S32 val,IMP_S32 Lenght);
 /*/得到srcGray的二值图,经大于val的赋值为255，其他的赋值为0，保存在BinMask中，Length是图像的“高X宽”/*/
+
+IMP_S32 IMP_GaussImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW);
+/*/将图像进行高斯平滑,模板大小为3X3/*/
+
+IMP_S32 IMP_DResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW);
+/*/对图像进行抽样，改变图像的大小，src是经过高斯平滑的图像/*/
+
+IMP_S32 IMP_UResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW);
+/*/对图像进行抽样，改变图像的大小/*/
+
+IMP_S32 IMP_DePix(IMP_UCHAR*srcGray,IMP_S32 ImgH,IMP_S32 ImgW,IMP_S32 val);
+/*/滤除图像中孤立的点/*/
+
+IMP_S32 IMP_UResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW);
+/*/对图像上采样，将图像尺寸放大一倍/*/
 
 IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 ImgW);
 /*/得到srcGray的累计图，/*/

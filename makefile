@@ -53,7 +53,6 @@ PEA_OBJS := AlgoModule/ALGO_PARA/Para/imp_para.o \
 			AlgoModule/GA/EventManager/imp_ga_evt_manager.o \
 			AlgoModule/GA/LiscenseManager/imp_ga_license_manager.o \
 			AlgoModule/GA/WaterMark/imp_pea_watermark.o \
-			AlgoModule/PEA/code/BVA/imp_pea_osc.o \
 			AlgoModule/PEA/code/BVA/imp_pea_bva.o \
 			AlgoModule/PEA/code/BVA/imp_pea_bva_common.o \
 			AlgoModule/PEA/code/BVA/imp_pea_bva_log.o \
@@ -87,7 +86,6 @@ PEA_OBJS := AlgoModule/ALGO_PARA/Para/imp_para.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_log.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_motion.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_para.o \
-			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_pea_tracker_static.o \
 			AlgoModule/PEA/code/ObjRecognition/Tracker/imp_tracker.o \
 			AlgoModule/PEA/code/ObjRecognition/imp_pea_obj_recognition.o \
 			AlgoModule/PEA/code/PEACommon/imp_pea_common.o \
