@@ -238,6 +238,17 @@ static IMP_VOID ipDetectRegionShadow( IpRGEShadowPara *pstPara, PEA_DETECTED_REG
 }
 
 
+IMP_S32 IMP_GetMemSizeShadowImage(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += s32Width * sizeof(IpShadowInterval);
+	s32Size += s32Width * sizeof(IpShadowColumn);
+
+	return s32Size;
+}
+
+
 IMP_VOID ipShadowImageCreate( IpShadowImage *pstShadow, IMP_S32 s32Width, IMP_S32 s32Height, MEM_MGR_ARRAY_S *pstMemMgr )
 {
 	memset( pstShadow, 0, sizeof(IpShadowImage) );

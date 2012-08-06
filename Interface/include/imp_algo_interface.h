@@ -65,6 +65,20 @@ IMP_EXPORTS STATUS_E IMP_GetMemReq( IMP_HANDLE hModule, MEM_SET_S *pstMems );
 
 
 /***************************************************
+name:IMP_GetMemReq
+do:获取内存信息
+input:
+	s32Width:图像宽
+	s32Height:图像高
+output:
+return:
+	算法总共需要内存大小.
+history:
+****************************************************/
+IMP_S32 IMP_GetMemSize(IMP_S32 s32Width, IMP_S32 s32Height);
+
+
+/***************************************************
 name:IMP_Create
 do:为算法分配内存并做初始化
 input:
@@ -309,6 +323,7 @@ return:
 history:
 ****************************************************/
 IMP_BOOL IMP_AVD_ConfigParameter(IMP_HANDLE hModule, IMP_AVD_PARA_S *pstAvdParaSrc);
+
 
 
 /***************************************************

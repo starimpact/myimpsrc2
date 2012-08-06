@@ -6,8 +6,6 @@
 #include "imp_pea_regionset_label.h"
 
 
-
-
 /***************************************************
 name:IMP_GetMemSizeOSCD
 do:得到算法所需要的内存大小
@@ -16,14 +14,15 @@ input:
 output:算法需要的内存大小
 history:
 ****************************************************/
-IMP_S32 IMP_GetMemSizeOSCD( PEA_RESULT_S *pstResult )
+IMP_S32 IMP_GetMemSizeOSCD(IMP_S32 s32Width, IMP_S32 s32Height)
 {
-	IMP_S32 width = pstResult->s32Width;
-	IMP_S32 height = pstResult->s32Height;
+ 	IMP_S32 s32Size = 0;
+ 	
+ 	s32Size += sizeof(IMP_OSCD_S);
+ 	s32Size += sizeof(OSCD_REGION_S) * IMP_MAX_OSC_NUM;
+ 	s32Size += 10 * s32Width * s32Height;
 	
- 	IMP_S32 size = width * height * 30;
-	
-	return size;
+	return s32Size;
 }
 
 

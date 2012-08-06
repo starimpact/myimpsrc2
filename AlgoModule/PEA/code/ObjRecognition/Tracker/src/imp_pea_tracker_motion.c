@@ -1,6 +1,19 @@
 #include "imp_pea_tracker.h"
 
 
+IMP_S32 IMP_GetMemSizeTTI(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(IpTargetSetDataTrackerM);
+	s32Size += sizeof(IpTargetDataTrackerM) * IMP_MAX_TGT_CNT;
+	s32Size += sizeof(IpDrgDataTrackerM) * IMP_MAX_TGT_CNT;
+	s32Size += 2 * s32Width * s32Height;
+	
+	return s32Size;
+}
+
+
 IMP_VOID ipCreateMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, GA_HARDWARE_RS_S *pstHwResource, PEA_RESULT_S *pstResult )
 {
 	IMP_S32 s32ImgW, s32ImgH;
@@ -11,7 +24,6 @@ IMP_VOID ipCreateMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, GA_HA
 	pstTracker->pstPara = NULL;
 	s32ImgW = pstResult->s32Width;
 	s32ImgH = pstResult->s32Height;
-
 	// TARDAT
 	{
 		IpTrackedTargetSet *pstTargetSet = &pstResult->stTrackedTargetSet;
@@ -27,8 +39,10 @@ IMP_VOID ipCreateMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, GA_HA
 		IMP_S32 s32TarDateSize = sizeof(IpTargetDataTrackerM) * IMP_MAX_TGT_CNT;
 		IMP_S32 s32DrgDatSize = sizeof(IpDrgDataTrackerM) * IMP_MAX_TGT_CNT;
 		pstTracker->pstTargetSetData = IMP_MMAlloc( pstMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpTargetSetDataTrackerM) );
+		
 		IMP_ASSERT(pstTracker->pstTargetSetData);
 		pstTracker->pstTargetDatas = IMP_MMAlloc( pstMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpTargetDataTrackerM)*IMP_MAX_TGT_CNT );
+		
 		IMP_ASSERT(pstTracker->pstTargetDatas);
 		pstTracker->pstDRegionDatas = IMP_MMAlloc( pstMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpDrgDataTrackerM)*IMP_MAX_TGT_CNT );
 		IMP_ASSERT(pstTracker->pstDRegionDatas);
@@ -51,10 +65,10 @@ IMP_VOID ipCreateMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, GA_HA
 		pstResult->stTrackedTargetSet.stPrivateData.u32TrackerSz = sizeof(IpTargetSetDataTrackerM);
 
 		IMP_GrayImageCreate(&pstTracker->pstImgInGrayLast,s32ImgW,s32ImgH,pstMemMgr);
+		
 		IMP_GrayImageCreate(&pstTracker->pstImgFgRgnLast,s32ImgW,s32ImgH,pstMemMgr);
 		IMP_GrayImageSet(&pstTracker->pstImgInGrayLast,0);
 		IMP_GrayImageSet(&pstTracker->pstImgFgRgnLast,0);
-
 
 	}
 }

@@ -2,6 +2,41 @@
 #include "imp_pea_tracker.h"
 
 
+IMP_S32 IMP_GetMemSizeTracker(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(IpModuleTracker);
+	s32Size += sizeof(IpTargetTracker);
+	s32Size += IMP_GetMemSizeTTI(s32Width, s32Height);
+	
+	return s32Size;
+}
+
+
+IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_RS_S *pstHwResource, PEA_RESULT_S *pstResult );
+
+IMP_MODULE_HANDLE ipCreateTracker( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce )
+{
+	IMP_MODULE_HANDLE hModule=NULL;
+	IpModuleTracker *pModule=NULL;
+	IpTargetTracker *pTracker=NULL;
+
+	pModule = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpModuleTracker) );
+	
+	pModule->pstTracker = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpTargetTracker) );
+	pTracker = pModule->pstTracker;
+	
+	ipCreateTargetTrackerInternal( pTracker, pHwResouce, pstResult );
+	
+#ifdef LOG_DATA_TRACKER
+	ipOpenLogFile();
+#endif
+
+	hModule = (IMP_MODULE_HANDLE)pModule;
+	return hModule;
+}
+
 IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_RS_S *pstHwResource, PEA_RESULT_S *pstResult )
 {
 	memset( pstTarget, 0, sizeof(IpTargetTracker) );
@@ -12,6 +47,7 @@ IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_
 //	if (pstResult->s32ModuleSwitch & 1)
 	{
 		ipCreateMotionTrackerInternal( &pstTarget->stMotionModule, pstTarget->pstHwResource, pstTarget->pstResult );
+
 	}
 
 
@@ -22,6 +58,8 @@ IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_
 
 
 }
+
+
 
 IMP_VOID ipReleaseTargetTrackerInternal( IpTargetTracker *pstTarget )
 {
@@ -108,23 +146,7 @@ static IMP_VOID ipCalcRegionsActualArea( IpTrackerPara *pstTPara, PEA_DETECTED_R
 }
 
 
-IMP_MODULE_HANDLE ipCreateTracker( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce )
-{
-	IMP_MODULE_HANDLE hModule=NULL;
-	IpModuleTracker *pModule=NULL;
-	IpTargetTracker *pTracker=NULL;
 
-	pModule = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpModuleTracker) );
-	pModule->pstTracker = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpTargetTracker) );
-	pTracker = pModule->pstTracker;
-	ipCreateTargetTrackerInternal( pTracker, pHwResouce, pstResult );
-#ifdef LOG_DATA_TRACKER
-	ipOpenLogFile();
-#endif
-
-	hModule = (IMP_MODULE_HANDLE)pModule;
-	return hModule;
-}
 
 IMP_VOID ipReleaseTracker( IMP_MODULE_HANDLE hModule )
 {

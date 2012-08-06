@@ -1,15 +1,29 @@
 
 #include "imp_pea_obj_recognition.h"
 
-
+IMP_S32 IMP_GetMemSizeOfObjRecognition(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(PEA_ModuleObjRecognition);
+	s32Size += IMP_GetMemSizeDetector(s32Width, s32Height);
+	s32Size += IMP_GetMemSizeTracker(s32Width, s32Height);
+	
+	return s32Size;
+}
 
 IMP_MODULE_HANDLE IMP_PEA_CreateObjRecognition( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResouce )
 {
 	IMP_MODULE_HANDLE hModule=NULL;
 	PEA_ModuleObjRecognition *pModule=NULL;
+	IMP_S32 s32Size1 = 0, s32Size2 = 0;
 
 	pModule = IMP_MMAlloc( &pstHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_ModuleObjRecognition) );	// 64
+	
+	s32Size1 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
 	pModule->hDetector = ipCreateDetector( pstResult, pstHwResouce );
+	s32Size2 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+	
 	pModule->hTracker = ipCreateTracker( pstResult, pstHwResouce );
 
 	pModule->pstResult = pstResult;

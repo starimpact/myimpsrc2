@@ -48,6 +48,8 @@ typedef struct
 }IpWaterMarkDetector;
 
 
+IMP_S32 IMP_GetMemSizeWaterMarker(IMP_S32 s32Width, IMP_S32 s32Height);
+
 IMP_VOID ipCreateWaterMarkDetector( IpWaterMarkDetector *module, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource );
 
 IMP_VOID ipReleaseWaterMarkDetector( IpWaterMarkDetector *module );

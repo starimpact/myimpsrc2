@@ -9,6 +9,40 @@ IMP_VOID IMP_PEA_DetectorDataClear( PEA_DETECTOR_DATA_S *pstData )
 }
 
 
+IMP_S32 IMP_GetMemSizeDetector(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(IpModuleDetector);
+	s32Size += sizeof(PEA_TARGET_DETECTOR_S);
+	s32Size += IMP_GetMemSizeViBe(s32Width, s32Height);
+	s32Size += IMP_GetMemSizeOSCD(s32Width, s32Height);
+	s32Size += IMP_GetMemSizeWaterMarker(s32Width, s32Height);
+	s32Size += IMP_GetMemSizeRegionExtract(s32Width, s32Height);
+	s32Size += s32Width * s32Height * 20;
+	
+	return s32Size;
+}
+
+
+IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce );
+
+IMP_MODULE_HANDLE ipCreateDetector( PEA_RESULT_S *pResult, GA_HARDWARE_RS_S *pHwResouce )
+{
+	IMP_MODULE_HANDLE hModule=NULL;
+	IpModuleDetector *pModule=NULL;
+	PEA_TARGET_DETECTOR_S *pDetector=NULL;
+
+	pModule = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpModuleDetector) );
+	pModule->pDetector = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_TARGET_DETECTOR_S) );
+	pDetector = pModule->pDetector;
+	ipCreateTargetDetectorInternal( pDetector, pResult, pHwResouce );
+
+	hModule = (IMP_MODULE_HANDLE)pModule;
+	return hModule;
+}
+
+
 IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce )
 {
 	IMP_S32 s32Height, s32Width;
@@ -165,7 +199,7 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	IMP_GrayImageDestroy( &pstTargetDetector->stImgStBgGray, pstMemMgr );///NEW
 	IMP_GrayImageDestroy( &pstTargetDetector->stImgBgDiff, pstMemMgr );///NEW
 #endif
-
+	
 	IMP_GrayImageDestroy( &pstTargetDetector->stImgBgGray, pstMemMgr );
 	
 	IMP_GrayImageDestroy( &pstTargetDetector->stImgInGrayDiff, pstMemMgr );
@@ -405,20 +439,7 @@ static IMP_VOID ipPreProcessCurrentImage( PEA_TARGET_DETECTOR_S *pstTargetDetect
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-IMP_MODULE_HANDLE ipCreateDetector( PEA_RESULT_S *pResult, GA_HARDWARE_RS_S *pHwResouce )
-{
-	IMP_MODULE_HANDLE hModule=NULL;
-	IpModuleDetector *pModule=NULL;
-	PEA_TARGET_DETECTOR_S *pDetector=NULL;
 
-	pModule = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(IpModuleDetector) );
-	pModule->pDetector = IMP_MMAlloc( &pHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_TARGET_DETECTOR_S) );
-	pDetector = pModule->pDetector;
-	ipCreateTargetDetectorInternal( pDetector, pResult, pHwResouce );
-
-	hModule = (IMP_MODULE_HANDLE)pModule;
-	return hModule;
-}
 
 IMP_VOID ipReleaseDetector( IMP_MODULE_HANDLE hModule )
 {
@@ -456,6 +477,7 @@ IMP_S32 IMP_PEA_ProcessDetector( IMP_MODULE_HANDLE hModule )
 //printf("ProcessDetector\n");
 	return ipProcessTargetDetectorInternal( pDetector );
 }
+
 
 IMP_S32 ipPostProcessDetector( IMP_MODULE_HANDLE hModule )
 {

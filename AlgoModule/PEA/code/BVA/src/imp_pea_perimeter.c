@@ -14,6 +14,16 @@ static IMP_S32 ipAddFreeNode(IpStaticList *pstList,IMP_S32 s32NodeId);
 static IMP_S32 ipGetFreeNum(IpStaticList *pstList);
 static IMP_S32 ipGetUsedNum(IpStaticList *pstList);
 
+
+IMP_S32 IMP_GetMemSizePerimeter(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += 0;
+	
+	return s32Size;
+}
+
 IMP_VOID ipCreatePerimeterAnalysti( IpPerimeterAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )
 {
 	memset( pstAnalyst, 0, sizeof(IpPerimeterAnalyst) );

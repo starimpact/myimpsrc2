@@ -116,6 +116,8 @@ typedef struct impModuleBehaviorAnalysis
 } IpModuleBehaviorAnalysis;
 
 
+IMP_S32 IMP_GetMemSizeBehaviorAnalysis(IMP_S32 s32Width, IMP_S32 s32Height);
+
 IMP_MODULE_HANDLE IMP_PEA_BVA_CreateBehaviorAnalysis( PEA_RESULT_S *pResult, GA_HARDWARE_RS_S *pHwResouce );
 IMP_VOID IMP_PEA_BVA_ReleaseBehaviorAnalysis( IMP_MODULE_HANDLE hModule );
 IMP_VOID IMP_PEA_BVA_ConfigBehaviorAnalysis( IMP_MODULE_HANDLE hModule, INNER_PARA_S *pVapara );

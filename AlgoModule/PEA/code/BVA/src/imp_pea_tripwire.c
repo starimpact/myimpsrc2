@@ -3,6 +3,24 @@
 #if defined(SUPPORT_TRIPWIRE)
 
 extern IpTripwireTargetData* ipGetTripwireTargetData( IMP_VOID *pData );
+
+
+IMP_S32 IMP_GetMemSizeTripwire(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	return s32Size;
+}
+
+IMP_VOID ipCreateTripwireAnalysti( IpTripwireAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )
+{
+	memset( pstAnalyst, 0, sizeof(IpTripwireAnalyst) );
+	pstAnalyst->pstResult = pstResult;
+	pstAnalyst->pstHwResource = pstHwResource;
+}
+
+
+
 IMP_VOID ipFillTargetEventDataTripwire( EVT_ITEM_S *pstEvent, IpTrackedTarget *pstTarget, RULE_S *pstRule )
 {
 	IMP_S32 s32ZoneIndex = pstEvent->u32Zone;
@@ -26,12 +44,6 @@ IMP_VOID ipFillTargetEventDataTripwire( EVT_ITEM_S *pstEvent, IpTrackedTarget *p
 	}
 }
 
-IMP_VOID ipCreateTripwireAnalysti( IpTripwireAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )
-{
-	memset( pstAnalyst, 0, sizeof(IpTripwireAnalyst) );
-	pstAnalyst->pstResult = pstResult;
-	pstAnalyst->pstHwResource = pstHwResource;
-}
 
 IMP_VOID ipReleaseTripwireAnalysti( IpTripwireAnalyst *pstAnalyst )
 {

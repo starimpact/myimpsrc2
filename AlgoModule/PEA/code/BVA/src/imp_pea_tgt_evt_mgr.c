@@ -6,6 +6,14 @@ static IMP_VOID ipClearTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr );
 static IMP_VOID ipCollectTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEvts, PEA_RESULT_S *pstResult, IMP_S32 s32Flag );
 static IMP_VOID ipClearTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEvts, PEA_RESULT_S *pstResult, IMP_S32 s32Flag );
 extern IpTripwireTargetData* ipGetTripwireTargetData( IMP_VOID *pData );
+
+IMP_S32 IMP_GetMemSizeTargetEvtMgr(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	return s32Size;
+}
+
 IMP_VOID ipCreateTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr, PEA_RESULT_S *pstResult )
 {
 	memset( pstEvtMgr, 0, sizeof(IpTargetEvtMgr) );

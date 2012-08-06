@@ -19,6 +19,7 @@ typedef struct impPEA_ModuleObjRecognition
 	GA_HARDWARE_RS_S *pstHwResouce;
 } PEA_ModuleObjRecognition;
 
+IMP_S32 IMP_GetMemSizeOfObjRecognition(IMP_S32 s32Width, IMP_S32 s32Height);
 
 IMP_MODULE_HANDLE IMP_PEA_CreateObjRecognition( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResouce );
 IMP_VOID IMP_PEA_ReleaseObjRecognition( IMP_MODULE_HANDLE hModule );

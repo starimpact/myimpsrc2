@@ -202,6 +202,18 @@ IMP_S32 IMP_FDEPTH_GetRectDimension( FDEPTH_S *pstFDepth , IMP_POINT_S *pstPos, 
 }
 
 
+IMP_S32 IMP_GetMemSizeRule(IMP_S32 s32ImgW, IMP_S32 s32ImgH)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(RULE_S);
+	s32Size += s32ImgW * s32ImgH;
+	s32Size += s32ImgW * s32ImgH;
+	
+	return s32Size;
+}
+
+
 RULE_S* IMP_RULE_Alloc( IMP_S32 s32ImgW, IMP_S32 s32ImgH, IMP_VOID *pMMgr )
 {
 	RULE_S *pRule;
@@ -1248,6 +1260,18 @@ CLBR_IALG_S stClbrIAlgCv =
 };
 //
 //////////////////////////////////////////////////////////////////////////
+
+
+IMP_S32 IMP_GetMemSizeRuleAdvPara(IMP_S32 s32BufNum, IMP_S32 s32BufLen)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += s32BufNum * s32BufLen;
+	
+	return s32Size;
+}
+
+
 IMP_VOID IMP_RULE_AdvParaAlloc( ADVANCE_PARA_S *pstAdvPara, IMP_S32 s32BufNum, IMP_S32 s32BufLen, IMP_VOID *pMemMgr )
 {
 	MEM_MGR_ARRAY_S *pstMemMgr = (MEM_MGR_ARRAY_S*)pMemMgr;

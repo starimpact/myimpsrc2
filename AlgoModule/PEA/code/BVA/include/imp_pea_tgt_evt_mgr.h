@@ -52,6 +52,9 @@ typedef struct
 	IMP_U32 au32TgtEvtIds[IMP_EVENT_CODE_NUM];
 } IpTargetEvtMgr;
 
+
+IMP_S32 IMP_GetMemSizeTargetEvtMgr(IMP_S32 s32Width, IMP_S32 s32Height);
+
 IMP_VOID ipCreateTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr, PEA_RESULT_S *pstResult );
 IMP_VOID ipReleaseTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr );
 IMP_VOID ipConfigTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr, IMP_S32 s32Flag, RULE_S *pstRule );

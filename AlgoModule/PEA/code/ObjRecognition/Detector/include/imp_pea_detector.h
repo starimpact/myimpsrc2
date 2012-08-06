@@ -104,6 +104,8 @@ typedef struct impPEA_TARGET_DETECTOR_S
 } PEA_TARGET_DETECTOR_S;
 
 
+IMP_S32 IMP_GetMemSizeDetector(IMP_S32 s32Width, IMP_S32 s32Height);
+
 IMP_VOID ipParseDetectorParaData(PEA_DETECTOR_PARA_S *pstPara );
 
 IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce );

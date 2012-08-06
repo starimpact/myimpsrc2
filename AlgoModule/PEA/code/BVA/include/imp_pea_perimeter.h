@@ -74,6 +74,8 @@ typedef struct
 	IpStaticList stStaticList;
 } IpPerimeterAnalyst;
 
+IMP_S32 IMP_GetMemSizePerimeter(IMP_S32 s32Width, IMP_S32 s32Height);
+
 IMP_VOID ipCreatePerimeterAnalysti( IpPerimeterAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource );
 IMP_VOID ipReleasePerimeterAnalysti( IpPerimeterAnalyst *pstAnalyst );
 IMP_VOID ipConfigPerimeterAnalysti( IpPerimeterAnalyst *pstAnalyst, IpPerimeterPara *pstParams );

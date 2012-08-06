@@ -8,6 +8,18 @@ static IMP_VOID ipClearRegionExtract( PEA_REGION_EXTRACT_MODULE_S *pModule )
 
 	ipShadowImageClear( &pModule->stShadowImage );
 }
+
+
+IMP_S32 IMP_GetMemSizeRegionExtract(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += IMP_GetMemSizeShadowImage(s32Width, s32Height);
+	
+	return s32Size;
+}
+
+
 IMP_VOID ipCreateRegionExtract( PEA_REGION_EXTRACT_MODULE_S *pModule, PEA_DETECTOR_DATA_S *detdata, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )
 {
 	IMP_S32 s32Height, s32Width;

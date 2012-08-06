@@ -172,6 +172,9 @@ typedef struct
 
 } IpTargetTrackerMotion;
 
+
+IMP_S32 IMP_GetMemSizeTTI(IMP_S32 s32Width, IMP_S32 s32Height);
+
 IMP_VOID ipCreateMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, GA_HARDWARE_RS_S *pstHwResource, PEA_RESULT_S *pstResult );
 IMP_VOID ipReleaseMotionTrackerInternal( IpTargetTrackerMotion *pstTracker );
 IMP_VOID ipConfigMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, IpTrackerPara *pstPara );
@@ -259,6 +262,7 @@ typedef struct
 } IpModuleTracker;
 
 
+IMP_S32 IMP_GetMemSizeTracker(IMP_S32 s32Width, IMP_S32 s32Height);
 
 IMP_MODULE_HANDLE ipCreateTracker( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce );
 IMP_VOID ipReleaseTracker( IMP_MODULE_HANDLE hModule );

@@ -23,9 +23,9 @@
 
 //#define h2
 //#define h1
-//#define d1
+#define d1
 //#define cif
-#define qcif
+//#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
@@ -42,8 +42,8 @@
 //500*476
 //500*400,500*300 have problem.
 #ifdef d1
-#define Y_WIDTH 500
-#define Y_HEIGHT 300
+#define Y_WIDTH 600
+#define Y_HEIGHT 500
 #endif
 
 #ifdef h1
@@ -53,7 +53,7 @@
 
 #ifdef h2
 #define Y_WIDTH 1920
-#define Y_HEIGHT 1088
+#define Y_HEIGHT 1080
 #endif
 
 #define U_WIDTH (Y_WIDTH/2)
@@ -537,12 +537,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
 	s32ImgW = Y_WIDTH;
 	s32ImgH = Y_HEIGHT;
-
+	
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
     
     color_dst_blob = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
     color_dst_trajectory = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3 );
-
+	
 	imageDst = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
 	hsv = cvCreateImage(cvSize(s32ImgW, s32ImgH), IPL_DEPTH_8U, 3);
 	
@@ -556,6 +556,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	
 	stMems.u32ImgW = s32Width;
 	stMems.u32ImgH = s32Height;
+	
 	IMP_PEA_HD_GetMemReq(hIMP, &stMems);
 	IMP_MemsAlloc(&stMems);
 
