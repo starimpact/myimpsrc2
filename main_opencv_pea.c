@@ -23,8 +23,8 @@
     #include <sys/time.h>
 #endif
 
-#define d1
-//#define cif
+//#define d1
+#define cif
 //#define qcif
 
 #ifdef qcif
@@ -154,136 +154,7 @@ int ReadImage(unsigned char *pImage,char *cFileName,int nWidth,int nHeight,long 
      return flag;
 }
 
-static void draw_motion_trajectory_dregion( PEA_RESULT_S *rs, IplImage *img, PROCESS_TYPE_E enFlag )
-{
-    IMP_S32 i;
-    IMP_RECT_S rc;
 
-
-	PEA_DETECTED_REGIONSET_S *rgs;
-	IMP_S8 ch[10];
-	CvFont font1;
-
-    CvScalar cr;
-	CvScalar cr_m=CV_RGB( 0, 0, 255);
-	CvScalar cr_sl=CV_RGB( 0, 255, 0 );
-	CvScalar cr_sr=CV_RGB( 255, 0, 0 );
-	CvScalar cr_suk=CV_RGB( 0,255,255 );
-	CvScalar cr_light=CV_RGB( 255, 255, 0 );
-	CvScalar cr_uk=CV_RGB( 255, 0, 255);
-
-	cvInitFont( &font1, CV_FONT_HERSHEY_SIMPLEX, 1.0, 1.0, 0, 1, CV_AA );
-
-
-	if( enFlag == IMP_PROCESS_CHG)
-	{
-		rgs = &rs->stDRegionSetChg;
-	}
-	else
-	{
-		rgs = &rs->stDRegionSet;
-	}
-
-	for( i=1; i<IMP_MAX_TGT_CNT-1; i++ )
-	{
-		if( rgs->astDrg[i].u8Used )
-		{
-			rc.s16X1 = rgs->astDrg[i].stRect.s16X1;
-			rc.s16X2 = rgs->astDrg[i].stRect.s16X2;
-			rc.s16Y1 = rgs->astDrg[i].stRect.s16Y1;
-			rc.s16Y2 = rgs->astDrg[i].stRect.s16Y2;
-			if( IMP_DRG_IS_MOTION(rgs->astDrg[i].u8Used) )
-				cr = cr_m;
-			else if( IMP_DRG_IS_STATIC_L(rgs->astDrg[i].u8Used) )
-				cr = cr_sl;
-			else if( IMP_DRG_IS_STATIC_R(rgs->astDrg[i].u8Used) )
-				cr = cr_sr;
-			else if( IMP_DRG_IS_LIGHT(rgs->astDrg[i].u8Used) )
-				cr = cr_suk;
-			else
-				cr = cr_uk;
-			if( IMP_DRG_IS_DIFF( rgs->astDrg[i].u8Used ) )
-				cr = cr_light;
-
-            cvRectangle( img, cvPoint(rc.s16X1,rc.s16Y1), cvPoint(rc.s16X2,rc.s16Y2),
-				cr, 0, CV_AA, 0 );
-			//             sprintf( ch, "%d", i );
-			// 			cvPutText( img, ch, cvPoint(rc.s16X1,rc.s16Y1), &font1, cvScalar(255,0,0,0) );
-		}
-	}
-}
-
-#if 0
-static void draw_motion_trajectory_ttarget( RESULT_S *rs,IplImage *img, IMP_S32 flag )
-{
-	IMP_S32 i, j, k, n, cnt, num,flag1,line_thickness;
-	CvScalar *pcrRect,*pcrLine;
-	IpTargetPosition *pos0, *pos1;
-	IMP_POINT_S *pt1, *pt2;
-	TGT_SET_S *tts;
-	TGT_ITEM_S *target;
-	tts = &rs->stTargetSet;
-	cnt = tts->s32TargetNum;
-    line_thickness=1;
-    flag1=0;
-    char abyText[100];
-    
-    CvFont font;
-    
-    cvInitFont(&font,CV_FONT_HERSHEY_DUPLEX ,0.35f,0.35f,0,1,CV_AA);	    
-
-	for( i=0, j=0; i<cnt; i++ )
-	{
-    //    if( target->stTargetInfo.u32TgtEvent & IMP_TGT_EVENT_PERIMETER )
-    	target = &tts->astTargets[i];
-   // 	if (target->s32Used)    
-        {
-
-			n = 0;
-			pos0 = ipTargetTrajectoryGetPosition( &target->stTrajectory, 0 );
-			num = ipTargetTrajectoryGetLength( &target->stTrajectory );
-			pt1 = &pos0->stPt;
-			pcrLine = &(colors[target->u32TargetId%12]);
-
-			if (target->stTargetInfo.u32Type==IMP_TGT_TYPE_HUMAN)
-			{
-				pcrRect = &(colors[12]);
-			}
-			else if(target->stTargetInfo.u32Type==IMP_TGT_TYPE_VEHICLE)
-			{
-				pcrRect = &(colors[1]);
-			}
-			else if (target->stTargetInfo.u32Type==IMP_TGT_TYPE_UNKNOWN)
-			{
-				pcrRect = &(colors[0]);
-			}
-			else
-			{
-				pcrRect = &(colors[4]);//
-			}
-				
-			sprintf(abyText, "%d,%d,%d", target->u32TargetId, pos0->u32AreaPixel, num);
-			cvPutText(img,abyText,cvPoint(pt1->s16X,pt1->s16Y),&font, CV_RGB(0, 255, 0));
-				
-			for( k=1; k<num; k++ )
-			{
-				pos1 = ipTargetTrajectoryGetPosition( &target->stTrajectory, -k );
-				pt2 = &pos1->stPt;
-				cvLine( img, cvPoint(pt1->s16X,pt1->s16Y), cvPoint(pt2->s16X,pt2->s16Y),
-					*pcrLine, line_thickness, CV_AA, 0 );
-				pt1 = pt2;
-			}
-            cvRectangle( img, cvPoint(pos0->stRg.s16X1,pos0->stRg.s16Y1), cvPoint(pos0->stRg.s16X2,pos0->stRg.s16Y2),*pcrRect, 0, CV_AA, 0 );
-
-		}
-
-		j += target->s32Used ? 1 : 0;
-		if( j>=cnt ) break;
-
-		target++;
-	}
-}
-#endif
 
 
 static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32 flag )
@@ -916,11 +787,9 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
         cvCvtColor( pImgGray, color_dst_blob, CV_GRAY2BGR );
         cvCvtColor( pImgGray, color_dst_trajectory, CV_GRAY2BGR );
-    //    draw_motion_trajectory_dregion(pPEA->pstResult,color_dst_blob,IMP_PROCESS_CHG);
-    //    draw_motion_trajectory_ttarget(&stResult,color_dst_blob,2);
-        //draw_classtype_trajectory_ttarget(pPEA->m_pResult, color_dst_trajectory, 1 );
+
         draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
-        //ShowTargetMsg(pModule,color_dst_trajectory);
+
         ShowPEAResult(&stResult,color_dst_blob);
 
         ShowPeaRule(&stURPpara,color_dst_blob);
@@ -1004,53 +873,24 @@ int main()
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
-#ifdef cif
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-23033-近点芦苇荡-低对比度.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11032-1.avi";
 //   IMP_S8 *fileName = "/home/zm/video/PEA/SILVER-1080.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31024-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21004-夜晚路灯-车辆逆行大灯.mpg";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31053-夜红外切换-小目标低对比.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/26P-2.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
 
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-21014-1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/yl-kjg-z.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13012.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13005.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/6.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/00016.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
-//	IMP_S8 *fileName = "/home/star/video/pea/PEA-11015-校区道路行人-自然光线变化.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13022-白天行人-快速跑动.avi";
-//	IMP_S8 *fileName = "";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/cif1.y";
-    //IMP_S8 *fileName = "../../all-1-cif.avi";
-	//IMP_S8 *fileName = "../../normal.yuv";
+
+#ifdef cif
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
 
 #ifdef d1
-//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
     m_frame_width = 720;
 	m_frame_height = 576;
 	videoFormat = IMP_D1;
 #else
-//    IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-//    IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;

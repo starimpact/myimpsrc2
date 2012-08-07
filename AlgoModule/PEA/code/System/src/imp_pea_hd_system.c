@@ -19,7 +19,7 @@ STATUS_E IMP_PEA_HD_GetMemReq(IMP_HANDLE hModule, MEM_SET_S *pstMems)
 	MEM_SET_S *pstSubMems = &pstHDInfo->stSubMems;
 	IMP_S32 s32OriW, s32OriH;
 	
-	printf("RESULT_S:%d\n", sizeof(RESULT_S));
+//	printf("RESULT_S:%d\n", sizeof(RESULT_S));
 	
 	s32OriW = pstMems->u32ImgW;
 	s32OriH = pstMems->u32ImgH;

@@ -152,60 +152,6 @@ int ReadImage(unsigned char *pImage,char *cFileName,int nWidth,int nHeight,long 
 }
 
 
-static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32 flag )
-{
-	int i, k, cnt, num,line_thickness;
-	CvScalar *pcrRect,*pcrLine;//绘图像素颜色
-	IMP_POINT_S pt1, pt2;
- 	TGT_SET_S *tts;
-	TGT_ITEM_S *target;
-
-	//tts = &rs->target_set;
-	//target = tts->targets;
-	//cnt = tts->target_num;
-
-    tts = &rs->stTargetSet;
-	target = tts->astTargets;
-	cnt = tts->s32TargetNum;
-
-	line_thickness=1;
-	//printf("cnt=%d\n",cnt);
-
-	for( i=0; i<cnt; i++ )
-	{
-		//IP_PIXVAL *pcr = &(colors[target->id%12]);
-		TGT_MOTION_ITEM_S *item_data = (TGT_MOTION_ITEM_S*)(target->au8Data);
-		TGT_TRAJECT_S *traject = &item_data->stTraject;
-
-		//printf("target->event =%d\n",target->event );
-		if(target->u32Event !=0)
-		{
-		    pcrLine = &(colors[target->u32Id%12]);
-		}
-		else
-		{
-		    pcrLine = &(colors[0]);
-		}
-
-		num = traject->s32Length;
-		//printf("num=%d\n",num);
-		pt1 = traject->stPoints[0];
-		for( k=1; k<num; k++ )
-		{
-			pt2 = traject->stPoints[k];
-			//DrawLine( img, pt1, pt2, pcr );
-			cvLine( img, cvPoint(pt1.s16X,pt1.s16Y), cvPoint(pt2.s16X,pt2.s16Y),
-					*pcrLine, line_thickness, CV_AA, 0 );
-			pt1 = pt2;
-		}
- 		//DrawRect( img, &target->rect, pcr );
- 		IMP_RECT_S *rg=&target->stRect;
-        cvRectangle( img, cvPoint(rg->s16X1,rg->s16Y1), cvPoint(rg->s16X2,rg->s16Y2),(colors[12]), 0, CV_AA, 0 );
-
-		target++;
-	}
-}
-
 
 
 //added by mzhang
@@ -665,8 +611,6 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		
 		cvCvtColor(pImgGray, color_dst_blob, CV_GRAY2BGR);
 		cvCvtColor(pImgGray, color_dst_trajectory, CV_GRAY2BGR);
-		
-		draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
 
 #if 1
         ShowPEAResult(&stResult,color_dst_blob);

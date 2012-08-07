@@ -172,12 +172,19 @@ IMP_S32 IMP_GetMemSize(IMP_S32 s32Width, IMP_S32 s32Height)
 {
 	IMP_S32 s32Size = 0;
 	
+//	printf("INNER_PARA_S:%d\n", sizeof(INNER_PARA_S));
 	s32Size += sizeof(INNER_PARA_S);
+//	printf("GetMemSizeRule:%d\n", IMP_GetMemSizeRule(s32Width, s32Height));
 	s32Size += IMP_GetMemSizeRule(s32Width, s32Height);//IMP_RULE_Alloc
+//	printf("GetMemSizeRuleAdvPara:%d\n", IMP_GetMemSizeRuleAdvPara(IMP_VPARAADVBUFNUM_MAX, IMP_PARA_ADVBUF_BUFLEN));
 	s32Size += IMP_GetMemSizeRuleAdvPara(IMP_VPARAADVBUFNUM_MAX, IMP_PARA_ADVBUF_BUFLEN);//IMP_RULE_AdvParaAlloc
+//	printf("PEA_SYSTEM_PARA_S:%d\n", sizeof(PEA_SYSTEM_PARA_S));
 	s32Size += sizeof(PEA_SYSTEM_PARA_S);//
+//	printf("PEA_RESULT_S:%d\n", sizeof(PEA_RESULT_S));
 	s32Size += sizeof(PEA_RESULT_S);
+//	printf("GetMemSizeOfObjRecognition:%d\n", IMP_GetMemSizeOfObjRecognition(s32Width, s32Height));
 	s32Size += IMP_GetMemSizeOfObjRecognition(s32Width, s32Height);
+//	printf("GetMemSizeBehaviorAnalysis:%d\n", IMP_GetMemSizeBehaviorAnalysis(s32Width, s32Height));
 	s32Size += IMP_GetMemSizeBehaviorAnalysis(s32Width, s32Height);
 	
 //	printf("system memeory size:%d\n", s32Size);
@@ -195,7 +202,7 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	GA_HARDWARE_RS_S *pHwRes = &pModule->stHwRes;
 	MEM_MGR_ARRAY_S *pMemMgr = &pHwRes->stMemMgr;
 	MEM_MGR_REQ_S sNReq;
-	IMP_S32 s32ImgW, s32ImgH;
+	IMP_S32 s32ImgW, s32ImgH, s32MemSize, s32MemSize2;
 	IMP_S32 s32Res = IMP_STATUS_OK;
 
 #ifdef TD_LICENSE_CHECK
@@ -221,6 +228,9 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 		return IMP_STATUS_FALSE;
 	}
 #endif
+
+//	printf("==============================\n");
+	
 	s32ImgW = pstMems->u32ImgW;
 	s32ImgH = pstMems->u32ImgH;
 	memset( pModule, 0, sizeof(PEA_MODULE) );
@@ -236,20 +246,38 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 //	printf("memory length:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemLen);
 
 	// init module( rule modeling )
+//	s32MemSize = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
 	pModule->pstInnerPara = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(INNER_PARA_S) );
-
- 	pModule->pstInnerPara->pRule = IMP_RULE_Alloc( s32ImgW, s32ImgH, pMemMgr );
+//	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("INNER_PARA_S:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
+	
+	pModule->pstInnerPara->pRule = IMP_RULE_Alloc( s32ImgW, s32ImgH, pMemMgr );
+// 	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("RULE_Alloc:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
+	
  	IMP_RULE_AdvParaAlloc( &pModule->pstInnerPara->stAdvance, IMP_VPARAADVBUFNUM_MAX,
 					IMP_PARA_ADVBUF_BUFLEN, pMemMgr );
+//	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("AdvParaAlloc:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
+	
 	IMP_RULE_InitParaPea( pModule->pstInnerPara, pMemMgr );
 
 	// init parameter
 	pModule->pstSysPara = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_SYSTEM_PARA_S) );
+//	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("PEA_SYSTEM_PARA_S:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 
 	memset( pModule->pstSysPara, 0, sizeof(PEA_SYSTEM_PARA_S) );
 
 	// init result
 	pModule->pstResult = IMP_MMAlloc( pMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_RESULT_S) );
+//	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("PEA_RESULT_S:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 
 	IMP_PEA_ResultInit( pModule->pstResult, s32ImgW, s32ImgH, pMemMgr );
 	
@@ -259,12 +287,17 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	
 	// init module( object recognition )
 	pModule->hObjRecg = IMP_PEA_CreateObjRecognition( pModule->pstResult, &pModule->stHwRes ); //memory allocation error
-
+//	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("CreateObjRecognition:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 //	printf("CreateObjRecognition:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
 	
 	// init module( event analysis )
  	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
-
+	
+//	s32MemSize2 = pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("CreateBehaviorAnalysis:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 //	printf( "max used mem is (%d, %d)\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemLen, pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax );
 	
 //	exit(0);
@@ -297,7 +330,7 @@ STATUS_E IMP_Release( IMP_HANDLE hModule )
 	IMP_RULE_Free( pModule->pstInnerPara->pRule, pMemMgr );
 	IMP_MMFree( pMemMgr, IMP_MEMBLK_TYPE_SLOW, pModule->pstInnerPara );
 	
-	printf("MemMax:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+//	printf("MemMax:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
 	
 	// terminate memory
 	IMP_MMTerminate( pMemMgr );
@@ -1190,6 +1223,7 @@ static IMP_VOID IMP_PEA_OutputWaterMark(PEA_MODULE *pPEA,TGT_SET_S *pstTargetSet
 	pstTarget[k].u32Event = IMP_TGT_EVENT_PERIMETER ;
 	IMP_SET_TGT_STABLE(pstTarget[k].u32Status);
 	IMP_SET_TGT_MEASURED(pstTarget[k].u32Status);
+
 	IMP_SET_TGT_MTREND(pstTarget[k].u32Status);
 	memcpy( &pstTarget[k].stRect, &pstPara->M[2], sizeof(IMP_RECT_S) );
 	stPt.s16X=(pstPara->M[2].s16X2+pstPara->M[2].s16X1)>>1;

@@ -713,6 +713,7 @@ static IMP_S32 ipAnalysisBehaviorPerimeterEnter( IpPerimeterPara *pstParams, IpT
 	s32Ret = ipIsEnter(pstTarget,pstImage,s32ZoneIndex,pstParams);
 	if(	1
 		&& ipPerimeterIsAccordantType( pstParams, pstPeriPara, pstTarget )
+
 		&& s32Ret
 		)
 	{
@@ -1436,10 +1437,14 @@ IMP_VOID ipFillTargetEventDataPerimeter( EVT_ITEM_S *pstEvent, IpTrackedTarget *
 {
 	IMP_S32 s32ZoneIndex = pstEvent->u32Zone;
 	RULE_ZONE_S *pstZone = &pstRule->stZones.astZone[s32ZoneIndex];
-	IpTargetPosition *pstPos = ipTargetTrajectoryGetPosition(&pstTarget->stTrajectory,0);
 	EVT_DATA_PERIMETER_S *pstData = (EVT_DATA_PERIMETER_S *)pstEvent->au8Data;
-
-	memcpy(&pstData->stRect,&pstPos->stRg,sizeof(IMP_RECT_S));
+	IpTargetPosition *pstPos = 0;
+	
+	if (pstTarget)
+	{
+		pstPos = ipTargetTrajectoryGetPosition(&pstTarget->stTrajectory, 0);
+		memcpy(&pstData->stRect,&pstPos->stRg,sizeof(IMP_RECT_S));
+	}
 	pstData->stRule.u32Mode = pstZone->stPara.stPerimeter.s32Mode;
 }
 

@@ -107,6 +107,8 @@ STATUS_E IMP_OSC_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	s32ImgW = pstMems->u32ImgW;
 	s32ImgH = pstMems->u32ImgH;
 	memset( pModule, 0, sizeof(PEA_MODULE) );
+	
+//	printf("==============================\n");
 
 	// init memory
 	sNReq.au32NodNum[IMP_MEMBLK_TYPE_FAST] = FAST_RAM_NODE_NUM;
@@ -143,7 +145,10 @@ STATUS_E IMP_OSC_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 
 	// init module( event analysis )
  	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
+ 	
+ //	printf( "max used mem is (%d, %d)\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemLen, pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax );
 
+	exit(0);
 	return IMP_STATUS_OK;
 }
 
@@ -172,7 +177,7 @@ STATUS_E IMP_OSC_Release( IMP_HANDLE hModule )
 	IMP_RULE_Free( pModule->pstInnerPara->pRule, pMemMgr );
 	IMP_MMFree( pMemMgr, IMP_MEMBLK_TYPE_SLOW, pModule->pstInnerPara );
 
-	printf("MemMax:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
+//	printf("MemMax:%d\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax);
 	
 	// terminate memory
 	IMP_MMTerminate( pMemMgr );

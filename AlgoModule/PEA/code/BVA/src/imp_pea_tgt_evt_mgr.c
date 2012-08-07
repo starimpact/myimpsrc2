@@ -74,7 +74,6 @@ static EVT_ITEM_S* ipAddTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEv
 
 	pstEvt = IMP_EVT_SET_AddEvent( pstEvts, u32Type, u32EvtId, u32Level, u32Status, u32Zone );
 	if( !pstEvt ) return NULL;
-
 	if(IMP_EVT_STATUS_START == u32Status && IMP_EVT_TYPE_AlarmTripwire == pstEvt->u32Type)
 	{
 		pstTargetData = ipGetTripwireTargetData( pstTarget->stPrivateData.pDataAnalyst );
@@ -114,6 +113,17 @@ static EVT_ITEM_S* ipAddTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEv
         return pstEvt;
 
     }
+    
+	if(!pstTarget && IMP_EVT_STATUS_END == u32Status && IMP_EVT_TYPE_AlarmPerimeter == pstEvt->u32Type)
+  	{
+		IMP_S32 s32ZoneIndex = pstEvt->u32Zone;
+		RULE_ZONE_S *pstZone = &pstEvtMgr->pstRule->stZones.astZone[s32ZoneIndex];
+		EVT_DATA_PERIMETER_S *pstData = (EVT_DATA_PERIMETER_S*)pstEvt->au8Data;
+		
+		memset(&pstData->stRect, 0,sizeof(IMP_RECT_S));
+		pstData->stRule.u32Mode = pstZone->stPara.stPerimeter.s32Mode;
+    }
+    
 	if( !pstTarget /*|| IMP_EVT_STATUS_END == u32Status*/)
 	{
         return pstEvt;
@@ -154,7 +164,7 @@ static IMP_VOID ipCollectHelper11( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEvts
 
 	u32TargetId = pstTarget->u32TargetId;
 	u32TgtEvent = pstTarget->stTargetInfo.u32TgtEvent;
-
+	
 	for( i=0; i<IMP_MAX_NUM_RULE_ZONE; i++ )
 	{
 		u32Zone = &pstEvtMgr->pstRule->stZones.astZone[i];
@@ -178,17 +188,19 @@ static IMP_VOID ipCollectHelper11( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEvts
 				//				pstRecord->au32EvtId[i][j] = 0;
 				//				u32EvtId = 0;
 				//			}
-
+				
 				if( !u32EvtId )
 				{
 					u32EvtId = ipGetEventID(pstEvtMgr);
 					ipAddTargetEvent( pstEvtMgr, pstEvts, u32VEvent, u32EvtId, u32Level, IMP_EVT_STATUS_START, i, u32TargetId, pstTarget );
 					pstRecord->au32EvtId[i][j] = u32EvtId;
+					
 				}
 				else
 				{
 					//u32EvtId = ipGetEventID(pstEvtMgr);
 					ipAddTargetEvent( pstEvtMgr, pstEvts, u32VEvent, u32EvtId, u32Level, IMP_EVT_STATUS_PROCEDURE, i, u32TargetId, pstTarget );
+					
 					//pstRecord->au32EvtId[i][j] = u32EvtId;
 				}
 			}
@@ -300,9 +312,7 @@ static IMP_VOID ipCollectTargetEventEvery( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S 
 			ipCollectHelper01(pstEvtMgr, pstEvts, pstRecord, pstTarget);
 		//	printf("pstTarget_[%d]_ID:%d;  ", i, pstTarget->u32TargetId);
 		}
-
-
-
+		
 		pstRecord++;
 		pstTarget++;
 	}

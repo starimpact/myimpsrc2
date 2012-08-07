@@ -3,11 +3,15 @@
 
 IMP_S32 IMP_GetMemSizeOfObjRecognition(IMP_S32 s32Width, IMP_S32 s32Height)
 {
-	IMP_S32 s32Size = 0;
+	IMP_S32 s32Size = 0, s32Size1 = 0;
 	
 	s32Size += sizeof(PEA_ModuleObjRecognition);
-	s32Size += IMP_GetMemSizeDetector(s32Width, s32Height);
-	s32Size += IMP_GetMemSizeTracker(s32Width, s32Height);
+	s32Size1 = IMP_GetMemSizeDetector(s32Width, s32Height);
+//	printf("GetMemSizeDetector:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeTracker(s32Width, s32Height);
+//	printf("GetMemSizeTracker:%d\n", s32Size1);
+	s32Size += s32Size1;
 	
 	return s32Size;
 }
@@ -16,15 +20,23 @@ IMP_MODULE_HANDLE IMP_PEA_CreateObjRecognition( PEA_RESULT_S *pstResult, GA_HARD
 {
 	IMP_MODULE_HANDLE hModule=NULL;
 	PEA_ModuleObjRecognition *pModule=NULL;
-	IMP_S32 s32Size1 = 0, s32Size2 = 0;
+	IMP_S32 s32Size1 = 0, s32Size2 = 0, s32MemSize, s32MemSize2;
 
+//	s32MemSize = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
 	pModule = IMP_MMAlloc( &pstHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_ModuleObjRecognition) );	// 64
+//	s32MemSize2 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("PEA_ModuleObjRecognition:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 	
-	s32Size1 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
 	pModule->hDetector = ipCreateDetector( pstResult, pstHwResouce );
-	s32Size2 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	s32MemSize2 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("ipCreateDetector:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 	
 	pModule->hTracker = ipCreateTracker( pstResult, pstHwResouce );
+//	s32MemSize2 = pstHwResouce->stMemMgr.astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("ipCreateTracker:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 
 	pModule->pstResult = pstResult;
 	pModule->pstHwResouce = pstHwResouce;

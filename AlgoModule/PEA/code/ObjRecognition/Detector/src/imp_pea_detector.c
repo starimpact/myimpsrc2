@@ -11,14 +11,23 @@ IMP_VOID IMP_PEA_DetectorDataClear( PEA_DETECTOR_DATA_S *pstData )
 
 IMP_S32 IMP_GetMemSizeDetector(IMP_S32 s32Width, IMP_S32 s32Height)
 {
-	IMP_S32 s32Size = 0;
+	IMP_S32 s32Size = 0, s32Size1 = 0;
 	
 	s32Size += sizeof(IpModuleDetector);
 	s32Size += sizeof(PEA_TARGET_DETECTOR_S);
-	s32Size += IMP_GetMemSizeViBe(s32Width, s32Height);
-	s32Size += IMP_GetMemSizeOSCD(s32Width, s32Height);
-	s32Size += IMP_GetMemSizeWaterMarker(s32Width, s32Height);
-	s32Size += IMP_GetMemSizeRegionExtract(s32Width, s32Height);
+	s32Size1 = IMP_GetMemSizeViBe(s32Width, s32Height);	
+//	printf("GetMemSizeViBe:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeOSCD(s32Width, s32Height);
+//	printf("GetMemSizeOSCD:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeWaterMarker(s32Width, s32Height);
+//	printf("GetMemSizeWaterMarker:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeRegionExtract(s32Width, s32Height);
+//	printf("GetMemSizeRegionExtract:%d\n", s32Size1);
+	s32Size += s32Size1;
+//	printf("s32Width * s32Height * 20:%d\n", s32Width * s32Height * 20);
 	s32Size += s32Width * s32Height * 20;
 	
 	return s32Size;
@@ -45,7 +54,7 @@ IMP_MODULE_HANDLE ipCreateDetector( PEA_RESULT_S *pResult, GA_HARDWARE_RS_S *pHw
 
 IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce )
 {
-	IMP_S32 s32Height, s32Width;
+	IMP_S32 s32Height, s32Width, s32MemSize, s32MemSize2;
 	MEM_MGR_ARRAY_S *pstMemMgr;
     PEA_DETECTED_REGIONSET_S *pstRegionSet;
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
@@ -57,10 +66,25 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	pstTargetDetector->pstResult = pstResult;
 
 	//create and init ViBe model
-	pstTargetDetector->hViBeModel = IMP_CreateViBe( pstResult, pHwResouce );
+//	s32MemSize = pstMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
 	
-	pstTargetDetector->hOSCDModel = IMP_CreateOSCD( pstResult, pHwResouce );
+	pstTargetDetector->hViBeModel = IMP_CreateViBe( pstResult, pHwResouce );
 
+//	s32MemSize2 = pstMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("hViBeModel:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
+	
+if (pstResult->s32ModuleSwitch & 2)
+{
+	pstTargetDetector->hOSCDModel = IMP_CreateOSCD( pstResult, pHwResouce );
+}
+
+//	s32MemSize2 = pstMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("hOSCDModel:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
+	
+//	s32MemSize = pstMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+	
 #ifdef USE_WATERMARK_DETECOTR
 	ipCreateWaterMarkDetector(&pstTargetDetector->stWaterMarkDetector,pstResult,pHwResouce);
 #endif
@@ -96,6 +120,9 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	IMP_GrayImageCreate( &pstTargetDetector->pstImgBgEdgeG, s32Width, s32Height, pstMemMgr );
 #endif
 
+//	s32MemSize2 = pstMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax;
+//	printf("s32Width * s32Height * 20:%d\n", s32MemSize2 - s32MemSize);
+//	s32MemSize = s32MemSize2;
 	
 	{
 		
@@ -160,6 +187,7 @@ IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector )
 {
 	MEM_MGR_ARRAY_S *pstMemMgr = &pstTargetDetector->pstHwResource->stMemMgr;
+	PEA_RESULT_S *pstResult = pstTargetDetector->pstResult;
 	
 #ifdef ACCUM_BGEDGE
 	IMP_GrayImageDestroy( &pstTargetDetector->pstImgBgEdgeG, pstMemMgr );
@@ -213,7 +241,10 @@ IMP_VOID ipReleaseTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetect
 	//release image
 	IMP_ReleaseViBe(pstTargetDetector->hViBeModel);
 	
-	IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
+	if (pstResult->s32ModuleSwitch & 2)
+	{
+		IMP_ReleaseOSCD(pstTargetDetector->hOSCDModel);
+	}
 	
 	memset( pstTargetDetector, 0, sizeof(PEA_TARGET_DETECTOR_S) );
 }
@@ -223,11 +254,14 @@ IMP_VOID ipConfigTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	IMP_S32 s32FrmDura = pstPara->s32FrmDura;
 	PEA_DETECTOR_PARA_S *pstDetPara = &pstTargetDetector->stPara;
 	PEA_DETECTOR_DATA_S *pstDetData = &pstTargetDetector->stData;
-	IMP_OSCDPara_S stOSCDPara;
+	PEA_RESULT_S *pstResult = pstTargetDetector->pstResult;
 	
-	stOSCDPara.pstRule = pstPara->pstRule;
-	
-	IMP_ConfigOSCD(pstTargetDetector->hOSCDModel, &stOSCDPara);
+	if (pstResult->s32ModuleSwitch & 2)
+	{
+		IMP_OSCDPara_S stOSCDPara;
+		stOSCDPara.pstRule = pstPara->pstRule;
+		IMP_ConfigOSCD(pstTargetDetector->hOSCDModel, &stOSCDPara);
+	}
 	
 	memcpy( pstDetPara, pstPara, sizeof(PEA_DETECTOR_PARA_S) );
 	{
@@ -251,6 +285,7 @@ IMP_VOID ipConfigTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 // clear
 static IMP_VOID ipClearTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector )
 {
+	
 #ifdef ACCUM_BGEDGE
 	pstTargetDetector->stData.pstImgBgEdgeG = &pstTargetDetector->pstImgBgEdgeG;
 #else
@@ -376,7 +411,8 @@ printf("vibe:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 
 #endif //VIBE
 
-
+if (pstResult->s32ModuleSwitch & 2)
+{
 #if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif
@@ -385,7 +421,7 @@ gettimeofday(&t1, NULL);
 gettimeofday(&t2, NULL);
 printf("IMP_ProcessOSCD:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
-
+}
 
 if (pstResult->s32ModuleSwitch & 1)
 {
@@ -504,8 +540,8 @@ static IMP_VOID ipForceVapara2DetectorPara( INNER_PARA_S *pstParaInner, PEA_DETE
 	pstUsrAdvPara = (USR_ADV_PARA_S*)pstRule->u8AdvParaData;
 
 	pstPara->s32FrmDura = pstGlobalPara->s32TimeUnit;
-
-
+	
+	
 	u32FuncUseMotion = IMP_FUNC_PERIMETER
 					| IMP_FUNC_TRIPWIRE
 					| IMP_FUNC_MTRIPWIRE

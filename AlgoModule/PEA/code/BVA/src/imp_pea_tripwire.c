@@ -29,8 +29,10 @@ IMP_VOID ipFillTargetEventDataTripwire( EVT_ITEM_S *pstEvent, IpTrackedTarget *p
 	EVT_DATA_TRIPWIRE_S *pData = (EVT_DATA_TRIPWIRE_S *)pstEvent->au8Data;
     IpTripwireTargetData *pstTargetData = ipGetTripwireTargetData( pstTarget->stPrivateData.pDataAnalyst );
 	IMP_S32 s32LineIndex = 0;
+	
 	if (pstEvent->u32Status == IMP_EVT_STATUS_START || pstEvent->u32Status == IMP_EVT_STATUS_PROCEDURE)
 	{
+		pstPos = ipTargetTrajectoryGetPosition(&pstTarget->stTrajectory,0);
 		memcpy(&pData->stRect,&pstPos->stRg,sizeof(IMP_RECT_S));
 	}
 

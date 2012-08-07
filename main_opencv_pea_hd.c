@@ -309,20 +309,19 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
     //printf("event num:%d\n",result->stEventSet.s32EventNum);
     for(i=0;i<result->stEventSet.s32EventNum;i++)
     {
+    	pdataPerimeter=(EVT_DATA_PERIMETER_S*)(result->stEventSet.astEvents[i].au8Data);
+    	
+
         if(result->stEventSet.astEvents[i].u32Status==IMP_EVT_STATUS_START)
         {
             if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
                 zone=result->stEventSet.astEvents[i].u32Zone;
                // printf("Target:%d perimeter start \n",result->stEventSet.astEvents[i].u32Id);
-
-                pdataPerimeter=(EVT_DATA_PERIMETER_S*)(result->stEventSet.astEvents[i].au8Data);
-
-			    //Send VCA Alarm Msg
-			    for (k = 0; k < result->stTargetSet.s32TargetNum; k++)
-			    {
-				    if (pdataPerimeter->u32TId == result->stTargetSet.astTargets[k].u32Id)
-				    {
+				for (k = 0; k < result->stTargetSet.s32TargetNum; k++)
+				{
+					if (pdataPerimeter->u32TId == result->stTargetSet.astTargets[k].u32Id)
+					{
                       width = result->stTargetSet.astTargets[k].stRect.s16X2 - result->stTargetSet.astTargets[k].stRect.s16X1;
                       height = result->stTargetSet.astTargets[k].stRect.s16Y2 - result->stTargetSet.astTargets[k].stRect.s16Y1;
 
@@ -332,7 +331,7 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
                             printf("zone: %d, event: %s, state: 0, tid: %u, type: %s\n",
 				 		                    zone, "perimeter", pdataPerimeter->u32TId,
 				 		                   "HUMAN");
-                        }
+                       }
 				       else if(result->stTargetSet.astTargets[k].u32Type == IMP_TGT_TYPE_VEHICLE)
 				       {
                             printf("zone: %d, event: %s, state: 0, tid: %u, type: %s\n",
@@ -349,16 +348,15 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
 						break;
 				    }
 			    }
-
-
             }
+        } 
 
-        }
+
         if(result->stEventSet.astEvents[i].u32Status == IMP_EVT_STATUS_PROCEDURE)
         {
             if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
-
+			//	printf("id_%d_perimeter type 2:%d\n", pdataPerimeter->u32TId, pdataPerimeter->stRule.u32Mode);
                 zone=result->stEventSet.astEvents[i].u32Zone;
 
             }
@@ -367,13 +365,15 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
         }
         else if(result->stEventSet.astEvents[i].u32Status==IMP_EVT_STATUS_END)
         {
-
+				
             pcrRect = &(colors[2]);
              if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
-
+			//	printf("id_%d_perimeter type 3:%d\n", pdataPerimeter->u32TId, pdataPerimeter->stRule.u32Mode);
+				cvWaitKey(0);
             }
         }
+       
     }
     //printf("rec_count=%d\n",rec_count);
 }
@@ -393,23 +393,26 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
 		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_PERIMETER;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeLimit = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeHuman = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeVehicle = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32DirectionLimit = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32ForbiddenDirection = 180;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinDist = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinTime = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.s32BoundaryPtNum = 4;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16X = 340;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16X = 340;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16Y = 270;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 270;
+		
+		URP_PERIMETER_RULE_PARA_S *pstP = &stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara;
+		
+		pstP->s32Mode = IMP_URP_PMODE_ENTER; //IMP_URP_PMODE_INTRUSION; //;
+		pstP->s32TypeLimit = 0;
+		pstP->s32TypeHuman = 1;
+		pstP->s32TypeVehicle = 1;
+		pstP->stLimitPara.s32DirectionLimit = 0;
+		pstP->stLimitPara.s32ForbiddenDirection = 180;
+		pstP->stLimitPara.s32MinDist = 0;
+		pstP->stLimitPara.s32MinTime = 0;
+		pstP->stLimitPara.stBoundary.s32BoundaryPtNum = 4;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[0].s16X = 50;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 50;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[1].s16X = 240;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 100;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[2].s16X = 240;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[2].s16Y = 200;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
+		pstP->stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 200;
 
 	//	stURPpara.stRuleSet.astRule[0].u32Enable = 0;
 	//	stURPpara.stRuleSet.astRule[0].u32Valid = 1;
