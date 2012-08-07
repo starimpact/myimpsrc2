@@ -338,7 +338,8 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 			type = 'h';
 		}
 		
-		sprintf(abyText, "%d:%c,%d", target->u32Id, type, num);
+	//	sprintf(abyText, "%d:%c,%d", target->u32Id, type, num);
+		sprintf(abyText, "%d:%d", target->u32Id, num);
 		cvPutText(img,abyText,cvPoint(pt1.s16X,pt1.s16Y),&font, CV_RGB(0, 255, 0));
 		
 		for( k=1; k<num; k++ )
@@ -570,8 +571,8 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinDist = 0;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinTime = 0;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.s32BoundaryPtNum = 4;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 10;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 50;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 50;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16X = 340;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 10;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16X = 340;

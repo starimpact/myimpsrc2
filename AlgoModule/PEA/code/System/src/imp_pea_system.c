@@ -513,7 +513,8 @@ static STATUS_E IMP_TansURPToInnerData(URP_PARA_S *pURPpara, RULE_S *pRule)
 	USR_ADV_PARA_S *pstUsrAdvPara = (USR_ADV_PARA_S *)pRule->u8AdvParaData;
 
       memcpy(&pstUsrAdvPara->stParaUrp,&pURPpara->stAdvancePara,sizeof(URP_ADVANCE_PARA_S));
-
+	
+//	memset(pu8ZoneData, 0, s32ImgW * s32ImgH);
 	for( s32ZoneIndex = 0; s32ZoneIndex < 8; s32ZoneIndex++ )
 	{
 		pRule->stZones.astZone[s32ZoneIndex].u32Valid = pURPpara->stRuleSet.astRule[s32ZoneIndex].u32Valid;
@@ -564,6 +565,7 @@ static STATUS_E IMP_TansURPToInnerData(URP_PARA_S *pURPpara, RULE_S *pRule)
 				if(stPoly.s32BoundaryPtNum >2 && !InsidePolygon(polygon,s32Np,p))
 				{
 					pRule->stZones.stImage.pu8Data[n] |= (1 <<s32ZoneIndex);
+					
 				}
 				else
 				{
@@ -572,6 +574,7 @@ static STATUS_E IMP_TansURPToInnerData(URP_PARA_S *pURPpara, RULE_S *pRule)
 			}
 		}
 	}
+
 	return enRet;
 }
 
@@ -1445,7 +1448,8 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 	IpTrackedTarget *pstTTarget = pstTTargetSet->astTargets;
 	IpTargetPosition *pstPos;
 	IMP_S32 s32TrjDist2 = (s32TrajectDist * s32TrajectDist);
-
+	
+//	printf("s32TrjDist2:%d\n", s32TrajectDist);
 	k = pstTargetSet->s32TargetNum;
 //	printf("OutputTargetSet target num:%d\n", pstTTargetSet->s32UsedTotal);
 	for( i = 0, j = 0; i < IMP_MAX_TGT_CNT; i++ )
@@ -1454,7 +1458,7 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 			continue;
 		
 	//	printf("hello:%d,%d\n", i,j);
-		if( s32TrjDist2 )
+		if(s32TrjDist2)
 		{
 			IMP_S32 m, s32Num;
 			IMP_S32 x0, x1, y0, y1;
@@ -1503,7 +1507,7 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 			&& ( s32OutputAllTgts==1 || ( s32OutputAllTgts==2 && ipTrackedTargetIsActiveMeasuredMtrend(&pstTTarget[i]) ) || pstTTarget[i].stTargetInfo.u32TgtEvent!=IMP_TGT_EVENT_UNKNOWN )
 			)
 		{
-		//	printf("hahahaha:%d,%d\n", i,j);
+		//	printf("hahahaha:%d,%d\n", pstTTarget[i].u32TargetId, pstTTarget[i].stTrajectory.s32Num);
 			
 			pstTarget[k].u32Id= pstTTarget[i].u32TargetId;
 			pstTarget[k].u32Type = pstTTarget[i].stTargetInfo.u32Type;
@@ -1536,6 +1540,7 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 					}
 				}
 				traject->s32Length = n;
+			//	printf("---------------%d, %d\n", n, IMP_MAX_TRAJECT_LEN);
 			}
 
 			k++;

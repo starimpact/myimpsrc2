@@ -133,7 +133,7 @@ static IMP_S32 ipPreProcessPerimeterAnalystInternal( IpPerimeterAnalyst *pstAnal
 		}
 		u8ZoneValue = 0;
 		
-	//	printf("id_%d\n", pstTarget->u32TargetId);
+	//	
 #ifdef SUPPORT_PERIMETER
 
 	/*	if (!pstAnalyst->safe_dis_det_set_flag)
@@ -141,7 +141,7 @@ static IMP_S32 ipPreProcessPerimeterAnalystInternal( IpPerimeterAnalyst *pstAnal
 			ipSafeDistanceDetectionZonesSet(pstAnalyst);
 			pstAnalyst->safe_dis_det_set_flag = 1;
 		}*/
-
+		
 		////////////////////////////////////////////
 		for( s32ZoneIndex = 0; s32ZoneIndex < IMP_MAX_NUM_RULE_ZONE; s32ZoneIndex++ )
 		{
@@ -256,6 +256,7 @@ IMP_S32 ipProcessPerimeterAnalystInternal( IpPerimeterAnalyst *pstAnalyst )
 				{
 					if ( pstParams->s32PerimeterUseMtrend && IMP_IS_TGT_MTREND(pstTarget->stTargetInfo.u32Status) )
 					{
+					
 						ipAnalysisBehaviorPerimeter( pstParams, pstTarget, s32ZoneIndex );
 					}
 					if ( !pstParams->s32PerimeterUseMtrend )

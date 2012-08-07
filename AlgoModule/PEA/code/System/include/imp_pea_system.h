@@ -107,7 +107,7 @@ typedef struct
 #define IMP_PROCESSOR_OUTPUT_PREDICTED 0
 #define IMP_PROCESSOR_PTZ_TGTEVTS 0
 #define IMP_PROCESSOR_PROC_INTERVAL 0//120 what's it
-#define IMP_PROCESSOR_TRAJECT_DIST 8
+#define IMP_PROCESSOR_TRAJECT_DIST 3//8
 #define IMP_PROCESSOR_FRM_DURA 20 //40 why is it 40, maybe 25, for the detect, same to imp_para.c:pstPara->stGlobal.s32TimeUnit
 
 

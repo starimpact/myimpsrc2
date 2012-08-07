@@ -9,6 +9,8 @@ IMP_S32 ipZoneObjectAvailable( IpTrackedTarget *pstTarget, GRAY_IMAGE_S *pstImag
 	pstPos = ipTargetTrajectoryGetPosition( &pstTarget->stTrajectory, 0 );
 	u8PixelVal = IMP_GrayImageGetPixelVal( pstImage, pstPos->stPt.s16X, pstPos->stPt.s16Y );
 	s32Ret = ( u8PixelVal>>s32ZoneIndex & 0x01 );
+	
+//	printf("id_%d:%d,%d,ret:%d\n", pstTarget->u32TargetId, pstPos->stPt.s16X, pstPos->stPt.s16Y, s32Ret);
 
 	return s32Ret;
 }
@@ -269,10 +271,9 @@ IMP_S32 ipZoneObjectEffective( IpTrackedTarget *pstTarget, GRAY_IMAGE_S *pstImag
 	IMP_S32 s32Tmp = 0,s32TmpX = 0;
 	IMP_S32 s32Width = pstImage->s32W;
 
-	if(s32DelicacyFlag)
+	if(0&&s32DelicacyFlag)
 	{
 		s32Ratio = ipComputeTargetInZoneRatio(pstTarget,pstImage,s32ZoneIndex);
-
 		if (s32Ratio >= s32AreaRatio)
 		{
 			s32Ret = IMP_TRUE;

@@ -281,7 +281,7 @@ static IMP_VOID ipPreProcessCurrentImage( PEA_TARGET_DETECTOR_S *pstTargetDetect
 
 IMP_S32 ipProcessTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector )
 {
-#define PTDI_TIME 0
+#define PTDI_TIME 1
 	PEA_STATUS_S *pstStatus = &pstTargetDetector->pstResult->stSysStatus;
     PEA_DETECTED_REGIONSET_S *pstRegionSet = 0;
 	GRAY_IMAGE_S *pstImgFrmDiff = 0;
@@ -418,6 +418,7 @@ gettimeofday(&t2, NULL);
 printf("ipProcessRegionExtract:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 }
+
 //printf("ipProcessTargetDetectorInternal:8\n");
 	return 1;
 }

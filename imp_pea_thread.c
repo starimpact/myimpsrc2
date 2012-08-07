@@ -78,10 +78,10 @@ gettimeofday(&t1, NULL);
         HI_MPI_VI_ReleaseFrame(ViDev, ViChn, &stFrame);
 
         // Process Image
-//		IMP_ProcessImage( hIMP, &stImage );
+		IMP_ProcessImage( hIMP, &stImage );
 
         // Get Algo Result
-//		IMP_GetResults( hIMP, &stResult );
+		IMP_GetResults( hIMP, &stResult );
 
 gettimeofday(&t2, NULL);
 printf("out:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);

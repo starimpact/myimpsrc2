@@ -2,38 +2,6 @@
 #include "time.h"
 #include "stdlib.h"
 
-
-IMP_S32 IMP_ShowImg(IMP_UCHAR*srcGray,IMP_S32 Height,IMP_S32 Width,IMP_UCHAR*widoName)
-{
-	IMP_S32 width;
-	IMP_S32 height;
-	IMP_UCHAR *P1;
-	IMP_UCHAR *P2;
-	IplImage*src;
-	
-	if(!srcGray)
-	{
-	  printf("The input of IMP_ShowImg is wrong!\n");
-	  return 0;
-	}
-	
-	src=cvCreateImage(cvSize(Width,Height),IPL_DEPTH_8U,1);
-	
-	for (height=Height;height>0;height--)
-	{
-		P1=(IMP_UCHAR*)(src->imageData+(height-1)*src->widthStep);
-		P2=srcGray+(height-1)*Width;
-		for (width=Width;width>0;width--)
-		{
-			P1[width-1]=P2[width-1];
-		}
-	}
-	cvShowImage(widoName,src);
-	//cvWaitKey(1);
-	cvReleaseImage(&src);
-	return 1;
-}
-
 IMP_S32 IMP_BinaryImg(IMP_UCHAR *srcGray,IMP_UCHAR *BinMask,IMP_S32 val,IMP_S32 Lenght)
 {
 	IMP_S32 lenght;
@@ -55,30 +23,17 @@ IMP_S32 IMP_BinaryImg(IMP_UCHAR *srcGray,IMP_UCHAR *BinMask,IMP_S32 val,IMP_S32 
 
 IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 ImgW)//chengfa xuyao gaijin 
 {
-	//该操作之前需要对statiImg图像进行归零
-	//srcGray图像中像素值不是0，则statiImg相应位置应该+1；
-	//srcGray图像中像素值为0，则statiImg相应位置应该-1
-	//当数值大于255时，statiImg赋值为255
-	//当数值小雨0，statiImg赋值为0
 	IMP_U8 *P1;
 	IMP_U8 *P2;
 	IMP_S32 Num;
 	IMP_S32 width;
 	IMP_S32 height;
 	IMP_S32 OffNeg[6]={-ImgW-1,-ImgW,-ImgW+1, ImgW-1, ImgW,-ImgW+1};
-	
-	//if (!srcGray||!statiImg)
-	//{
-	//	printf("The input of IMP_StatiPix is wrong!\n");
-	//	return 0;
-	//}
 
 	P1=srcGray;
 	P2=statiImg;
 	for(height=1;height<ImgH-1;height++)
 	{
-	  //P1=srcGray+height*ImgW;
-	  //P2=statiImg+height*ImgW;
 	  P1+=ImgW;
 	  P2+=ImgW;
 	  for(width=1;width<ImgW-1;width++)
@@ -115,7 +70,6 @@ IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 I
 }
 IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_UCHAR*proMat2,IMP_S32 Length)
 {
-	/*得到两图像像素比值，存放与propotMat中，Length是图像的内存长度*/
 	
 	IMP_S32 length;
 	length=Length;
@@ -138,12 +92,6 @@ IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_
 
 IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 {
-	//将原先的图像增加一个通道
-	//增加的一个通道用来存放该
-	//像素对应的位置的八邻域的
-	//值之和信息
-	//struct timeval tvStart,tvEnd;//delete
-	//double linStart = 0,linEnd = 0,lTime = 0;//delete
 	IMP_S32 i;
 	IMP_S32 j;
 	IMP_S32 ImgH;
@@ -217,14 +165,11 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	IMP_GaussImg(PsModel->pstResult->stDRegionSet.pstImgBgGray->pu8Data,XY00, ImgH, ImgW);
 	IMP_DResizeImg(XY00,PsModel->bckImg,ImgH,ImgW);
 	IMP_DResizeImg(PsModel->pstResult->stDRegionSet.pstImgFgOrg->pu8Data,PsModel->forImg,ImgH,ImgW);
-	//Pgray=PsModel->pstResult->stImgInGray.pu8Data;
-	//FoImg=PsModel->pstResult->stDRegionSet.pstImgFgOrg->pu8Data;
+
 	Pgray=PsModel->srcGray;
 	Pbck=PsModel->bckImg;
 	FoImg=PsModel->forImg;
 	
-	
-	//Pbck=PsModel->pstResult->stDRegionSet.pstImgBgGray->pu8Data;
 	ImgH=ImgH>>1;
 	ImgW=ImgW>>1;
 	
@@ -233,7 +178,6 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	Wstep=ImgW+ImgW;
 	for(height=1;height<ImgH-1;height++)
 	{
-		//Length=height*ImgW;
 		Length1+=ImgW;
 		Length2+=Wstep;
 		P=Pgray+Length1;
@@ -405,7 +349,6 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	
-	//gettimeofday (&tvStart,"usec");//delete
 	Pzsad=zSadMin+ImgW;
 	Pvsad=vSadMin+ImgW;
 	Length1=ImgW<<1;
@@ -522,11 +465,6 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 		}
 	}
 	
-	//gettimeofday (&tvEnd,"usec");//delete
-	//linStart = (double)tvStart.tv_usec;//unit S
-    //linEnd = (double)tvEnd.tv_usec;//unit S
-    //lTime = linEnd-linStart;
-    //printf("swing=%3.1lfms  \n",lTime/1000);
 	return 1;
 }
 
@@ -568,7 +506,6 @@ IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 	pstModule->srcGray=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 	pstModule->forImg=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 	pstModule->bckImg=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
-	//pstModule->vSadmin=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 
 	while(length--)
 	{
@@ -585,9 +522,6 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_Swing_S *pstModule;	
 	PEA_RESULT_S *pstResult;
 
-	struct timeval tvStart,tvEnd;//delete
-	
-	double linStart = 0,linEnd = 0,lTime = 0;//delete
 	IMP_S32 val;
 	IMP_S32 Step;
 	IMP_S32 ImgH;
@@ -608,7 +542,6 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_UCHAR * p11;
 	IMP_UCHAR * p22;
 
-	gettimeofday (&tvStart,"usec");//delete
 	pstModule = (IMP_Swing_S*)hModule;
 	p11=pstModule->p11;
 	p22=pstModule->p22;
@@ -620,11 +553,9 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_GetSadImg1(pstModule);
 	IMP_Proporte(pstModule->bckImg,pstModule->srcGray,p11,p22,Lenght);
 	
-	//将前景的摇摆区域去除
 	pc1=(pstModule->p00+ImgW);
 	pc2=(pstModule->zSadmin+ImgW);
 	pc3=(pstModule->vSadmin+ImgW);
-	//pc4=(pstModule->swImg+ImgW)
 	pc5=(pstModule->swImg+ImgW);
 	pc6=(pstModule->forImg+ImgW);
 	Step=0;
@@ -683,6 +614,7 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 					
 			if(val||pc5[width])//val||pc5[width]
 			{
+
 				if(pc2[width]>12&&abs(pc2[width]-pc3[width])<6)
 				    pc6[width]=255;
 				else
@@ -702,13 +634,9 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_BinaryImg(pstModule->inMask,pstModule->swImg,40,Lenght);
 	
 	IMP_DePix(pstModule->forImg,ImgH,ImgW,100);
-	//IMP_ShowImg(pstModule->forImg,ImgH,ImgW,"hesult2");
 	
-	//IMP_UResizeImg(pstModule->forImg,pstModule->p00,ImgH,ImgW);
 	IMP_UResizeImg(pstModule->swImg,pstModule->p00,ImgH,ImgW);
 	IMP_UResizeImg(pstModule->forImg,pstModule->p11,ImgH,ImgW);
-	IMP_ShowImg(pstModule->p00,ImgH<<1,ImgW<<1,"Swing");
-	IMP_ShowImg(pstModule->p11,ImgH<<1,ImgW<<1,"Deduction");
 	ImgH=ImgH<<1;
 	ImgW=ImgW<<1;
 	pc1=pstModule->p00;
@@ -728,12 +656,6 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 			
 		}
 	}
-	IMP_ShowImg(pc3,ImgH,ImgW,"Result");
-	gettimeofday (&tvEnd,"usec");//delete
-	linStart = (double)tvStart.tv_usec;//unit S
-    linEnd = (double)tvEnd.tv_usec;//unit S
-    lTime = linEnd-linStart;
-    printf("swing=%3.1lfms  \n",lTime/1000);
 	return 1;
 }
 
@@ -771,7 +693,6 @@ IMP_S32 IMP_GaussImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW)
 	IMP_S32 val;
 	IMP_S32 width;
 	IMP_S32 height;
-	//IMP_S32 Step;
 	IMP_UCHAR*P1;
 	IMP_UCHAR*P2;
 	
@@ -800,7 +721,6 @@ IMP_S32 IMP_GaussImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW)
 
 IMP_S32 IMP_DResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW)
 {
-/*/输入的src图像是已经经过高斯平滑处理的图像/*/
 	IMP_S32 width;
 	IMP_S32 height;
 	IMP_S32 Step;
@@ -895,7 +815,7 @@ IMP_S32 IMP_DePix(IMP_UCHAR*srcGray,IMP_S32 ImgH,IMP_S32 ImgW,IMP_S32 val)
 			}
 		}
 	}
-	return 1;	
+	return 1;
 }
 
 

@@ -175,11 +175,9 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 			ptr_bkg[s32col] = (IMP_U8)s32model1;				
 		}
 	}
-	ipShowGrayImage(s32W, s32H, pu8Bkg, "hellotrl1");
 	IMP_GrayImageClone( &pstModule->pstOutput->stFilter, &pstModule->stFilter);
 	filter(pstModule);
 	Mutation(pstModule);
-	ipShowGrayImage(s32W, s32H, pu8Filter, "hellofilter");
 	gettimeofday(&end,NULL);
 	IMP_S32 timeuse = end.tv_usec - start.tv_usec; 
 	printf("time %d\n", timeuse);

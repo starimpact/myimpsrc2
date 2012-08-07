@@ -10,6 +10,7 @@
 #define IMP_MIN_TGT_AREA          40
 #define IMP_STABLE_THRESHOLD      20
 
+
 typedef struct impTgtPosition_S
 {
 	IMP_U8 s32Used;
@@ -32,6 +33,12 @@ typedef struct impTgtTrajectory_S
 	IMP_U16 u16Num;
 	IMP_TgtPosition_S astPositions[IMP_MAX_TRAJECTORY_LEN];
 }IMP_TgtTrajectory_S;//目标轨迹
+
+typedef struct impTgtSubRegion_S
+{
+	IMP_U16 astSign[10];
+	IMP_TgtTrajectory_S astSubRegionTrajectory[10];
+}IMP_TgtSubRegion_S;//目标中子区域信息
 	
 void IMP_PushNewPosition(IMP_TgtTrajectory_S *pstTrajectory, IMP_TgtPosition_S *pstPositions)//轨迹记录
 {
@@ -60,6 +67,7 @@ typedef struct impTarget_S
 	IMP_U8 u8Used;
 	IMP_U8 u8Stable;
 	IMP_TgtTrajectory_S stTrajectory;
+	IMP_TgtSubRegion_S stTgtSubRegion;
 	IMP_U16 TargetID;
 }IMP_Target_S;
 
@@ -72,13 +80,15 @@ typedef struct impTargetSet_S
 	IMP_Target_S astTarget[IMP_MAX_TGT_CNT];
 }IMP_TargetSet_S;
 
-IMP_S32 IMP_ShowTarget(GRAY_IMAGE_S*);
+//IMP_S32 IMP_ShowTarget(GRAY_IMAGE_S*);
 IMP_S32 IMP_DeleteTarget(IMP_Target_S*, PEA_RESULT_S*);
 IMP_S32 IMP_CreateTarget(IMP_Target_S*, PEA_RESULT_S*);
 IMP_S32 impFindTargetOutById(IpTrackedTargetSet *pstTTS, IMP_U32 u32ID);
 IMP_S32 impOutputTargetOut(IMP_Target_S *pstTarget, PEA_RESULT_S *pstResult);
+double ImpGetDist(IMP_RECT_S*, IMP_RECT_S*);
+void GetCentroid(GRAY_IMAGE_S*, IMP_RECT_S*, IMP_POINT_S*);
 
-double ColorTable[] = {0,255,0,255,0,0,0,0,255,255,255,0,255,0,255,0,255,255,0,0,0,255,255,255,128,128,128,128,128,0};
+//double ColorTable[] = {0,255,0,255,0,0,0,0,255,255,255,0,255,0,255,0,255,255,0,0,0,255,255,255,128,128,128,128,128,0};
 
 IMP_TargetSet_S stTrackTgtSet;
 
@@ -178,10 +188,8 @@ IMP_S32 IMP_ReleaseTracker( IMP_MODULE_HANDLE hModule )
 	IMP_U8 **ppu8Bkgs = 0;
 	MEM_MGR_ARRAY_S *pstMemMgr;	
 	s32Width = pstModule->s32Width;
-	s32Height = pstModule->s32Height;
+	s32Height = pstModule->s32Height;	
 	pstMemMgr = &pstModule->pstHwResource->stMemMgr;
-	
-	IMP_MMFree(pstMemMgr, IMP_MEMBLK_TYPE_SLOW, pstModule);
 
 	return 0;
 }
@@ -238,8 +246,7 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 	PEA_DETECTED_REGION_S *pstDrg = pstDRegionSet->astDrg;
 
 //====================================================================================================跟踪
-	int i, j;
-	int imgPixel = (int)(pstInGray->s32W*pstInGray->s32H); 
+	int i, j,k;
 	uchar *ptrImgCurrent = pstDRegionSet->pstImgFgRgn->pu8Data;
 	uchar *ptrTmp = stTrackTgtSet.tmpFrame;
 	IMP_Target_S *pstTarget = stTrackTgtSet.astTarget;
@@ -247,68 +254,133 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 	{
 		if(pstTarget->u8Used)
 		{
+			IMP_RECT_S* pstRect = &pstTarget->stTrajectory.astPositions[pstTarget->stTrajectory.u16Num-1].stRg;
 			IMP_TgtPosition_S stPositions;
 			IMP_U8 TrackFlag = 0;
 			IMP_U8 overlapSign[10]={0,0,0,0,0,0,0,0,0,0}; 
 			IMP_S32 overlapPixel[10] = {1,1,1,1,1,1,1,1,1,1};
 			IMP_U8 overlapFlag = 0, TargetSign = 0;
-			for(j=0; j<imgPixel; j++)//计算重叠区域面积
+			for(j=pstRect->s16Y1; j<=pstRect->s16Y2; j++)//分析重叠
 			{
-				if(ptrTmp[j]==pstTarget->u8Sign && ptrImgCurrent[j]!=0)
+				for(k=pstRect->s16X1; k<=pstRect->s16X2; k++)
 				{
-					if(overlapFlag==0) { overlapSign[0] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[0]) overlapPixel[0]++;
-					else if(overlapFlag==1) { overlapSign[1] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[1]) { overlapPixel[1]++; }
-					else if(overlapFlag==2) { overlapSign[2] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[2]) { overlapPixel[2]++; }
-					else if(overlapFlag==3) { overlapSign[3] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[3]) { overlapPixel[3]++; }
-					else if(overlapFlag==4) { overlapSign[4] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[4]) { overlapPixel[4]++; }
-					else if(overlapFlag==5) { overlapSign[5] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[5]) { overlapPixel[5]++; }
-					else if(overlapFlag==6) { overlapSign[6] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[6]) { overlapPixel[6]++; }
-					else if(overlapFlag==7) { overlapSign[7] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[7]) { overlapPixel[7]++; }
-					else if(overlapFlag==8) { overlapSign[8] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[8]) { overlapPixel[8]++; }
-					else if(overlapFlag==9) { overlapSign[9] = ptrImgCurrent[j]; overlapFlag++; }
-					else if(ptrImgCurrent[j]==overlapSign[9]) { overlapPixel[9]++; }
+					if(ptrImgCurrent[j*pstInGray->s32W+k]!=0 && ptrTmp[j*pstInGray->s32W+k]!=0)
+					{
+						if(overlapFlag==0) { overlapSign[0] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[0]) overlapPixel[0]++;
+						else if(overlapFlag==1) { overlapSign[1] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[1]) overlapPixel[1]++;
+						else if(overlapFlag==2) { overlapSign[2] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[2]) overlapPixel[2]++;
+						else if(overlapFlag==3) { overlapSign[3] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[3]) overlapPixel[3]++;
+						else if(overlapFlag==4) { overlapSign[4] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[4]) overlapPixel[4]++;
+						else if(overlapFlag==5) { overlapSign[5] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[5]) overlapPixel[5]++;
+						else if(overlapFlag==6) { overlapSign[6] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[6]) overlapPixel[6]++;
+						else if(overlapFlag==7) { overlapSign[7] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[7]) overlapPixel[7]++;
+						else if(overlapFlag==8) { overlapSign[8] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[8]) overlapPixel[8]++;
+						else if(overlapFlag==9) { overlapSign[9] = ptrImgCurrent[j*pstInGray->s32W+k]; overlapFlag++; }
+						else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[9]) overlapPixel[9]++; //ptrImgCurrent[j*pstInGray->s32W+k] = TargetSign;
+					}
+//					else if(ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[0]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[1]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[2]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[3]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[4]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[5]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[6]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[7]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[8]||ptrImgCurrent[j*pstInGray->s32W+k]==overlapSign[9]) ptrImgCurrent[j*pstInGray->s32W+k] = TargetSign;
 				}
 			}
 
-			int n;
-			IMP_S32 MaxTmp;
-			if(overlapFlag>0)
+			int n; j = 0;//矩形框分析
+			typedef struct
 			{
-				MaxTmp = overlapPixel[overlapFlag-1];
-				TargetSign = overlapSign[overlapFlag-1];
-				while(overlapFlag>1)
+				IMP_U8 u8Used;
+				IMP_RECT_S Rect;
+				IMP_U32 Pixels[10];
+				IMP_U8 Signs[10];
+			}RectTmp_S;
+			RectTmp_S RectTmp[10];
+			while(overlapFlag>0)
+			{
+				pstDrg = pstDRegionSet->astDrg;
+				for(n=0; n<IMP_MAX_TGT_CNT; n++)
 				{
-					if(overlapPixel[overlapFlag-2]>MaxTmp)
+					if(pstDrg->u8Used && pstDrg->u8Sign==overlapSign[overlapFlag-1])
 					{
-						MaxTmp = overlapPixel[overlapFlag-2];
-						TargetSign = overlapSign[overlapFlag-2];
+						RectTmp[j].u8Used = 1;
+						RectTmp[j].Rect = pstDrg->stRect; 
+						RectTmp[j].Pixels[0] = (IMP_U32)pstDrg->s32AreaPixel;
+						RectTmp[j].Signs[0] = pstDrg->u8Sign;
+						for(k=1; k<10; k++)
+						{
+							RectTmp[j].Pixels[k] = 0;
+							RectTmp[j].Signs[k] = 0;
+						}	
+						TrackFlag = 1; 
+						j++;
 					}
-					overlapFlag--;
+					pstDrg++;
 				}
+				overlapFlag--;
 			}
-			pstDrg = pstDRegionSet->astDrg;
-			for(n=0; n<IMP_MAX_TGT_CNT; n++)
+			while(j<10) 
 			{
-				if(pstDrg->u8Used && pstDrg->u8Sign==TargetSign)
+				RectTmp[j].u8Used = 0;
+				for(k=0; k<10; k++)
 				{
-					pstDrg->u8Used = 0; 
-					pstTarget->u8Sign = TargetSign; 
-					stPositions.stRg = pstDrg->stRect; 
-					stPositions.u32AreaPixel = (IMP_U32)pstDrg->s32AreaPixel;
-					TrackFlag = 1; 
-					pstTarget->u8Used = 1; 
+					RectTmp[j].Pixels[k] = 0;
+					RectTmp[j].Signs[k] = 0;
 				}
-				pstDrg++;
+				j++;
 			}
+
+			IMP_U8 flag = 1;
+			while(flag && TrackFlag)
+			{
+				k = 1;
+				flag = 0;
+				for(j=1; j<10; j++)
+					for(n=0; n<k; n++)
+					{
+						if(RectTmp[j].u8Used)
+						{
+							if(ImpGetDist(&RectTmp[j].Rect, &RectTmp[n].Rect)<10)//矩形框距离
+							{
+								flag = 1;
+								if(RectTmp[j].Rect.s16X1<RectTmp[n].Rect.s16X1) RectTmp[n].Rect.s16X1 = RectTmp[j].Rect.s16X1;
+								if(RectTmp[j].Rect.s16Y1<RectTmp[n].Rect.s16Y1) RectTmp[n].Rect.s16Y1 = RectTmp[j].Rect.s16Y1;
+								if(RectTmp[j].Rect.s16X2>RectTmp[n].Rect.s16X2) RectTmp[n].Rect.s16X2 = RectTmp[j].Rect.s16X2;
+								if(RectTmp[j].Rect.s16Y2>RectTmp[n].Rect.s16Y2) RectTmp[n].Rect.s16Y2 = RectTmp[j].Rect.s16Y2;
+								RectTmp[j].u8Used = 0;
+								int p, q = 0;
+								for(p=0; p<10; p++)
+								{
+									if(RectTmp[n].Pixels[p]==0)
+									{
+										if(RectTmp[j].Pixels[q]!=0) { RectTmp[n].Pixels[p] = RectTmp[j].Pixels[q]; RectTmp[j].Pixels[q] = 0; }
+										q++;
+									}
+								}
+								q = 0;
+								for(p=0; p<10; p++)
+								{
+									if(RectTmp[n].Signs[p]==0)
+									{
+										if(RectTmp[j].Signs[q]!=0) { RectTmp[n].Signs[p] = RectTmp[j].Signs[q];  RectTmp[j].Signs[q] = 0; }
+										q++;
+									}
+								}
+							}
+							else
+							{
+								RectTmp[k] = RectTmp[j];
+								k++;
+								break;
+							}
+						}
+					}
+			}
+
 			if(!TrackFlag)
 			{ 
 				pstTarget->u8Used = 0;
@@ -316,9 +388,35 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 			}
 			else
 			{
+				n = 0;
+				IMP_POINT_S stPt1;
+				IMP_POINT_S stPt2 = pstTarget->stTrajectory.astPositions[pstTarget->stTrajectory.u16Num-1].stPt;
+				GetCentroid(pstImgFgRgn, &RectTmp[0].Rect, &stPt1);
+				double dist = pow(stPt1.s16X-stPt2.s16X, 2)+pow(stPt1.s16Y-stPt2.s16Y, 2);
+				double dist0 = 0;
+				for(k=1; k<10; k++)
+				{
+					if(RectTmp[k].u8Used)
+					{
+						GetCentroid(pstImgFgRgn, &RectTmp[k].Rect, &stPt1);
+						dist0 = pow(stPt1.s16X-stPt2.s16X, 2)+pow(stPt1.s16Y-stPt2.s16Y, 2);
+						if(dist0<dist){ n = k; dist = dist0; };
+					}
+				}
+				stPositions.stRg = RectTmp[n].Rect;
+				
+				for(k=0; RectTmp[n].Signs[k]!=0; k++)
+				{
+					pstDrg = pstDRegionSet->astDrg;
+					for(j=0; j<IMP_MAX_TGT_CNT; j++)
+					{
+						if(pstDrg->u8Used && pstDrg->u8Sign==RectTmp[n].Signs[k]) { pstDrg->u8Used = 0; break; }
+						pstDrg++;
+					}		
+				}
+				stPositions.u32AreaPixel = 0;
 				stPositions.s32Used = 1;
-				stPositions.stPt.s16X = (stPositions.stRg.s16X1+stPositions.stRg.s16X2)>>1;
-				stPositions.stPt.s16Y = (stPositions.stRg.s16Y1+stPositions.stRg.s16Y2)>>1;
+				GetCentroid(pstImgFgRgn, &stPositions.stRg, &stPositions.stPt);
 				if(pstTarget->stTrajectory.u16Num>=IMP_STABLE_THRESHOLD) 
 				{
 					if(pstTarget->u8Stable==0)
@@ -352,34 +450,7 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 		pstTarget++;
 	}
 
-/*	pstTarget = stTrackTgtSet.astTarget;
-	for(i=0; i<IMP_MAX_TGT_CNT; i++)
-	{
-		if(pstTarget->u8Used)
-		{
-			for(j=1; j+i<IMP_MAX_TGT_CNT; j++)
-			{
-				if((pstTarget+j)->u8Used && pstTarget->u8Sign==(pstTarget+j)->u8Sign)
-				{
-					if(!pstTarget->u8Stable) pstTarget->u8Used = 0;
-					if(!(pstTarget+j)->u8Stable) (pstTarget+j)->u8Used = 0;
-				}
-			}
-			int n;
-			pstDrg = pstDRegionSet->astDrg;
-			for(n=0; n<IMP_MAX_TGT_CNT; n++)
-			{
-				if(pstDrg->u8Used && pstTarget->u8Sign == pstDrg->u8Sign)
-				{
-					pstDrg->u8Used = 0;
-					break;
-				}
-				pstDrg++;
-			}
-		}
-		pstTarget++;
-	}*/
-//====================================================================================================新目标
+//======================================================================================================加入新目标
 	i = 0; j = 0;
 	pstDrg = pstDRegionSet->astDrg;
 	pstTarget = stTrackTgtSet.astTarget;
@@ -401,8 +472,7 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 					IMP_TgtPosition_S stPositions;
 					stPositions.s32Used = 1;
 					stPositions.stRg = pstDrg->stRect;
-					stPositions.stPt.s16X = (stPositions.stRg.s16X1+stPositions.stRg.s16X2)>>1;
-					stPositions.stPt.s16Y = (stPositions.stRg.s16Y1+stPositions.stRg.s16Y2)>>1;
+					GetCentroid(pstImgFgRgn, &stPositions.stRg, &stPositions.stPt);
 					stPositions.u32AreaPixel = (IMP_U32)pstDrg->s32AreaPixel;
 					stPositions.s32Velocity = 0;
 					stPositions.s32Direction = 0;
@@ -447,8 +517,9 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 
 //printf("output target number:%d\n", Total);
 //====================================================================================================结果显示
+#if 0
 //	cvNamedWindow("test",1);
-//	IMP_ShowTarget(pstImgFgRgn);
+	IMP_ShowTarget(pstInGray);
 //	cvMoveWindow("test", 360, 360);
 	
 	ipShowGrayImage(s32Width, s32Height, pstInGray->pu8Data, "tracker_inframe");
@@ -460,11 +531,66 @@ IMP_S32 IMP_ProcessTracker( IMP_MODULE_HANDLE hModule )
 //	cvMoveWindow("tracker_bkg", 360, 0);
 //	cvMoveWindow("tracker_frg", 0, 360);
 //	cvMoveWindow("tracker_rgn", 0, 720);
+#endif
 
 	return 0;
 }
 
+void GetCentroid(GRAY_IMAGE_S *pstImg, IMP_RECT_S *pstRect, IMP_POINT_S *pstCentroid)
+{
+	uchar *ptrImg = pstImg->pu8Data;
+	int j,k;
+	int X = 0; int Y = 0; int i = 0;
+	for(j=pstRect->s16Y1; j<=pstRect->s16Y2; j++)//分析重叠
+	{
+		for(k=pstRect->s16X1; k<=pstRect->s16X2; k++)
+		{
+			if(ptrImg[j*pstImg->s32W+k]!=0)
+			{
+				X += k;
+				Y += j;
+				i++;
+			}
+		}
+	}
+	pstCentroid->s16X = (IMP_S16)((double)X/(double)i);
+	pstCentroid->s16Y = (IMP_S16)((double)Y/(double)i);
+}
 
+double ImpGetDist(IMP_RECT_S *pstRect1, IMP_RECT_S *pstRect2)
+{
+	double dist = 0;
+	if(pstRect1->s16X2<pstRect2->s16X1)
+	{
+		if(pstRect1->s16Y2<pstRect2->s16Y1) dist = sqrt(pow(pstRect2->s16X1-pstRect1->s16X2,2)+pow(pstRect2->s16Y1-pstRect1->s16Y2,2));
+		else 
+		{
+			if(pstRect1->s16Y1>pstRect2->s16Y2) dist = sqrt(pow(pstRect2->s16X1-pstRect1->s16X2,2)+pow(pstRect1->s16Y1-pstRect2->s16Y2,2));
+			else dist = pstRect2->s16X1-pstRect1->s16X2;
+		}
+	}
+	else
+	{
+		if(pstRect1->s16X1>pstRect2->s16X2)
+		{
+			if(pstRect1->s16Y2<pstRect2->s16Y1) dist = sqrt(pow(pstRect1->s16X1-pstRect2->s16X2,2)+pow(pstRect2->s16Y1-pstRect1->s16Y2,2));
+			else 
+			{
+				if(pstRect1->s16Y1>pstRect2->s16Y2) dist = sqrt(pow(pstRect1->s16X1-pstRect2->s16X2,2)+pow(pstRect1->s16Y1-pstRect2->s16Y2,2));
+				else dist = pstRect1->s16X1-pstRect2->s16X2;
+			}
+		}
+		else
+		{
+			if(pstRect1->s16Y2<pstRect2->s16Y1) dist = pstRect2->s16Y1-pstRect1->s16Y2;
+			else
+			{
+				if(pstRect1->s16Y1>pstRect2->s16Y2) dist = pstRect1->s16Y1-pstRect2->s16Y2;
+			}
+		}
+	}
+	return dist;	
+}
 IMP_S32 impFindTargetOutById(IpTrackedTargetSet *pstTTS, IMP_U32 u32ID)
 {
 	IMP_S32 s32TI;
@@ -556,6 +682,7 @@ IMP_S32 IMP_CreateTarget(IMP_Target_S *pstTarget, PEA_RESULT_S *pstResult)
 	return 0;
 }
 
+#if 0
 IMP_S32 IMP_ShowTarget(GRAY_IMAGE_S *pstGrayImg)
 {	
 	IplImage *pstImgForShow = cvCreateImage(cvSize((int)pstGrayImg->s32W,(int)pstGrayImg->s32H),IPL_DEPTH_8U,3);
@@ -567,21 +694,21 @@ IMP_S32 IMP_ShowTarget(GRAY_IMAGE_S *pstGrayImg)
 		uchar *ptr_img = (uchar*)(pstImgForShow->imageData+i*pstImgForShow->widthStep);
 		for(j=0; j<pstImgForShow->width; j++)
 		{
-//			ptr_img[3*j] = *ptrGrayData;
-//			ptr_img[3*j+1] = *ptrGrayData;
-//			ptr_img[3*j+2] = *ptrGrayData;
-			if(*ptrGrayData)
-			{
-				ptr_img[3*j] = 255;
-				ptr_img[3*j+1] = 255;
-				ptr_img[3*j+2] = 255;
-			}
-			else
-			{
-				ptr_img[3*j] = 0;
-				ptr_img[3*j+1] = 0;
-				ptr_img[3*j+2] = 0;
-			}
+			ptr_img[3*j] = *ptrGrayData;
+			ptr_img[3*j+1] = *ptrGrayData;
+			ptr_img[3*j+2] = *ptrGrayData;
+//			if(*ptrGrayData)
+//			{
+//				ptr_img[3*j] = 255;
+//				ptr_img[3*j+1] = 255;
+//				ptr_img[3*j+2] = 255;
+//			}
+//			else
+//			{
+//				ptr_img[3*j] = 0;
+//				ptr_img[3*j+1] = 0;
+//				ptr_img[3*j+2] = 0;
+//			}
 			ptrGrayData++;
 		}
 	}
@@ -629,12 +756,13 @@ IMP_S32 IMP_ShowTarget(GRAY_IMAGE_S *pstGrayImg)
 
 //	char tmp3[10];
 //	sprintf(tmp3,"%d.jpg",stTrackTgtSet.frame);
-//	if(stTrackTgtSet.frame>2600 && stTrackTgtSet.frame<2700)	cvSaveImage(tmp3,pstImgForShow,0);
+//	if(stTrackTgtSet.frame>4900 && stTrackTgtSet.frame<5000)	cvSaveImage(tmp3,pstImgForShow,0);
 
 	cvReleaseImage(&pstImgForShow);
 
 	return 0;
 }
+#endif
 
 
 
