@@ -38,7 +38,6 @@ extern VO_INTF_SYNC_E gs_enSDTvMode;
 
 char gabyAlgoInfo[1024];
 
-int master_thread_init_ok = 0;
 
 extern IMP_HANDLE hIMP;
 
@@ -270,7 +269,7 @@ HI_S32 SAMPLE_VIO_TDE_1Screen_VoVGA()
         
         PEA_MODULE *pstModule = (PEA_MODULE*)hIMP;
         GRAY_IMAGE_S *pstBgGray = pstModule->pstResult->stDRegionSet.pstImgBgGray;
-        GRAY_IMAGE_S *pstFgGray = pstModule->pstResult->stDRegionSet.pstImgFgRgn;
+        GRAY_IMAGE_S *pstFgGray = pstModule->pstResult->stDRegionSet.pstImgFgOrg;
 		IMP_CopySmallImage2Video(&stFrame.stVFrame, pstBgGray, stFrame.stVFrame.u32Width - pstBgGray->s32W * 2, 0);
 		IMP_CopySmallImage2Video(&stFrame.stVFrame, pstFgGray, stFrame.stVFrame.u32Width - pstBgGray->s32W, 0);
         

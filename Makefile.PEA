@@ -22,7 +22,7 @@ MPP_LIBS:= $(MPP_LIBS_PATH)/libmpi.a \
 	$(MPP_LIBS_PATH)/libresampler.a \
 	$(MPP_LIBS_PATH)/libloadbmp.a \
 	$(MPP_LIBS_PATH)/libtde.a
-objs:=main_pea.o imp_pea_thread.o imp_draw_osd.o sample_common.o
+objs:=main_pea.o imp_pea_thread.o imp_draw_osd.o sample_common.o imp_draw_text.o
 PEA_EXE:$(objs)
 	$(CC) -lpthread -o PEA_EXE $(objs) -lm -lArmPEA $(MPP_LIBS) -L./ -L$(MPP_LIBS_PATH)
 
