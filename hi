@@ -1,5 +1,0 @@
-main_opencv_pea_hd.c: In function ‘ReadImage’:
-main_opencv_pea_hd.c:137: warning: ignoring return value of ‘fread’, declared with attribute warn_unused_result
-main_opencv_pea_hd.c: In function ‘IMP_OpencvExample’:
-main_opencv_pea_hd.c:585: warning: ‘return’ with a value, in function returning void
-main_opencv_pea_hd.c:718: warning: ‘return’ with a value, in function returning void

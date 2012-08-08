@@ -1,5 +1,8 @@
 #include "imp_pea_thread.h"
 #include "imp_draw_osd.h"
+#include "imp_pea_system.h"
+
+
 pthread_t thread[2];
 
 pthread_mutex_t mut;
@@ -32,6 +35,14 @@ typedef enum hiSAMPLE_VO_DIV_MODE
 /* For PAL or NTSC input and output. */
 extern VIDEO_NORM_E gs_enViNorm;
 extern VO_INTF_SYNC_E gs_enSDTvMode;
+
+char gabyAlgoInfo[1024];
+
+int master_thread_init_ok = 0;
+
+extern IMP_HANDLE hIMP;
+
+void IMP_CopySmallImage2Video(VIDEO_FRAME_S *pVBuf, GRAY_IMAGE_S *pstSmall, IMP_S32 s32X, IMP_S32 s32Y);
 /*****************************************************************************
  Prototype       : SAMPLE_GetViCfg_SD
  Description     : vi configs to input standard-definition video
@@ -256,6 +267,15 @@ HI_S32 SAMPLE_VIO_TDE_1Screen_VoVGA()
             printf("HI_MPI_VI_GetFrame err, vi(%d,%d)\n", ViDev, 0);
             return -1;
         }
+        
+        PEA_MODULE *pstModule = (PEA_MODULE*)hIMP;
+        GRAY_IMAGE_S *pstBgGray = pstModule->pstResult->stDRegionSet.pstImgBgGray;
+        GRAY_IMAGE_S *pstFgGray = pstModule->pstResult->stDRegionSet.pstImgFgRgn;
+		IMP_CopySmallImage2Video(&stFrame.stVFrame, pstBgGray, stFrame.stVFrame.u32Width - pstBgGray->s32W * 2, 0);
+		IMP_CopySmallImage2Video(&stFrame.stVFrame, pstFgGray, stFrame.stVFrame.u32Width - pstBgGray->s32W, 0);
+        
+		IMP_DrawTextInVbuf(&stFrame.stVFrame, 8, 8, 2, gabyAlgoInfo, 1, fontdata_sun8x16, 8, 16);
+        
         if(s32TargetNum > 0 )
         {
             TDE_HANDLE s32Handle;

@@ -10,6 +10,10 @@ extern RESULT_S gstPeaResult;
 
 extern URP_PARA_S stURPpara;
 extern master_thread_init_ok;
+
+IMP_HANDLE hIMP;
+extern char gabyAlgoInfo[1024];
+
 IMP_S32 PEA_ALGO_PROCESS()
 {
     IMP_S32 nFrmNum = 0;
@@ -19,7 +23,7 @@ IMP_S32 PEA_ALGO_PROCESS()
 
     OBJ_S stObj;
 	LIB_INFO_S stLibInfo;
-	IMP_HANDLE hIMP = &stObj;
+	hIMP = &stObj;
 	MEM_SET_S stMems;
 	YUV_IMAGE422_S stImage;
 	RESULT_S stResult;
@@ -78,13 +82,14 @@ gettimeofday(&t1, NULL);
         HI_MPI_VI_ReleaseFrame(ViDev, ViChn, &stFrame);
 
         // Process Image
-//		IMP_ProcessImage( hIMP, &stImage );
+		IMP_ProcessImage( hIMP, &stImage );
 
         // Get Algo Result
-//		IMP_GetResults( hIMP, &stResult );
+		IMP_GetResults( hIMP, &stResult );
 
 gettimeofday(&t2, NULL);
-printf("out:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+IMP_FLOAT fTime3 = (t2.tv_usec - t1.tv_usec) / 1000.f;
+printf("out:%.1f ms\n", fTime3);
 printf("\n--------------------------\n");
 #ifdef SHOW_DEBUG_INFO
         IMP_ShowDebugInfo(&stResult);
@@ -92,6 +97,9 @@ printf("\n--------------------------\n");
         pthread_mutex_lock(&mut);
         gstPeaResult = stResult;
         pthread_mutex_unlock(&mut);
+        
+        sprintf(gabyAlgoInfo, "W:%d, H:%d\nAlgoTime:%.1f ms\n", stFrame.stVFrame.u32Width, stFrame.stVFrame.u32Height, fTime3);
+        
         usleep(100000);
 
     }
