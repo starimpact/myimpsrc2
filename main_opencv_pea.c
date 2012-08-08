@@ -310,8 +310,8 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 		//IP_PIXVAL *pcr = &(colors[target->id%12]);
 		TGT_MOTION_ITEM_S *item_data = (TGT_MOTION_ITEM_S*)(target->au8Data);
 		TGT_TRAJECT_S *traject = &item_data->stTraject;
-
 		
+		printf("ID_%d: PERI:%d, TRIP:%d\n", target->u32Id, target->u32Event & IMP_TGT_EVENT_PERIMETER, target->u32Event & IMP_TGT_EVENT_TRIPWIRE);
 		if(target->u32Event !=0)
 		{
 		//	printf("id:%d, event=%d\n", target->u32Id, target->u32Event);
@@ -864,7 +864,8 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 
 #endif
 
-		memcpy(pFrImg->imageData,pDetector->stImgFgRgnMotion.pu8Data,s32ImgW*s32ImgH);
+	//	memcpy(pFrImg->imageData,pDetector->stImgFgRgnMotion.pu8Data,s32ImgW*s32ImgH);
+		memcpy(pFrImg->imageData,pPEA->pstResult->stDRegionSet.pstImgFgOrg->pu8Data,s32ImgW*s32ImgH);
 		memcpy(pBkImg->imageData,pDetector->stImgBgGray.pu8Data,s32ImgW*s32ImgH);
 
         cvCvtColor( pImgGray, color_dst_blob, CV_GRAY2BGR );
@@ -885,7 +886,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         int dwI;
         for (dwI = 0; dwI < s32ImgW*s32ImgH; dwI++)
         {
-        	pFrImg->imageData[dwI] = pFrImg->imageData[dwI] != 0 ? 255 : 0;
+        //	pFrImg->imageData[dwI] = pFrImg->imageData[dwI] != 0 ? 255 : 0;
         }
         cvShowImage("foreground", pFrImg);
         //time increase

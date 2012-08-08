@@ -4,6 +4,73 @@
 IMP_VOID IMP_DrawRect( VIDEO_FRAME_S *pVBuf, IMP_RECT_S *rc,PIXEL_S *cr,VIDEO_FORMAT_E enFormatSrc,VIDEO_FORMAT_E enFormatAlgo );
 IMP_VOID IMP_DrawLine( VIDEO_FRAME_S *pVBuf, IMP_POINT_S *pt1, IMP_POINT_S *pt2,PIXEL_S *cr ,VIDEO_FORMAT_E enFormatSrc,VIDEO_FORMAT_E enFormatAlgo);
 
+
+
+void IMP_CopySmallImage2Video(VIDEO_FRAME_S *pVBuf, GRAY_IMAGE_S *pstSmall, IMP_S32 s32X, IMP_S32 s32Y)
+{	
+	IMP_U32 w, h;
+	HI_U32 phy_addr,size;
+	IMP_U8 *pVBufVirt_Y = 0, *pVBufVirt_VU = 0, *Dst = 0, *Sor = 0;
+	if(pVBuf->enPixelFormat == PIXEL_FORMAT_YUV_SEMIPLANAR_420 )
+	{	
+		size = (pVBuf->u32Stride[0])*(pVBuf->u32Height)*3/2;
+	}
+	else
+		{
+			printf("Frame->format is not yuv_420\n");
+			return;
+		}
+	phy_addr = pVBuf->u32PhyAddr[0];
+    pVBufVirt_Y = (HI_U8 *) HI_MPI_SYS_Mmap(phy_addr, size);
+//	printf("pVBufVirt_Y:%x\n", pVBufVirt_Y);
+	pVBufVirt_VU = pVBufVirt_Y+pVBuf->u32Width*pVBuf->u32Height;
+	if (NULL == pVBufVirt_Y)
+	{
+		return;
+	}
+	Sor = pstSmall->pu8Data;	
+	Dst = pVBufVirt_Y + pVBuf->u32Width*s32Y +s32X;
+//	printf("ww:%d; s32X:%d, s32Y:%d\n", pVBuf->u32Width, s32X, s32Y);
+//	printf("Dst:%x, Sor:%x \n", Dst, Sor);
+	for(h = 0;(h<pstSmall->s32H) && (h<pVBuf->u32Height-s32Y);h++)
+	{
+//		printf("h:%d ", h);
+		if(pstSmall->s32W<pVBuf->u32Width-s32X)
+		{
+//			printf("Dst:%x, Sor:%x ", Dst, Sor);
+			memcpy(Dst,Sor,pstSmall->s32W);
+		}
+		else
+		{
+			memcpy(Dst,Sor,pVBuf->u32Width-s32X);
+		}
+		Dst+=pVBuf->u32Width;
+		Sor+=pstSmall->s32W;
+//		printf("\n");
+	}
+	
+//	return;
+	Dst = pVBufVirt_VU+pVBuf->u32Width*s32Y/2 +s32X;
+	for(h=0;(h<pstSmall->s32H/2) && (h<pVBuf->u32Height/2-s32Y/2);h++)
+	{
+		if(pstSmall->s32W<pVBuf->u32Width-s32X)
+		{
+			memset(Dst,128,pstSmall->s32W);
+		}
+		else
+		{
+			memset(Dst,128,pVBuf->u32Width-s32X);
+		}
+		Dst+=pVBuf->u32Width;
+		
+	}
+	
+	HI_MPI_SYS_Munmap(pVBufVirt_Y, size);
+	
+	return ;
+}
+
+
 IMP_VOID IMP_DrawPeaResult(VIDEO_FRAME_S *pVBuf, RESULT_S *pstResult,VIDEO_FORMAT_E enFormatSrc,VIDEO_FORMAT_E enFormatAlgo)
 {
     TGT_SET_S	*pstTargetSet = &pstResult->stTargetSet;
@@ -13,6 +80,8 @@ IMP_VOID IMP_DrawPeaResult(VIDEO_FRAME_S *pVBuf, RESULT_S *pstResult,VIDEO_FORMA
     PIXEL_S *pstRectCr = &cr_tbl[0];
     PIXEL_S *pstLineCr = &cr_tbl[1];
     IMP_S32 i = 0;
+    
+  //  printf("Hello DrawPeaResult:%d\n", u32TargetNum);
     for( i = 0;i < u32TargetNum;i++)
     {
         pstTarget = &pstTargetSet->astTargets[i];
@@ -25,6 +94,7 @@ IMP_VOID IMP_DrawPeaResult(VIDEO_FRAME_S *pVBuf, RESULT_S *pstResult,VIDEO_FORMA
             IMP_POINT_S *pt1,*pt2;
             num = traject->s32Length;
             pt1 = &traject->stPoints[0];
+       //     printf("id_%d:%d\n", pstTarget->u32Id, num);
             for( k=1; k<num; k++ )
             {
                 pt2 = &traject->stPoints[k];
@@ -238,6 +308,7 @@ IMP_VOID IMP_DrawRect( VIDEO_FRAME_S *pVBuf, IMP_RECT_S *rc,PIXEL_S *cr ,VIDEO_F
 			}
 			if(rc->s16X1 < 0 || rc->s16X1 > 176 || rc->s16Y1 < 0 || rc->s16Y1 > 119 || rc->s16X2 < 0 || rc->s16X2 > 176 || rc->s16Y2 < 0 || rc->s16Y2 > 119)
 			{
+
 				return;
 			}
         }
@@ -492,6 +563,7 @@ IMP_VOID IMP_DrawLine( VIDEO_FRAME_S *pVBuf, IMP_POINT_S *pt1, IMP_POINT_S *pt2,
 			{
 				return;
 			}
+
 		}
 		else if (enFormatAlgo == IMP_D1)
 		{

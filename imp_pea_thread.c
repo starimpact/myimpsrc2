@@ -10,8 +10,14 @@ extern RESULT_S gstPeaResult;
 
 extern URP_PARA_S stURPpara;
 extern master_thread_init_ok;
+
+extern char gabyAlgoInfo[1024];
+
+IMP_HANDLE hIMP;
+
 IMP_S32 PEA_ALGO_PROCESS()
 {
+	IMP_FLOAT fTime3;
     IMP_S32 nFrmNum = 0;
     VIDEO_FRAME_INFO_S stFrame;
     VI_DEV ViDev = 0;
@@ -19,7 +25,7 @@ IMP_S32 PEA_ALGO_PROCESS()
 
     OBJ_S stObj;
 	LIB_INFO_S stLibInfo;
-	IMP_HANDLE hIMP = &stObj;
+	hIMP = &stObj;
 	MEM_SET_S stMems;
 	YUV_IMAGE422_S stImage;
 	RESULT_S stResult;
@@ -84,7 +90,8 @@ gettimeofday(&t1, NULL);
 		IMP_GetResults( hIMP, &stResult );
 
 gettimeofday(&t2, NULL);
-printf("out:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
+fTime3 = (t2.tv_usec - t1.tv_usec) / 1000.f;
+printf("out:%.1f ms\n", fTime3);
 printf("\n--------------------------\n");
 #ifdef SHOW_DEBUG_INFO
         IMP_ShowDebugInfo(&stResult);
@@ -92,6 +99,9 @@ printf("\n--------------------------\n");
         pthread_mutex_lock(&mut);
         gstPeaResult = stResult;
         pthread_mutex_unlock(&mut);
+        
+        sprintf(gabyAlgoInfo, "W:%d, H:%d\nAlgoTime:%.1f ms\nObject Number:%d\n", stFrame.stVFrame.u32Width, stFrame.stVFrame.u32Height, fTime3, stResult.stTargetSet.s32TargetNum);
+        
         usleep(100000);
 
     }
@@ -331,10 +341,10 @@ static void IMP_ParaConfig( IMP_MODULE_HANDLE hModule )
 	{
 		stURPpara.stConfigPara.s32ImgW = 352;
 		stURPpara.stConfigPara.s32ImgH = 288;
-		stURPpara.stRuleSet.astRule[0].u32Enable = 0;
+		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
 		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_PERIMETER;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeLimit = 0;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeHuman = 1;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32TypeVehicle = 1;
@@ -343,14 +353,14 @@ static void IMP_ParaConfig( IMP_MODULE_HANDLE hModule )
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinDist = 0;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.s32MinTime = 0;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.s32BoundaryPtNum = 4;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16X = 10;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 270;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16X = 50;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[0].s16Y = 50;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16X = 340;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[1].s16Y = 10;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16X = 340;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[2].s16Y = 270;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 340;
-		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 10;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
+		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 270;
 
 		stURPpara.stRuleSet.astRule[1].u32Enable = 1;
 		stURPpara.stRuleSet.astRule[1].u32Valid = 1;

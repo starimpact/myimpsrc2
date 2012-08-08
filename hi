@@ -1,0 +1,12 @@
+imp_draw_osd.c: In function `IMP_DrawATMOneRule':
+imp_draw_osd.c:1058: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1059: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1064: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1065: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c: In function `IMP_DrawPeaRule':
+imp_draw_osd.c:1113: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1114: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1118: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1119: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1130: 警告： 赋值 from incompatible pointer type
+imp_draw_osd.c:1131: 警告： 赋值 from incompatible pointer type

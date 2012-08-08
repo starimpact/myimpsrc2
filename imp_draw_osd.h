@@ -64,6 +64,9 @@ typedef enum impVIDEO_FORMAT_E
 	IMP_HD1
 }VIDEO_FORMAT_E;
 
+#define FONTDATAMAX 4096
+extern const unsigned char fontdata_sun8x16[FONTDATAMAX];
+
 #ifdef __cplusplus
 extern "C"
 {

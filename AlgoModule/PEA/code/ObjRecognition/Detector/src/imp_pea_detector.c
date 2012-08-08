@@ -347,7 +347,7 @@ gettimeofday(&t2, NULL);
 printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
-#if 1
+#if 0
 #if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif
@@ -364,22 +364,22 @@ printf("ProcessGrayGaussian:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 	
 	
-#if 0 //VIBE
+#if 1 //VIBE
 
-#if PTDI_TIME || 1
+#if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
 	//process ViBe
 	IMP_ProcessViBe(pstTargetDetector->hViBeModel);
 	
-#if PTDI_TIME || 1
+#if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 
 #endif //VIBE
 
-#if 1
+#if 0
 #if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif	
@@ -410,9 +410,14 @@ if (pstResult->s32ModuleSwitch & 1)
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
 #endif
-
+	IMP_S32 s32I;
+	
  	ipProcessRegionExtract( pstRgExtract );
-
+//	IMP_GrayImageClone(pstResult->stDRegionSet.pstImgFgRgn, pstResult->stDRegionSet.pstImgFgOrg);
+//	for (s32I = 0; s32I < s32ImgW * s32ImgH; s32I++)
+//	{
+//		pstResult->stDRegionSet.pstImgFgOrg->pu8Data[s32I] = pstResult->stDRegionSet.pstImgFgOrg->pu8Data[s32I] > 0 ? 255 : 0;
+//	}
 #if PTDI_TIME
 gettimeofday(&t2, NULL);
 printf("ipProcessRegionExtract:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
