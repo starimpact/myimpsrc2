@@ -314,7 +314,7 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 		
 		if(target->u32Event !=0)
 		{
-			printf("id:%d, event=%d\n", target->u32Id, target->u32Event);
+		//	printf("id:%d, event=%d\n", target->u32Id, target->u32Event);
 			
 		    pcrLine = &colors[2];//&(colors[target->u32Id%12]);
 		}
@@ -874,7 +874,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         //draw_classtype_trajectory_ttarget(pPEA->m_pResult, color_dst_trajectory, 1 );
         draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
         //ShowTargetMsg(pModule,color_dst_trajectory);
-        ShowPEAResult(&stResult,color_dst_blob);
+     //   ShowPEAResult(&stResult,color_dst_blob);
 
         ShowPeaRule(&stURPpara,color_dst_blob);
 

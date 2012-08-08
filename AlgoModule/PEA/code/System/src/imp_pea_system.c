@@ -1451,7 +1451,7 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 	
 //	printf("s32TrjDist2:%d\n", s32TrajectDist);
 	k = pstTargetSet->s32TargetNum;
-//	printf("OutputTargetSet target num:%d\n", pstTTargetSet->s32UsedTotal);
+	printf("OutputTargetSet target num:%d\n", pstTTargetSet->s32UsedTotal);
 	for( i = 0, j = 0; i < IMP_MAX_TGT_CNT; i++ )
 	{
 		if( !ipTrackedTargetIsActive( &pstTTarget[i] ) )

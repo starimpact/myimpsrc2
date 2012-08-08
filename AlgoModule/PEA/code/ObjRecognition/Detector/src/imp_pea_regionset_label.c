@@ -203,7 +203,8 @@ static IMP_VOID ipRemoveSmallRegionsOnFull( PEA_RGE_LABLE_PARA_S *pstPara, PEA_D
 	IMP_S32 s32Del, s32AreaPixel;
 	IMP_S32 s32ThDrgMinSizeWh = pstPara->s32ThDrgMinSizeWh;
 	IMP_S32 s32ThDrgMinSizePixel = pstPara->s32ThDrgMinSizePixelCur;
-
+	
+	
 	IMP_ITERATE_RGS_START
 	if( IMP_DRG_IS_LABELING(pstDrg->u8Used) || IMP_DRG_IS_LABELED(pstDrg->u8Used) )
 	{
@@ -239,7 +240,7 @@ static IMP_VOID ipRemoveSmallRegionsOnLine( PEA_RGE_LABLE_PARA_S *pstPara, PEA_D
 	PEA_DETECTED_REGION_S *pstDrg;
 	IMP_S32 i, s32Cnt;
 	IMP_S32 s32Del, s32AreaPixel;
-	IMP_S32 s32ThDrgMinSizePixel = pstPara->s32ThDrgMinSizePixelCur;
+	IMP_S32 s32ThDrgMinSizePixel = 10;//pstPara->s32ThDrgMinSizePixelCur;
 
 	IMP_ITERATE_RGS_START
 	if( IMP_DRG_IS_LABELED(pstDrg->u8Used) )

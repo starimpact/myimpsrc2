@@ -55,7 +55,7 @@ IMP_S32 IMP_PEA_TemperaryClassify(IpTrackedTarget *pstTarget);
 
 IMP_S32 IMP_PEA_ProcessObjRecognition( IMP_MODULE_HANDLE hModule )
 {
-#define POR_TIME 1
+#define POR_TIME 0
 	PEA_ModuleObjRecognition *pModule = (PEA_ModuleObjRecognition*)hModule;
 	PEA_RESULT_S *pstResult = pModule->pstResult;
 	

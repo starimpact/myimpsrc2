@@ -281,7 +281,7 @@ static IMP_VOID ipPreProcessCurrentImage( PEA_TARGET_DETECTOR_S *pstTargetDetect
 
 IMP_S32 ipProcessTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector )
 {
-#define PTDI_TIME 1
+#define PTDI_TIME 0
 	PEA_STATUS_S *pstStatus = &pstTargetDetector->pstResult->stSysStatus;
     PEA_DETECTED_REGIONSET_S *pstRegionSet = 0;
 	GRAY_IMAGE_S *pstImgFrmDiff = 0;
@@ -305,7 +305,7 @@ IMP_S32 ipProcessTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetecto
 	s32ImgW = pstTargetDetector->pstResult->s32Width;
 	s32ImgH = pstTargetDetector->pstResult->s32Height;
 	
-#if PTDI_TIME || 1
+#if PTDI_TIME || 0
 struct timeval t1, t2;
 #endif
 
@@ -348,7 +348,7 @@ printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
 #if 1
-#if PTDI_TIME || 1
+#if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif
 	IMP_ProcessGrayGaussian(pstTargetDetector->hGGModel);
@@ -357,7 +357,7 @@ gettimeofday(&t1, NULL);
 	IMP_GrayImageClone(&pstResult->stOutPutGG.stFilter, pstResult->stDRegionSet.pstImgFgOrg);
 	IMP_GrayImageClone(&pstResult->stOutPutGG.stBkg, pstResult->stDRegionSet.pstImgBgGray);
 	
-#if PTDI_TIME || 1
+#if PTDI_TIME || 0
 gettimeofday(&t2, NULL);
 printf("ProcessGrayGaussian:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
@@ -380,14 +380,14 @@ printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif //VIBE
 
 #if 1
-#if PTDI_TIME || 1
+#if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif	
 	IMP_ProcessSwing(pstTargetDetector->hSwingModel);
 	
 	IMP_GrayImageClone(pstResult->stDRegionSet.pstImgFgOrg, pstResult->stDRegionSet.pstImgFgRgn);
 	
-#if PTDI_TIME || 1
+#if PTDI_TIME || 0
 gettimeofday(&t2, NULL);
 printf("ProcessSwing:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif

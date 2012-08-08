@@ -180,7 +180,7 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 	Mutation(pstModule);
 	gettimeofday(&end,NULL);
 	IMP_S32 timeuse = end.tv_usec - start.tv_usec; 
-	printf("time %d\n", timeuse);
+//	printf("time %d\n", timeuse);
 }
 
 
