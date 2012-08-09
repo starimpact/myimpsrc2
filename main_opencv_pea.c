@@ -311,7 +311,7 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 		TGT_MOTION_ITEM_S *item_data = (TGT_MOTION_ITEM_S*)(target->au8Data);
 		TGT_TRAJECT_S *traject = &item_data->stTraject;
 		
-		printf("ID_%d: PERI:%d, TRIP:%d\n", target->u32Id, target->u32Event & IMP_TGT_EVENT_PERIMETER, target->u32Event & IMP_TGT_EVENT_TRIPWIRE);
+//		printf("ID_%d: PERI:%d, TRIP:%d\n", target->u32Id, target->u32Event & IMP_TGT_EVENT_PERIMETER, target->u32Event & IMP_TGT_EVENT_TRIPWIRE);
 		if(target->u32Event !=0)
 		{
 		//	printf("id:%d, event=%d\n", target->u32Id, target->u32Event);
@@ -341,6 +341,8 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 	//	sprintf(abyText, "%d:%c,%d", target->u32Id, type, num);
 		sprintf(abyText, "%d:%d", target->u32Id, num);
 		cvPutText(img,abyText,cvPoint(pt1.s16X,pt1.s16Y),&font, CV_RGB(0, 255, 0));
+
+
 		
 		for( k=1; k<num; k++ )
 		{
@@ -559,7 +561,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 	{
 		stURPpara.stConfigPara.s32ImgW = 352;
 		stURPpara.stConfigPara.s32ImgH = 288;
-		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[0].u32Enable = 0;
 		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_PERIMETER;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
@@ -580,51 +582,22 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 270;
 
-	//	stURPpara.stRuleSet.astRule[0].u32Enable = 0;
-	//	stURPpara.stRuleSet.astRule[0].u32Valid = 1;
-		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_TRIPWIRE;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeLimit = 0;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeHuman = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.s32TypeVehicle = 1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
-#if 0
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=200;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=280;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=190;
+		stURPpara.stRuleSet.astRule[1].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[1].u32Valid = 1;
+		stURPpara.stRuleSet.astRule[1].u32Mode |= IMP_FUNC_TRIPWIRE;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.s32TypeLimit = 1;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.s32TypeHuman =1;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.s32TypeVehicle =1;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
+
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=100;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=270;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=300;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=0;
-#endif
-
-#if 0
-        stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=180;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=0;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=200;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=280;
-#endif
-
-#if 0
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=350;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=250;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=50;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=240;
-#endif
-
-#if 0
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=50;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=220;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=350;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=210;
-#endif
-
-#if 1
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=350;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=150;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=50;
-		stURPpara.stRuleSet.astRule[0].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=150;
-#endif
 
 	}
 //	IMP_PARA_Init( pstPara, NULL, NULL, s32ImgW, s32ImgH, NULL );
@@ -966,7 +939,7 @@ int main()
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
 
@@ -975,7 +948,7 @@ int main()
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-32010-树林超强逆光-光线耀斑.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/3P-1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31024-1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21019-白天户外-小目标行驶.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-21019-白天户外-小目标行驶.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31029-夜红外树丛-小目标低对比.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-31002-白天行人-低对比度.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/cam2_2.avi";
@@ -999,7 +972,6 @@ int main()
 #endif
 
 	m_interFrame = 1;
-
 
 	IMP_OpencvExample(fileName,IMP_AVI,m_frame_width,m_frame_height,m_interFrame,videoFormat);
 //	IMP_OpencvExample(fileName,IMP_YUV,m_frame_width,m_frame_height,m_interFrame,videoFormat);

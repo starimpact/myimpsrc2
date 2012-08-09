@@ -58,7 +58,7 @@ IMP_S32 IMP_PEA_ProcessObjRecognition( IMP_MODULE_HANDLE hModule )
 #define POR_TIME 0
 	PEA_ModuleObjRecognition *pModule = (PEA_ModuleObjRecognition*)hModule;
 	PEA_RESULT_S *pstResult = pModule->pstResult;
-	
+
 #if POR_TIME
 struct timeval t1, t2;
 #endif
@@ -126,7 +126,7 @@ IMP_S32 IMP_PEA_TemperaryClassify(IpTrackedTarget *pstTarget)
 			
 			pstPos0->u32Type = IMP_TGT_TYPE_UNKNOWN;
 			
-			if (areaSize > 50 && areaSize * 100 > rgSize * 40)
+			if (1 || areaSize > 50 && areaSize * 100 > rgSize * 40)
 			{
 				if (fRatio > 1.2f) 
 				{	

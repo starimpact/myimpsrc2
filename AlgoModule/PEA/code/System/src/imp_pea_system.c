@@ -228,9 +228,9 @@ STATUS_E IMP_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 	
 	// init module( object recognition )
 	pModule->hObjRecg = IMP_PEA_CreateObjRecognition( pModule->pstResult, &pModule->stHwRes ); //memory allocation error
-
+	
 	// init module( event analysis )
- 	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
+	pModule->hEvtAnls = IMP_PEA_BVA_CreateBehaviorAnalysis( pModule->pstResult, &pModule->stHwRes );
 
 	return IMP_STATUS_OK;
 }
@@ -243,15 +243,15 @@ STATUS_E IMP_Release( IMP_HANDLE hModule )
 	MEM_MGR_ARRAY_S *pMemMgr = &pModule->stHwRes.stMemMgr;
 
 	// terminate module( event analysis )
- 	IMP_PEA_BVA_ReleaseBehaviorAnalysis( pModule->hEvtAnls );
-
+	IMP_PEA_BVA_ReleaseBehaviorAnalysis( pModule->hEvtAnls );
+	
 	// terminate module( object recognition )
 	IMP_PEA_ReleaseObjRecognition( pModule->hObjRecg );
-
+	
 	// terminate result
 	IMP_PEA_ResultTerminate( pModule->pstResult, pMemMgr );
 	IMP_MMFree( pMemMgr, IMP_MEMBLK_TYPE_SLOW, pModule->pstResult );
-
+	
 	// terminate parameter
 	IMP_MMFree( pMemMgr, IMP_MEMBLK_TYPE_SLOW, pModule->pstSysPara );
 

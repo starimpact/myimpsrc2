@@ -7,7 +7,7 @@
 #include "stdio.h"
 #include "math.h"
 
-#define IMP_MIN_TGT_AREA          40
+#define IMP_MIN_TGT_AREA          10
 #define IMP_STABLE_THRESHOLD      20
 
 

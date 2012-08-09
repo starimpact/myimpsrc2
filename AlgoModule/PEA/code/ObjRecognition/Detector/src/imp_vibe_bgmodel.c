@@ -413,9 +413,9 @@ printf("vibe-contour:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 
 #endif	//cat
 
-//	IMP_U8 au8Mask[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
-//	memset(pu8FgDilate, 0, s32Width * s32Height);
-//	ipMorphDilateImage(pu8Fg, s32Width, pu8FgDilate, s32Width, s32Width, s32Height, au8Mask);
+	IMP_U8 au8Mask[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+	memset(pu8FgDilate, 0, s32Width * s32Height);
+	ipMorphDilateImage(pu8Fg, s32Width, pu8FgDilate, s32Width, s32Width, s32Height, au8Mask);
 //	ipShowGrayImage(s32Width, s32Height, pu8FgDilate, "FgDilate");
 	
 #if VIBE_SHW_TIME

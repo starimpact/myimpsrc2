@@ -347,7 +347,7 @@ gettimeofday(&t2, NULL);
 printf("noise:%d ms\n", (t2.tv_usec - t1.tv_usec) / 1000);
 #endif
 
-#if 0
+#if 1
 #if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif
@@ -364,7 +364,7 @@ printf("ProcessGrayGaussian:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 #endif
 	
 	
-#if 1 //VIBE
+#if 0 //VIBE
 
 #if PTDI_TIME
 gettimeofday(&t1, NULL);
@@ -379,7 +379,7 @@ printf("vibe:%.1f ms\n", (t2.tv_usec - t1.tv_usec) / 1000.f);
 
 #endif //VIBE
 
-#if 0
+#if 1
 #if PTDI_TIME || 0
 gettimeofday(&t1, NULL);
 #endif	

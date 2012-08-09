@@ -15,11 +15,12 @@ typedef struct impGrayGaussian_S
 	IMP_U8 *pu8Dilate;
 	GRAY_IMAGE_S stFilter;
 	IMP_S32 s32Count;
+	IMP_S32 s32Tick;
+	IMP_S32 s32IfFirst;
 	IMP_S32 s32Size;
 	IMP_S32	s32H;
 	IMP_S32 s32W;	
 	IMP_S32 s32Alpha;       //模型学习率
-	IMP_S32 s32w_Alpha;     //权重学习率
 }IMP_GrayGaussian_S;
 
 IMP_S32 IMP_GetMemSizeGrayGaussian(PEA_RESULT_S *pstResult)
@@ -42,8 +43,10 @@ IMP_MODULE_HANDLE IMP_CreateGrayGaussian(PEA_RESULT_S *pstResult, GA_HARDWARE_RS
     IMP_S32	s32H=pstResult->s32Height;
 	IMP_S32 s32W=pstResult->s32Width;
 	pstModule->s32Alpha = 51;  //初始化模型学习率
-	pstModule->s32w_Alpha = 1; //初始化权重学习率
 	pstModule->s32Size = (s32H*s32W)>>3 ;
+	pstModule->s32Tick = 0;
+	pstModule->s32Count = 0;
+	pstModule->s32IfFirst = 1;
    	IMP_S32 s32row;
    	IMP_S32 s32col;
 	pstModule->pstCod = (IMP_S32 *) IMP_MMAlloc( &pstHwResource->stMemMgr,IMP_MEMBLK_TYPE_SLOW,s32H*s32W*4);
@@ -69,9 +72,9 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
     IMP_S32 s32H = pstModule->pstResult->s32Height ;
 	IMP_S32 s32W = pstModule->pstResult->s32Width ;
 	IMP_S32 s32Alpha = pstModule->s32Alpha ;
-   	IMP_S32 s32w_Alpha = pstModule->s32w_Alpha ;
 	IMP_S32 *ps32Codval = pstModule->pstCod ;
 	IMP_S32 s32threshold = 0;
+	IMP_S32 s32Tick = pstModule->s32Tick;
 	s32threshold = pstModule->pstResult->s32Noise;
 	s32threshold = ((s32threshold<<2)+s32threshold)>>2;
 	IMP_U8 u8Scenceval;
@@ -82,10 +85,11 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 	IMP_U8 *pu8Filter = pstModule->pstOutput->stFilter.pu8Data;
 	IMP_U8 *pu8Filtercop = pstModule->stFilter.pu8Data;
 	IMP_S32 s32d = pstModule->pstResult->u32FrmTimeCur ;  //帧号
-	if(s32d==0)                                       //取第一帧信息
+//	if(s32d==0)                                       //取第一帧信息
+	if (pstModule->s32IfFirst)
 	{
+		pstModule->s32IfFirst = 0;
 		memset(pu8Filter,0,s32H*s32W);
-		(pstModule->s32Count) = 0;
 	  	for(s32row=s32H-1;s32row>=0;s32row--)
 			for(s32col=s32W-1;s32col>=0;s32col--)
 			{
@@ -150,14 +154,14 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 			if(ptr_sub[(s32col<<2)+3]==0)
 			{
 				if(s32weight2-200<0)
-					if((s32d&3)==0)
+					if((s32Tick&1)==0)
 						s32weight2++;
 				s32model2=((s32model2<<7)+s32Alpha*(ptr_scence[s32col]-s32model2) +64 )>>7;
 			}
 			if((ptr_sub[(s32col<<2)+0]&ptr_sub[(s32col<<2)+3])==255)
 			{
-				if(s32weight2>1)
-				s32weight2 -=1;
+				if(s32weight2>4)
+				s32weight2 -=4;
 				s32model2 = ptr_scence[s32col];
 			}
 			s32weight1 = 200 -s32weight2;
@@ -175,12 +179,16 @@ IMP_S32 IMP_ProcessGrayGaussian(IMP_MODULE_HANDLE hModule)
 			ptr_bkg[s32col] = (IMP_U8)s32model1;				
 		}
 	}
+//	ipShowGrayImage(s32W, s32H, pu8Bkg, "hellotrl1");
 	IMP_GrayImageClone( &pstModule->pstOutput->stFilter, &pstModule->stFilter);
 	filter(pstModule);
 	Mutation(pstModule);
+//	ipShowGrayImage(s32W, s32H, pu8Filter, "hellofilter");
+	pstModule->s32Tick++;
+	if (pstModule->s32Tick > 100) pstModule->s32Tick = 0;
 	gettimeofday(&end,NULL);
 	IMP_S32 timeuse = end.tv_usec - start.tv_usec; 
-//	printf("time %d\n", timeuse);
+	printf("time %d\n", timeuse);
 }
 
 

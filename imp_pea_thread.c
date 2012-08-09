@@ -17,7 +17,9 @@ IMP_HANDLE hIMP;
 
 IMP_S32 PEA_ALGO_PROCESS()
 {
-	IMP_FLOAT fTime3;
+	IMP_FLOAT fTime3, fTime2, fTime1;
+	struct timeval t1, t2, t3, t4, t5, t6;
+	
     IMP_S32 nFrmNum = 0;
     VIDEO_FRAME_INFO_S stFrame;
     VI_DEV ViDev = 0;
@@ -70,15 +72,17 @@ printf("w:%d, h:%d\n", s32Width, s32Height);
         if(master_thread_init_ok == 0)
             continue;
         //Get Image From Hisi Interface
+gettimeofday(&t5, NULL);
         if (HI_MPI_VI_GetFrame(ViDev, ViChn, &stFrame))
         {
             printf("HI_MPI_VI_GetFrame err, vi(%d,%d)\n", ViDev, ViChn);
             continue;
         }
-        
-struct timeval t1, t2;
+gettimeofday(&t6, NULL);
+fTime1 = (t6.tv_usec - t5.tv_usec) / 1000.f;
+
 gettimeofday(&t1, NULL);
- 
+
         IMP_HiImageConvertToYUV422Image(&stFrame.stVFrame,&stImage);
 
         HI_MPI_VI_ReleaseFrame(ViDev, ViChn, &stFrame);
@@ -91,8 +95,8 @@ gettimeofday(&t1, NULL);
 
 gettimeofday(&t2, NULL);
 fTime3 = (t2.tv_usec - t1.tv_usec) / 1000.f;
-printf("out:%.1f ms\n", fTime3);
-printf("\n--------------------------\n");
+//printf("out:%.1f ms\n", fTime3);
+
 #ifdef SHOW_DEBUG_INFO
         IMP_ShowDebugInfo(&stResult);
 #endif
@@ -100,9 +104,16 @@ printf("\n--------------------------\n");
         gstPeaResult = stResult;
         pthread_mutex_unlock(&mut);
         
-        sprintf(gabyAlgoInfo, "W:%d, H:%d\nAlgoTime:%.1f ms\nObject Number:%d\n", stFrame.stVFrame.u32Width, stFrame.stVFrame.u32Height, fTime3, stResult.stTargetSet.s32TargetNum);
+gettimeofday(&t4, NULL);
+fTime2 = (t4.tv_usec - t3.tv_usec) / 1000.f;
         
-        usleep(100000);
+        sprintf(gabyAlgoInfo, "W:%d, H:%d\nAlgTime:%.1f ms\nGtFTime:%.1f ms\nSysTime:%.1f ms\nObject Number:%d\n", stFrame.stVFrame.u32Width, stFrame.stVFrame.u32Height, fTime3, fTime1, fTime2, stResult.stTargetSet.s32TargetNum);
+        printf("%s", gabyAlgoInfo);
+        
+gettimeofday(&t3, NULL);
+
+printf("\n--------------------------\n");
+        usleep(15000);
 
     }
 
@@ -341,7 +352,7 @@ static void IMP_ParaConfig( IMP_MODULE_HANDLE hModule )
 	{
 		stURPpara.stConfigPara.s32ImgW = 352;
 		stURPpara.stConfigPara.s32ImgH = 288;
-		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[0].u32Enable = 0;
 		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_PERIMETER;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION; //IMP_URP_PMODE_ENTER; //;
