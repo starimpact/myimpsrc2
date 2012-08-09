@@ -1,30 +1,17 @@
-In file included from /home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd.h:11,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/Detector/include/imp_pea_detector.h:5,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/imp_pea_obj_recognition.h:4,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/System/include/imp_pea_system.h:10,
-                 from main_pea.c:3:
-/home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd_clarity.h:7:51: 警告： no newline at end of file
-In file included from /home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd.h:14,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/Detector/include/imp_pea_detector.h:5,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/imp_pea_obj_recognition.h:4,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/System/include/imp_pea_system.h:10,
-                 from main_pea.c:3:
-/home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd_noise.h:10:49: 警告： no newline at end of file
-In file included from /home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd.h:17,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/Detector/include/imp_pea_detector.h:5,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/imp_pea_obj_recognition.h:4,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/System/include/imp_pea_system.h:10,
-                 from main_pea.c:3:
-/home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd_ptz.h:27:68: 警告： no newline at end of file
-In file included from /home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd.h:18,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/Detector/include/imp_pea_detector.h:5,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/ObjRecognition/imp_pea_obj_recognition.h:4,
-                 from /home/zm/Workingarea/imp_src/AlgoModule/PEA/code/System/include/imp_pea_system.h:10,
-                 from main_pea.c:3:
-/home/zm/Workingarea/imp_src/AlgoModule/AVD/include/imp_avd_interfere.h:22:74: 警告： no newline at end of file
-main_pea.c: In function `thread_create':
-main_pea.c:689: 警告： passing arg 3 of `pthread_create' from incompatible pointer type
-main_pea.c:693: 警告： passing arg 3 of `pthread_create' from incompatible pointer type
-main_pea.c: In function `main':
-main_pea.c:720: 警告： `return' with a value, in function returning void
-main_pea.c:713: 警告： return type of 'main' is not `int'
+In file included from main_opencv_pea.c:9:
+/home/zm/Workingarea/imp_src/AlgoModule/PEA/code/PEACommon/include/imp_pea_common.h:17:1: warning: "MIN" redefined
+In file included from /usr/local/include/opencv2/core/core_c.h:47,
+                 from /usr/local/include/opencv/cv.h:63,
+                 from main_opencv_pea.c:2:
+/usr/local/include/opencv2/core/types_c.h:268:1: warning: this is the location of the previous definition
+In file included from main_opencv_pea.c:9:
+/home/zm/Workingarea/imp_src/AlgoModule/PEA/code/PEACommon/include/imp_pea_common.h:18:1: warning: "MAX" redefined
+In file included from /usr/local/include/opencv2/core/core_c.h:47,
+                 from /usr/local/include/opencv/cv.h:63,
+                 from main_opencv_pea.c:2:
+/usr/local/include/opencv2/core/types_c.h:272:1: warning: this is the location of the previous definition
+main_opencv_pea.c: In function ‘ReadImage’:
+main_opencv_pea.c:139: warning: ignoring return value of ‘fread’, declared with attribute warn_unused_result
+main_opencv_pea.c: In function ‘IMP_OpencvExample’:
+main_opencv_pea.c:677: warning: ‘return’ with a value, in function returning void
+main_opencv_pea.c:852: warning: ‘return’ with a value, in function returning void

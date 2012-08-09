@@ -375,7 +375,7 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
             {
 
                 zone=result->stEventSet.astEvents[i].u32Zone;
-               // printf("Target:%d perimeter procedure \n",result->stEventSet.astEvents[i].u32Id);
+                printf("Target:%d perimeter procedure \n",result->stEventSet.astEvents[i].u32Id);
 
                 /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
                 for(i=0;i<num1;i++)

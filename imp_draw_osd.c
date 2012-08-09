@@ -28,7 +28,7 @@ void IMP_CopySmallImage2Video(VIDEO_FRAME_S *pVBuf, GRAY_IMAGE_S *pstSmall, IMP_
 	{
 		return;
 	}
-	Sor = pstSmall->pu8Data;	
+	Sor = pstSmall->pu8Data;
 	Dst = pVBufVirt_Y + pVBuf->u32Width*s32Y +s32X;
 //	printf("ww:%d; s32X:%d, s32Y:%d\n", pVBuf->u32Width, s32X, s32Y);
 //	printf("Dst:%x, Sor:%x \n", Dst, Sor);

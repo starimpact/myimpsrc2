@@ -339,7 +339,7 @@ static void IMP_ParaConfig( IMP_MODULE_HANDLE hModule )
 	{
 		stURPpara.stConfigPara.s32ImgW = 352;
 		stURPpara.stConfigPara.s32ImgH = 288;
-		stURPpara.stRuleSet.astRule[0].u32Enable = 0;
+		stURPpara.stRuleSet.astRule[0].u32Enable = 1;
 		stURPpara.stRuleSet.astRule[0].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[0].u32Mode |= IMP_FUNC_PERIMETER;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.s32Mode = IMP_URP_PMODE_INTRUSION;
