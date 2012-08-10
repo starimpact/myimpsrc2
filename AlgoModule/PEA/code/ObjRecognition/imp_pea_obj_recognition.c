@@ -10,8 +10,8 @@ IMP_MODULE_HANDLE IMP_PEA_CreateObjRecognition( PEA_RESULT_S *pstResult, GA_HARD
 
 	pModule = IMP_MMAlloc( &pstHwResouce->stMemMgr, IMP_MEMBLK_TYPE_SLOW, sizeof(PEA_ModuleObjRecognition) );	// 64
 	pModule->hDetector = ipCreateDetector( pstResult, pstHwResouce );
-//	pModule->hTracker = ipCreateTracker( pstResult, pstHwResouce );
-	pModule->hNewTracker = IMP_CreateTracker(pstResult, pstHwResouce);
+	pModule->hTracker = ipCreateTracker( pstResult, pstHwResouce );
+//	pModule->hNewTracker = IMP_CreateTracker(pstResult, pstHwResouce);
 
 	pModule->pstResult = pstResult;
 	pModule->pstHwResouce = pstHwResouce;
@@ -25,8 +25,8 @@ IMP_VOID IMP_PEA_ReleaseObjRecognition( IMP_MODULE_HANDLE hModule )
 	PEA_ModuleObjRecognition *pModule = (PEA_ModuleObjRecognition*)hModule;
 	GA_HARDWARE_RS_S *pHwResouce = pModule->pstHwResouce;
 	
-//	ipReleaseTracker( pModule->hTracker );
-	IMP_ReleaseTracker(pModule->hNewTracker);
+	ipReleaseTracker( pModule->hTracker );
+//	IMP_ReleaseTracker(pModule->hNewTracker);
 	
 	ipReleaseDetector(pModule->hDetector);
 
@@ -38,7 +38,7 @@ IMP_VOID IMP_PEA_ConfigObjRecognition( IMP_MODULE_HANDLE hModule, INNER_PARA_S *
 	PEA_ModuleObjRecognition *pModule = (PEA_ModuleObjRecognition*)hModule;
 
 	ipConfigDetector( pModule->hDetector, pstVapara );
-//	ipConfigTracker( pModule->hTracker, pstVapara );
+	ipConfigTracker( pModule->hTracker, pstVapara );
 }
 IMP_VOID IMP_PEA_StartObjRecognition( IMP_MODULE_HANDLE hModule )
 {
@@ -82,8 +82,8 @@ if (pstResult->s32ModuleSwitch & 1)
 gettimeofday(&t1, NULL);
 #endif
 
-//	IMP_PEA_ProcessTracker( pModule->hTracker );
-	IMP_ProcessTracker(pModule->hNewTracker);
+	IMP_PEA_ProcessTracker( pModule->hTracker );
+//	IMP_ProcessTracker(pModule->hNewTracker);
 
 #if POR_TIME
 gettimeofday(&t2, NULL);
@@ -169,7 +169,7 @@ IMP_S32 IMP_PEA_PostProcessObjRecognition( IMP_MODULE_HANDLE hModule )
 {
 	PEA_ModuleObjRecognition *pModule = (PEA_ModuleObjRecognition*)hModule;
 
-//	ipPostProcessTracker( pModule->hTracker );
+	ipPostProcessTracker( pModule->hTracker );
 
 	ipPostProcessDetector( pModule->hDetector );
 
