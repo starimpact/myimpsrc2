@@ -214,7 +214,7 @@ imp_pea_common.c:(.text+0x2cc)：对‘cvReleaseImage’未定义的引用
 //Noise Estimate by 5X5 area, better and quicker version
 IMP_S32 ipNoiseEstimateByBox_25(GRAY_IMAGE_S *pimgNow, GRAY_IMAGE_S *pimgTmp, IMP_S32 *pdwNoiseValue)
 {
-#define NEBB_SHW 1
+#define NEBB_SHW 0
 	IMP_S32 dwRI, dwCI;
 	IMP_S32 dwBRI, dwBCI;
 	IMP_S32 dwOft, dwOft2, dwMax;

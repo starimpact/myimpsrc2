@@ -229,7 +229,7 @@ IMP_S32 IMP_ProcessViBe( IMP_MODULE_HANDLE hModule )
 
 IMP_S32 impGetAvgBkg_2(IMP_U8 **ppu8Bkgs, IMP_U8 *pu8Bkg, IMP_S32 s32Width, IMP_S32 s32Height);
 
-#define VIBE_SHW_TIME 1
+#define VIBE_SHW_TIME 0
 //two backgrounds
 IMP_S32 impProcessViBe0( IMP_MODULE_HANDLE hModule )
 {
