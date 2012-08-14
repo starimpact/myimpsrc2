@@ -45,6 +45,7 @@ typedef struct
 	IMP_S32 s32ThShadowDel;
 } IpRGEShadowPara;
 
+IMP_S32 IMP_GetMemSizeShadowImage(IMP_S32 s32Width, IMP_S32 s32Height);
 
 IMP_VOID ipRemoveRegionSetShadow( IpRGEShadowPara *pstPara, PEA_DETECTED_REGIONSET_S *pstRgs, IpShadowImage *pstShadow );
 

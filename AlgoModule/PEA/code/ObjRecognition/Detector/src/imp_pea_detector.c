@@ -9,6 +9,31 @@ IMP_VOID IMP_PEA_DetectorDataClear( PEA_DETECTOR_DATA_S *pstData )
 }
 
 
+IMP_S32 IMP_GetMemSizeDetector(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0, s32Size1 = 0;
+	
+	s32Size += sizeof(IpModuleDetector);
+	s32Size += sizeof(PEA_TARGET_DETECTOR_S);
+	s32Size1 = IMP_GetMemSizeViBe(s32Width, s32Height);	
+//	printf("GetMemSizeViBe:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeOSCD(s32Width, s32Height);
+//	printf("GetMemSizeOSCD:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeWaterMarker(s32Width, s32Height);
+//	printf("GetMemSizeWaterMarker:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizeRegionExtract(s32Width, s32Height);
+//	printf("GetMemSizeRegionExtract:%d\n", s32Size1);
+	s32Size += s32Size1;
+//	printf("s32Width * s32Height * 20:%d\n", s32Width * s32Height * 20);
+	s32Size += s32Width * s32Height * 20;
+	
+	return s32Size;
+}
+
+
 IMP_VOID ipCreateTargetDetectorInternal( PEA_TARGET_DETECTOR_S *pstTargetDetector, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce )
 {
 	IMP_S32 s32Height, s32Width;

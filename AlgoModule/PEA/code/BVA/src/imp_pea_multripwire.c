@@ -5,6 +5,12 @@
 extern IpTripwireTargetData* ipGetTripwireTargetData( IMP_VOID *pData );
 extern IpMTripwireTargetData* ipGetMTripwireTargetData( IMP_VOID *pData );
 
+IMP_S32 IMP_GetMemSizeMTripwire(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	return s32Size;
+}
 
 IMP_VOID ipCreateMTripwireAnalysti( IpMTripwireAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )
 {

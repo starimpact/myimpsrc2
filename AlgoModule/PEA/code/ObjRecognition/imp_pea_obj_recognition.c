@@ -1,6 +1,20 @@
 
 #include "imp_pea_obj_recognition.h"
 
+IMP_S32 IMP_GetMemSizeOfObjRecognition(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0, s32Size1 = 0;
+	
+	s32Size += sizeof(PEA_ModuleObjRecognition);
+	s32Size1 = IMP_GetMemSizeDetector(s32Width, s32Height);
+//	printf("GetMemSizeDetector:%d\n", s32Size1);
+	s32Size += s32Size1;
+	s32Size1 = IMP_GetMemSizePEATracker(s32Width, s32Height);
+//	printf("GetMemSizeTracker:%d\n", s32Size1);
+	s32Size += s32Size1;
+	
+	return s32Size;
+}
 
 
 IMP_MODULE_HANDLE IMP_PEA_CreateObjRecognition( PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResouce )

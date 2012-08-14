@@ -110,9 +110,16 @@ STATUS_E IMP_GetAlgoLibInfo( IMP_HANDLE hModule, LIB_INFO_S *pstLibInfo )
 	return IMP_STATUS_OK;
 }
 
+
+IMP_S32 IMP_GetMemSize(IMP_S32 s32Width, IMP_S32 s32Height);
+
+
 STATUS_E IMP_GetMemReq( IMP_HANDLE hModule, MEM_SET_S *pstMems )
 {
 	MEM_MGR_REQ_S sNReq;
+	IMP_S32 s32Size = 0;
+	
+	s32Size = IMP_GetMemSize(pstMems->u32ImgW, pstMems->u32ImgH);
 
 	sNReq.au32NodNum[IMP_MEMBLK_TYPE_FAST] = FAST_RAM_NODE_NUM;
 	sNReq.au32NodNum[IMP_MEMBLK_TYPE_SLOW] = SLOW_RAM_NODE_NUM;
@@ -156,6 +163,34 @@ STATUS_E IMP_CheckRule( IMP_HANDLE hModule, RULE_CHECK_S *pRulChk )
 
 	return enStatus;
 }
+
+
+//get memory size of system
+IMP_S32 IMP_GetMemSize(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+//	printf("INNER_PARA_S:%d\n", sizeof(INNER_PARA_S));
+	s32Size += sizeof(INNER_PARA_S);
+//	printf("GetMemSizeRule:%d\n", IMP_GetMemSizeRule(s32Width, s32Height));
+	s32Size += IMP_GetMemSizeRule(s32Width, s32Height);//IMP_RULE_Alloc
+//	printf("GetMemSizeRuleAdvPara:%d\n", IMP_GetMemSizeRuleAdvPara(IMP_VPARAADVBUFNUM_MAX, IMP_PARA_ADVBUF_BUFLEN));
+	s32Size += IMP_GetMemSizeRuleAdvPara(IMP_VPARAADVBUFNUM_MAX, IMP_PARA_ADVBUF_BUFLEN);//IMP_RULE_AdvParaAlloc
+//	printf("PEA_SYSTEM_PARA_S:%d\n", sizeof(PEA_SYSTEM_PARA_S));
+	s32Size += sizeof(PEA_SYSTEM_PARA_S);//
+//	printf("PEA_RESULT_S:%d\n", sizeof(PEA_RESULT_S));
+	s32Size += sizeof(PEA_RESULT_S);
+//	printf("GetMemSizeOfObjRecognition:%d\n", IMP_GetMemSizeOfObjRecognition(s32Width, s32Height));
+	s32Size += IMP_GetMemSizeOfObjRecognition(s32Width, s32Height);
+//	printf("GetMemSizeBehaviorAnalysis:%d\n", IMP_GetMemSizeBehaviorAnalysis(s32Width, s32Height));
+	s32Size += IMP_GetMemSizeBehaviorAnalysis(s32Width, s32Height);
+	
+//	printf("system memeory size:%d\n", s32Size);
+	
+//	exit(0);
+	return s32Size;
+}
+
 
 extern IMP_VOID IMP_RULE_InitParaPea( INNER_PARA_S *pstInnerPara, MEM_MGR_ARRAY_S *pMemMgr );
 static IMP_VOID IMP_PEA_ReStartStatus( IMP_HANDLE hModule );

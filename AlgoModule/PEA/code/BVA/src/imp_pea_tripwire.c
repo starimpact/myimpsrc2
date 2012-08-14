@@ -2,6 +2,15 @@
 
 #if defined(SUPPORT_TRIPWIRE)
 
+
+IMP_S32 IMP_GetMemSizeTripwire(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	return s32Size;
+}
+
+
 extern IpTripwireTargetData* ipGetTripwireTargetData( IMP_VOID *pData );
 IMP_VOID ipFillTargetEventDataTripwire( EVT_ITEM_S *pstEvent, IpTrackedTarget *pstTarget, RULE_S *pstRule )
 {

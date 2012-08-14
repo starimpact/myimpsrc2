@@ -6,6 +6,14 @@ static IMP_VOID ipClearTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr );
 static IMP_VOID ipCollectTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEvts, PEA_RESULT_S *pstResult, IMP_S32 s32Flag );
 static IMP_VOID ipClearTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEvts, PEA_RESULT_S *pstResult, IMP_S32 s32Flag );
 extern IpTripwireTargetData* ipGetTripwireTargetData( IMP_VOID *pData );
+
+IMP_S32 IMP_GetMemSizeTargetEvtMgr(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	return s32Size;
+}
+
 IMP_VOID ipCreateTargetEvtMgr( IpTargetEvtMgr *pstEvtMgr, PEA_RESULT_S *pstResult )
 {
 	memset( pstEvtMgr, 0, sizeof(IpTargetEvtMgr) );
@@ -106,6 +114,17 @@ static EVT_ITEM_S* ipAddTargetEvent( IpTargetEvtMgr *pstEvtMgr, EVT_SET_S *pstEv
         return pstEvt;
 
     }
+    
+   	if(!pstTarget && IMP_EVT_STATUS_END == u32Status && IMP_EVT_TYPE_AlarmPerimeter == pstEvt->u32Type)
+  	{
+		IMP_S32 s32ZoneIndex = pstEvt->u32Zone;
+		RULE_ZONE_S *pstZone = &pstEvtMgr->pstRule->stZones.astZone[s32ZoneIndex];
+		EVT_DATA_PERIMETER_S *pstData = (EVT_DATA_PERIMETER_S*)pstEvt->au8Data;
+		
+		memset(&pstData->stRect, 0,sizeof(IMP_RECT_S));
+		pstData->stRule.u32Mode = pstZone->stPara.stPerimeter.s32Mode;
+    }
+    
 	if( !pstTarget /*|| IMP_EVT_STATUS_END == u32Status*/)
 	{
         return pstEvt;

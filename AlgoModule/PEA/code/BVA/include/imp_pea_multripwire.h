@@ -61,6 +61,7 @@ typedef struct
 	IpMTripwirePara *pstPara;
 } IpMTripwireAnalyst;
 
+IMP_S32 IMP_GetMemSizeMTripwire(IMP_S32 s32Width, IMP_S32 s32Height);
 IMP_VOID ipCreateMTripwireAnalysti( IpMTripwireAnalyst *pstAnalyst, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource );
 IMP_VOID ipReleaseMTripwireAnalysti( IpMTripwireAnalyst *pstAnalyst );
 IMP_VOID ipConfigMTripwireAnalysti( IpMTripwireAnalyst *pstAnalyst, IpMTripwirePara *pstPara );

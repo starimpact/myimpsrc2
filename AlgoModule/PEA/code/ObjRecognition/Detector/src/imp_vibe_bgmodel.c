@@ -59,14 +59,16 @@ input:
 output:算法需要的内存大小
 history:
 ****************************************************/
-IMP_S32 IMP_GetMemSizeViBe( PEA_RESULT_S *pstResult )
+IMP_S32 IMP_GetMemSizeViBe(IMP_S32 s32Width, IMP_S32 s32Height)
 {
-	IMP_S32 width = pstResult->s32Width;
-	IMP_S32 height = pstResult->s32Height;
+	IMP_S32 s32Size = 0;
 	
- 	IMP_S32 size = width * height * 30;
+	s32Size += sizeof(IMP_ViBe_S);
+	s32Size += s32Width * s32Height * sizeof(IMP_U8*);
+	s32Size += 2 * s32Width * s32Height;
+	s32Size += 4 * s32Width * s32Height;
 	
-	return size;
+	return s32Size;
 }
 
 

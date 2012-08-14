@@ -2,6 +2,18 @@
 #include "imp_pea_tracker.h"
 
 
+IMP_S32 IMP_GetMemSizePEATracker(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(IpModuleTracker);
+	s32Size += sizeof(IpTargetTracker);
+	s32Size += IMP_GetMemSizeTTI(s32Width, s32Height);
+	
+	return s32Size;
+}
+
+
 IMP_VOID ipCreateTargetTrackerInternal( IpTargetTracker *pstTarget, GA_HARDWARE_RS_S *pstHwResource, PEA_RESULT_S *pstResult )
 {
 	memset( pstTarget, 0, sizeof(IpTargetTracker) );

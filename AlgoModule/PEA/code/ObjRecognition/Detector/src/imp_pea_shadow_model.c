@@ -2,6 +2,17 @@
 #include "imp_pea_regionset_label.h"
 
 
+IMP_S32 IMP_GetMemSizeShadowImage(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += s32Width * sizeof(IpShadowInterval);
+	s32Size += s32Width * sizeof(IpShadowColumn);
+
+	return s32Size;
+}
+
+
 IMP_VOID ipRemoveRegionSetShadow( IpRGEShadowPara *pstPara, PEA_DETECTED_REGIONSET_S *pstRgs, IpShadowImage *pstShadow )
 {
 	IMP_S32 i, s32Cnt;

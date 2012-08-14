@@ -2,6 +2,27 @@
 #include "imp_pea_bva.h"
 
 
+IMP_S32 IMP_GetMemSizeBehaviorAnalysis(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(IpModuleAnalyst);
+	s32Size += sizeof(BEHAVIOR_ANALYSIS_S);
+	s32Size += sizeof(TARDAT_ANALYST_S) * IMP_MAX_TGT_CNT;
+	s32Size += IMP_GetMemSizePerimeter(s32Width, s32Height);
+#if defined(SUPPORT_TRIPWIRE)	
+	s32Size += IMP_GetMemSizeTripwire(s32Width, s32Height);
+#endif
+
+#if defined(SUPPORT_MTRIPWIRE)	
+	s32Size += IMP_GetMemSizeMTripwire(s32Width, s32Height);
+#endif
+	s32Size += IMP_GetMemSizeTargetEvtMgr(s32Width, s32Height);
+	
+	return s32Size;
+}
+
+
 IMP_VOID ipCreateAnalystInternal( BEHAVIOR_ANALYSIS_S *pstBva, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pHwResouce )
 {
 	MEM_MGR_ARRAY_S *pstMemMgr;

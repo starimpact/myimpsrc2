@@ -1,6 +1,14 @@
 
 #include "imp_pea_detector.h"
 
+IMP_S32 IMP_GetMemSizeWaterMarker(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += s32Width;
+	
+	return s32Size;
+}
 
 
 void ipCreateWaterMarkDetector( IpWaterMarkDetector *module, PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pstHwResource )

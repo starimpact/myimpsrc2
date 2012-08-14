@@ -1,5 +1,17 @@
 #include "imp_pea_tracker.h"
 
+IMP_S32 IMP_GetMemSizeTTI(IMP_S32 s32Width, IMP_S32 s32Height)
+{
+	IMP_S32 s32Size = 0;
+	
+	s32Size += sizeof(IpTargetSetDataTrackerM);
+	s32Size += sizeof(IpTargetDataTrackerM) * IMP_MAX_TGT_CNT;
+	s32Size += sizeof(IpDrgDataTrackerM) * IMP_MAX_TGT_CNT;
+	s32Size += 2 * s32Width * s32Height;
+	
+	return s32Size;
+}
+
 
 IMP_VOID ipCreateMotionTrackerInternal( IpTargetTrackerMotion *pstTracker, GA_HARDWARE_RS_S *pstHwResource, PEA_RESULT_S *pstResult )
 {

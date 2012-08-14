@@ -28,7 +28,7 @@ input:
 output:算法需要的内存大小
 history:
 ****************************************************/
-IMP_S32 IMP_GetMemSizeOSCD(PEA_RESULT_S *pstResult);
+IMP_S32 IMP_GetMemSizeOSCD(IMP_S32 s32Width, IMP_S32 s32Height);
 
 
 /***************************************************
