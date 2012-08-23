@@ -314,7 +314,7 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 //		printf("ID_%d: PERI:%d, TRIP:%d\n", target->u32Id, target->u32Event & IMP_TGT_EVENT_PERIMETER, target->u32Event & IMP_TGT_EVENT_TRIPWIRE);
 		if(target->u32Event !=0)
 		{
-		//	printf("id:%d, event=%d\n", target->u32Id, target->u32Event);
+			printf("id:%d, event=%d\n", target->u32Id, target->u32Event);
 			
 		    pcrLine = &colors[2];//&(colors[target->u32Id%12]);
 		}
@@ -341,6 +341,7 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 	//	sprintf(abyText, "%d:%c,%d", target->u32Id, type, num);
 		sprintf(abyText, "%d:%d", target->u32Id, num);
 		cvPutText(img,abyText,cvPoint(pt1.s16X,pt1.s16Y),&font, CV_RGB(0, 255, 0));
+
 
 
 		
@@ -436,7 +437,7 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
 	 pcrRect = &(colors[1]);
 
     //printf("Nice PEA result:\n");
-    //printf("event num:%d\n",result->stEventSet.s32EventNum);
+    printf("event num:%d\n",result->stEventSet.s32EventNum);
     for(i=0;i<result->stEventSet.s32EventNum;i++)
     {
         if(result->stEventSet.astEvents[i].u32Status==IMP_EVT_STATUS_START)
@@ -480,43 +481,26 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
 				    }
 			    }
 
-
-                /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-              */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
+            else if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmTripwire)
+			{
+				printf("Target:%d tripwire start \n",result->stEventSet.astEvents[i].u32Id);
+			//	cvWaitKey(0);
+			}
 
         }
+        
         if(result->stEventSet.astEvents[i].u32Status == IMP_EVT_STATUS_PROCEDURE)
         {
             if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
-
-                zone=result->stEventSet.astEvents[i].u32Zone;
+            	zone=result->stEventSet.astEvents[i].u32Zone;
                // printf("Target:%d perimeter procedure \n",result->stEventSet.astEvents[i].u32Id);
-
-                /*num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-               */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
-
-
+            else if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmTripwire)
+			{
+				printf("Target:%d tripwire procedure \n",result->stEventSet.astEvents[i].u32Id);
+			}
         }
         else if(result->stEventSet.astEvents[i].u32Status==IMP_EVT_STATUS_END)
         {
@@ -525,24 +509,6 @@ void ShowPEAResult(RESULT_S *result,IplImage *img)
              if(result->stEventSet.astEvents[i].u32Type==IMP_EVT_TYPE_AlarmPerimeter)
             {
                 //printf("Target:%d perimeter end \n",result->stEventSet.astEvents[i].u32Id);
-
-                 //zone = result->stEventSet.astEvents[i].u32Zone;
-				// NICE_EVT_DATA_PERIMETER *pData = (NICE_EVT_DATA_PERIMETER *)result->stEventSet.astEvents[i].au8Data;
-
-
-                /*zone=result->stEventSet.astEvents[i].u32Zone;
-
-                num1=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pt_num;
-                for(i=0;i<num1;i++)
-                {
-                    pt[i].s16X=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16X;
-                    pt[i].s16Y=stURPpara.stRuleSet.astRule[zone].stPara.perimeter_rule_para.perimeter_limit_para.perimeter_boundary.boundary_pts[i].s16Y;
-                }
-
-                cvFillConvexPoly(img,pt,num1,*pcrRect);
-                pdataPerimeter=(NICE_EVT_DATA_PERIMETER*)(result->stEventSet.astEvents[i].au8Data);
-                */
-                //printf("Target %d perimeter\n",result->stEventSet.astEvents[i].u32Id);
             }
         }
     }
@@ -591,13 +557,30 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=0;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
 
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=100;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=270;
-		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=300;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=20;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=280;
+		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=220;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=0;
+		
+		stURPpara.stRuleSet.astRule[2].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[2].u32Valid = 1;
+		stURPpara.stRuleSet.astRule[2].u32Mode |= IMP_FUNC_TRIPWIRE;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.s32TypeLimit = 1;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.s32TypeHuman =1;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.s32TypeVehicle =1;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=0;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
+
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=225;//20;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=0;//280;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=25;//220;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=280;//0;
 
 	}
 //	IMP_PARA_Init( pstPara, NULL, NULL, s32ImgW, s32ImgH, NULL );
@@ -848,7 +831,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         //draw_classtype_trajectory_ttarget(pPEA->m_pResult, color_dst_trajectory, 1 );
         draw_motion_trajectory_ntarget(&stResult,color_dst_blob,2);
         //ShowTargetMsg(pModule,color_dst_trajectory);
-     //   ShowPEAResult(&stResult,color_dst_blob);
+        ShowPEAResult(&stResult,color_dst_blob);
 
         ShowPeaRule(&stURPpara,color_dst_blob);
 
@@ -938,10 +921,11 @@ int main()
 
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+	IMP_S8 *fileName = "/home/zm/video/C_loitorig.wmv";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
 
 

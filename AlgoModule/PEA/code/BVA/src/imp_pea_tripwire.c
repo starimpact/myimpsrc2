@@ -419,7 +419,7 @@ static IMP_VOID ipAnalysisBehaviorTripwire( IpTripwirePara *pstParams, IpTracked
 	IpTripwireTargetData *pstTargetData = ipGetTripwireTargetData( pstTarget->stPrivateData.pDataAnalyst );
 
 	IMP_S32 s32LineIndex = -1;
-
+	
 	if(!pstTargetData->astCrossStatus[s32ZoneIndex])
 	{
 		pstTargetData->astCrossStatus[s32ZoneIndex] += ipTripwireIsBehave(pstParams,s32ZoneIndex,pstTarget, 1,&s32LineIndex);
@@ -436,7 +436,7 @@ static IMP_VOID ipAnalysisBehaviorTripwire( IpTripwirePara *pstParams, IpTracked
 		&& ipTripwireUserAdvanceParaConstraint(pstParams,pstTarget)
 		)
 	{
-	//	printf("\033[32;4mtarget id_%d:tripwire\033[0m\n", pstTarget->u32TargetId);
+		printf("\033[32;4mtarget id_%d:tripwire, zone:%d\033[0m\n", pstTarget->u32TargetId, s32ZoneIndex);
 		pstTarget->stTargetInfo.au32Events[s32ZoneIndex] |= IMP_TGT_EVENT_TRIPWIRE;
 		pstTarget->stTargetInfo.u32AlarmLevel = pstZone->u32Level;
 	}
