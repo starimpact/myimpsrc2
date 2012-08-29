@@ -344,6 +344,7 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 
 
 
+
 		
 		for( k=1; k<num; k++ )
 		{
@@ -773,6 +774,16 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         
 			
 			//
+			if (0)
+			{
+				int dwSmoothTime = imageSrc->width / imageDst->width;
+		//	printf("smooth time:%d\n", dwSmoothTime);
+				while(dwSmoothTime)
+				{
+					cvSmooth(imageSrc, imageSrc, CV_GAUSSIAN, 3, 3, 0, 0);
+					dwSmoothTime--;
+				}
+			}
 			cvResize(imageSrc, imageDst, CV_INTER_LINEAR);	//缂╂斁婧愬浘鍍忓埌鐩爣鍥惧儚
           //  cvShowImage("Hello", imageDst);
          //   cvWaitKey(0);
@@ -920,11 +931,10 @@ int main()
 	colors[13] = CV_RGB(0,0,255);
 
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-	IMP_S8 *fileName = "/home/zm/video/C_loitorig.wmv";
+//	IMP_S8 *fileName = "/home/zm/video/C_loitorig.wmv";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00011.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
+	IMP_S8 *fileName = "/home/zm/video/PEA/PEA_120412.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-22047.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-12034-湖面小船-水波树枝晃动.avi";
 

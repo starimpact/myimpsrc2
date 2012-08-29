@@ -51,6 +51,7 @@ IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 I
 	 
 	    if(Num>3||P1[width])
 	    {
+	    //Num表示像素点8邻域内都是非零值像素的个数，用于填补图像的漏洞
 	      if(P2[width]<255)
 	      {
 	        P2[width]++;
@@ -68,6 +69,81 @@ IMP_S32 IMP_StatiPix(IMP_UCHAR*srcGray,IMP_UCHAR*statiImg,IMP_S32 ImgH,IMP_S32 I
 
 	return 1;
 }
+
+IMP_S32 IMP_StatiPixZ(IMP_Swing_S*PsModel,IMP_UCHAR*srcGray)//chengfa xuyao gaijin 
+{
+
+	IMP_S32 i;
+	IMP_S32 Num;
+	IMP_S32 width;
+	IMP_S32 height;
+	IMP_S32 ImgW=PsModel->pstResult->s32Width>>1;
+	IMP_S32 ImgH=PsModel->pstResult->s32Height>>1;
+
+
+	IMP_S32 OffNeg[6]={-ImgW-1,-ImgW,-ImgW+1, ImgW-1, ImgW,-ImgW+1};
+	IMP_UCHAR *P1;
+	IMP_UCHAR *P2;
+	IMP_UCHAR *P3;
+	IMP_UCHAR *P4;
+	IMP_UCHAR *P5;
+
+	P1=srcGray;
+	P2=PsModel->inMask;
+	P3=PsModel->zSadmin;
+	P4=PsModel->vSadmin;
+	P5=PsModel->forImg;
+	
+
+	for(height=1;height<ImgH-1;height++)
+	{
+	  P1+=ImgW;
+	  P2+=ImgW;
+	  P3+=ImgW;
+	  P5+=ImgW;
+	  for(width=1;width<ImgW-1;width++)
+	  {
+	    Num=0;
+	    Num+=P1[width+OffNeg[0]];
+        Num+=P1[width+OffNeg[1]];
+	    Num+=P1[width+OffNeg[2]];
+        Num+=P1[width+OffNeg[3]];
+        Num+=P1[width+OffNeg[4]];
+        Num+=P1[width+OffNeg[5]];
+        Num+=P1[width-1];
+        Num+=P1[width];
+	    Num+=P1[width+1];
+	  
+		if(P5[width])//表示对前景点不为零的像素进行累加操作
+		{
+		  if((Num>3||P1[width]))
+	   	   {	
+	         if(P2[width]<254)
+	         {
+	      	   P2[width]+=2; 
+	         }
+	         if(P3[width]>20||abs(P3[width]-P4[width])>6)//该条件是绝对满足运动目标的情况下
+	         {
+	         	 if(P2[width]>2)
+	         	{
+	      	   		P2[width]-=3; 
+	         	}
+	         }
+	       }
+		}
+		else
+		{
+			if(P2[width]>0)
+			P2[width]--;
+		}
+	  }
+	}
+	
+	
+	return 1;
+}
+
+
 IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_UCHAR*proMat2,IMP_S32 Length)
 {
 	
@@ -76,11 +152,11 @@ IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_
 
 	while(length--)
 	{
-		if(srcGray[length]-backGray[length]>0)
+		if(srcGray[length]>backGray[length])
 		  proMat1[length]=1;
 		else
 		  proMat1[length]=0;
-		if(srcGray[length]-backGray[length]<0)
+		if(srcGray[length]<backGray[length])
 		  proMat2[length]=1;
 		else
 		  proMat2[length]=0;
@@ -90,8 +166,9 @@ IMP_S32 IMP_Proporte(IMP_UCHAR*backGray,IMP_UCHAR*srcGray,IMP_UCHAR*proMat1,IMP_
 }
 
 
-IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
+IMP_S32 IMP_GetSadImg(IMP_Swing_S*PsModel)
 {
+	int valin;
 	IMP_S32 i;
 	IMP_S32 j;
 	IMP_S32 ImgH;
@@ -155,7 +232,6 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	XY21=PsModel->p21;
 	XY22=PsModel->p22;
 	
-	
 	zSadMin=PsModel->zSadmin;
 	vSadMin=PsModel->vSadmin;
 	ImgH=PsModel->pstResult->s32Height;
@@ -165,11 +241,10 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	IMP_GaussImg(PsModel->pstResult->stDRegionSet.pstImgBgGray->pu8Data,XY00, ImgH, ImgW);
 	IMP_DResizeImg(XY00,PsModel->bckImg,ImgH,ImgW);
 	IMP_DResizeImg(PsModel->pstResult->stDRegionSet.pstImgFgOrg->pu8Data,PsModel->forImg,ImgH,ImgW);
-
 	Pgray=PsModel->srcGray;
 	Pbck=PsModel->bckImg;
 	FoImg=PsModel->forImg;
-	
+
 	ImgH=ImgH>>1;
 	ImgW=ImgW>>1;
 	
@@ -202,25 +277,26 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 
 		for(width=1;width<ImgW-1;width++)
 		{
-		    Hstep=width+width;
+		    Hstep=width<<1;
 		    
-			Pz11[Hstep]=abs(Pg11[width+1]-P[width]);
-			Pz10[Hstep]=abs(Pg10[width+1]-P[width]);
-			Pz1_1[Hstep]=abs(Pg1_1[width+1]-P[width]);
+			Pz11[Hstep]=abs(Pg11[width+1]-P[width]);//得到x,y偏移为1,1差值绝对值图像
+			Pz10[Hstep]=abs(Pg10[width+1]-P[width]);//得到x,y偏移为1,0差值绝对值图像
+			Pz1_1[Hstep]=abs(Pg1_1[width+1]-P[width]);//得到x,y偏移为1,-1差值绝对值图像
 
-			Pz01[Hstep]=abs(Pg01[width]-P[width]);
-			Pz00[Hstep]=abs(Pg00[width]-P[width]);
-			Pz0_1[Hstep]=abs(Pg0_1[width]-P[width]);
+			Pz01[Hstep]=abs(Pg01[width]-P[width]);//得到x,y偏移为0,1差值绝对值图像
+			Pz00[Hstep]=abs(Pg00[width]-P[width]);//得到x,y偏移为0,0差值绝对值图像
+			Pz0_1[Hstep]=abs(Pg0_1[width]-P[width]);//得到x,y偏移为0,-1差值绝对值图像
 		
-			Pz_11[Hstep]=abs(Pg_11[width-1]-P[width]);
-			Pz_10[Hstep]=abs(Pg_10[width-1]-P[width]);
-			Pz_1_1[Hstep]=abs(Pg_1_1[width-1]-P[width]);
+			Pz_11[Hstep]=abs(Pg_11[width-1]-P[width]);//得到x,y偏移为-1,1差值绝对值图像
+			Pz_10[Hstep]=abs(Pg_10[width-1]-P[width]);//得到x,y偏移为-1,0差值绝对值图像
+			Pz_1_1[Hstep]=abs(Pg_1_1[width-1]-P[width]);//得到x,y偏移为-1,-1差值绝对值图像
 		}
 	}
 	
 	
 	
 	P=XY22;
+	//得到SAD图像8邻域的均值
 	Length1=ImgW+ImgW;
 	for(height=1;height<ImgH-1;height++)
 	{
@@ -236,6 +312,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY21;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -251,6 +328,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY20;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -265,6 +343,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY12;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -279,6 +358,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY11;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -293,6 +373,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY10;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -307,6 +388,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY02;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -321,6 +403,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY01;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -335,6 +418,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 	}
 	
 	P=XY00;
+	//得到SAD图像8邻域的均值
 	for(height=1;height<ImgH-1;height++)
 	{
 	    Wstep=0;
@@ -347,8 +431,7 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 			Wstep+=2;
 		}
 	}
-	
-	
+
 	Pzsad=zSadMin+ImgW;
 	Pvsad=vSadMin+ImgW;
 	Length1=ImgW<<1;
@@ -359,13 +442,14 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 		Wstep+=2;
 		Pzsad+=ImgW;
 		Pvsad+=ImgW;
+		
 		Length2+=Length1;
 		
 		for(width=2;width<ImgW-2;width++)
 		{
 			zminVal=1000;
 			vminVal=1000;
-		
+		//得到SAD图像8邻域中8个方向均值的最小值
 			Wstep+=2;	
 			i=Length2+Wstep+1;
 			if(XY22[i]<zminVal)
@@ -412,9 +496,8 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 			{
 				zminVal=XY00[i];
 			}
+			
 			Pzsad[width]=zminVal;
-			
-			
 			
 			if(XY22[Length2-Length1+Wstep-1]<vminVal)
 			{
@@ -460,14 +543,12 @@ IMP_S32 IMP_GetSadImg1(IMP_Swing_S*PsModel)
 			{
 				vminVal=XY00[Length2+Length1+Wstep+3];
 			}
+			
 			Pvsad[width]=vminVal;
-
 		}
 	}
-	
 	return 1;
 }
-
 
 
 IMP_S32 IMP_GetMemSizeSwingModel( PEA_RESULT_S *pstResult)
@@ -489,7 +570,6 @@ IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 	pstModule->pstResult = pstResult; 
 	pstModule->pstHwResource = pstHwResource; 
 
-
 	pstModule->p00=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,5*length*sizeof(IMP_UCHAR));
 	pstModule->p01=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
 	pstModule->p02=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,2*length*sizeof(IMP_UCHAR));
@@ -506,6 +586,7 @@ IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 	pstModule->srcGray=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 	pstModule->forImg=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
 	pstModule->bckImg=(IMP_UCHAR *)IMP_MMAlloc(&pstHwResource->stMemMgr, IMP_MEMBLK_TYPE_SLOW,length*sizeof(IMP_UCHAR));
+	
 
 	while(length--)
 	{
@@ -513,7 +594,9 @@ IMP_MODULE_HANDLE IMP_CreateSwing(PEA_RESULT_S *pstResult, GA_HARDWARE_RS_S *pst
 		pstModule->inMask[length]=0;
 		pstModule->swImg[length]=0;
 	}
+	
 	hModule = (IMP_MODULE_HANDLE)pstModule;
+
 	return hModule;
 }
 
@@ -522,6 +605,9 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	IMP_Swing_S *pstModule;	
 	PEA_RESULT_S *pstResult;
 
+	//struct timeval tvStart,tvEnd;//delete
+	
+	//double linStart = 0,linEnd = 0,lTime = 0;//delete
 	IMP_S32 val;
 	IMP_S32 Step;
 	IMP_S32 ImgH;
@@ -541,7 +627,8 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	
 	IMP_UCHAR * p11;
 	IMP_UCHAR * p22;
-
+	
+	//gettimeofday (&tvStart,"usec");//delete
 	pstModule = (IMP_Swing_S*)hModule;
 	p11=pstModule->p11;
 	p22=pstModule->p22;
@@ -549,20 +636,21 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 	ImgH=pstResult->s32Height>>1;
 	ImgW=pstResult->s32Width>>1;
 	Lenght=ImgW*ImgH;
-	
-	IMP_GetSadImg1(pstModule);
+	IMP_GetSadImg(pstModule);
 	IMP_Proporte(pstModule->bckImg,pstModule->srcGray,p11,p22,Lenght);
-	
 	pc1=(pstModule->p00+ImgW);
 	pc2=(pstModule->zSadmin+ImgW);
 	pc3=(pstModule->vSadmin+ImgW);
 	pc5=(pstModule->swImg+ImgW);
-	pc6=(pstModule->forImg+ImgW);
+	pc6=(pstModule->p01+ImgW);
+	
+	IMP_GaussImg(pstModule->pstResult->stDRegionSet.pstImgFgOrg->pu8Data,pstModule->p00,ImgH<<1,ImgW<<1);
+	IMP_DResizeImg(pstModule->p00,pstModule->forImg,ImgH<<1,ImgW<<1);
+	
+	
 	Step=0;
 	for (height=1;height<ImgH-1;height++)
 	{
-	
-	
 		pc1+=Step;
 		pc2+=Step;
 		pc3+=Step;
@@ -593,29 +681,31 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 			LowNum+=(p22+Step+ImgW)[width+1];
 			
 			val=abs(pc2[width]-pc3[width])<6&&abs(LowNum-UpNum)<6;
-			
-			if (pc2[width]>1&&pc2[width]<12)//2//20
+			if(pc6[width])
 			{
-				//val=abs(pc2[width]-pc3[width])<6&&abs(LowNum-UpNum)<6;
-				if (val)//6//6
+				if ((pc2[width]>0&&pc2[width]<8))//满足该条件表示符合随机摆动区域的像素
 				{
-					pc1[width]=1;
+					if (val)
+					{
+						pc1[width]=1;
+					}
+					else
+					{
+						pc1[width]=0;
+					}
 				}
 				else
-				{
-					pc1[width]=0;
-				}		
+					{
+						pc1[width]=0;
+					}
+		
 			}
-			else
-			{
-				pc1[width]=0;
-				//pc6[width]=0;
-			}
+			
+			
 					
-			if(val||pc5[width])//val||pc5[width]
+			if(!val||pc5[width])
 			{
-
-				if(pc2[width]>12&&abs(pc2[width]-pc3[width])<6)
+				if(pc2[width]>7&&abs(pc2[width]-pc3[width])>5)//该条件表示满足前景点的特点
 				    pc6[width]=255;
 				else
 				 	pc6[width]=0;		
@@ -628,15 +718,17 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 		}
 	}
 	
-	
-
-	IMP_StatiPix(pstModule->p00,pstModule->inMask,ImgH,ImgW);
+	IMP_StatiPixZ(pstModule,pstModule->p00);
 	IMP_BinaryImg(pstModule->inMask,pstModule->swImg,40,Lenght);
-	
 	IMP_DePix(pstModule->forImg,ImgH,ImgW,100);
-	
 	IMP_UResizeImg(pstModule->swImg,pstModule->p00,ImgH,ImgW);
-	IMP_UResizeImg(pstModule->forImg,pstModule->p11,ImgH,ImgW);
+	//IMP_ShowImg(pstModule->swImg,ImgH,ImgW,"Sw");
+	IMP_UResizeImg(pstModule->p01,pstModule->p11,ImgH,ImgW);
+	//IMP_ShowImg(pstModule->p00,ImgH<<1,ImgW<<1,"Swing");
+	//IMP_ShowImg(pstModule->p01,ImgH,ImgW,"Ded");
+	//cvSetMouseCallback( "Swing", ClickMouse,NULL);
+	//IMP_ShowImg(pstModule->p11,ImgH<<1,ImgW<<1,"Deduction");
+	//cvSetMouseCallback( "Deduction", ClickMouse,NULL);
 	ImgH=ImgH<<1;
 	ImgW=ImgW<<1;
 	pc1=pstModule->p00;
@@ -656,6 +748,12 @@ IMP_S32 IMP_ProcessSwing(IMP_MODULE_HANDLE hModule)
 			
 		}
 	}
+	
+	//gettimeofday (&tvEnd,"usec");//delete
+	//linStart = (double)tvStart.tv_usec;//unit S
+    //linEnd = (double)tvEnd.tv_usec;//unit S
+    //lTime = linEnd-linStart;
+    //printf("swing=%3.1lfms  \n",lTime/1000);
 	return 1;
 }
 
@@ -694,13 +792,7 @@ IMP_S32 IMP_GaussImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW)
 	IMP_S32 width;
 	IMP_S32 height;
 	IMP_UCHAR*P1;
-	IMP_UCHAR*P2;
-	
-	if(!srcGray||!dst)
-	{
-		printf("The input of IMP_GaussImg is wrong!\n");
-		return 0;
-	}	
+	IMP_UCHAR*P2;	
 	
 	P1=srcGray;
 	P2=dst;
@@ -728,12 +820,6 @@ IMP_S32 IMP_DResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW
 	IMP_UCHAR*P1;
 	IMP_UCHAR*P2;
 	
-	if(!srcGray||!dst)
-	{
-		printf("The input of IMIP_ResizeImg is wrong!\n");
-		return 0;
-	}	
-	
 	Step=ImgH>>1;
 	Step1=ImgW>>1;
 	P1=srcGray;
@@ -753,19 +839,12 @@ IMP_S32 IMP_DResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW
 
 IMP_S32 IMP_UResizeImg(IMP_UCHAR*srcGray,IMP_UCHAR*dst,IMP_S32 ImgH,IMP_S32 ImgW)
 {
-	/*/��ͼ���ϲ�������ͼ��ߴ�Ŵ�һ��/*/
 	IMP_S32 width;
 	IMP_S32 height;
 	IMP_S32 Step1;
 	IMP_S32 Step2;
 	IMP_UCHAR*P1;
 	IMP_UCHAR*P2;
-	
-	if(!srcGray||!dst)
-	{
-		printf("The input of IMP_UresizeImg is wrong!\n");
-		return 0;
-	}
 	
 	Step1=ImgW<<1;
 	Step2=ImgW<<2;
@@ -793,13 +872,6 @@ IMP_S32 IMP_DePix(IMP_UCHAR*srcGray,IMP_S32 ImgH,IMP_S32 ImgW,IMP_S32 val)
 	IMP_S32 height;
 	IMP_UCHAR*PC;
 	
-	
-	if(!srcGray)
-	{
-		printf("The input of IMP_DePix is wrong!\n");
-		return 0;
-	}
-	
 	PC=srcGray;
 	for(height=1;height<ImgH-1;height++)
 	{
@@ -815,7 +887,7 @@ IMP_S32 IMP_DePix(IMP_UCHAR*srcGray,IMP_S32 ImgH,IMP_S32 ImgW,IMP_S32 val)
 			}
 		}
 	}
-	return 1;
+	return 1;	
 }
 
 
