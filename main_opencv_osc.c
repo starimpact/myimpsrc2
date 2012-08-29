@@ -396,8 +396,8 @@ int dwI;
         IMP_POINT_S *pstPoint = psr->stOscRg.astPoint;
         for(dwI = 0; dwI < gadwRMVPntNum; dwI++)
         {
-            psr->stOscRg.astPoint[dwI].s16X = gawRMVRect[dwI][0];
-            psr->stOscRg.astPoint[dwI].s16Y = gawRMVRect[dwI][1];
+            psr->stOscRg.astPoint[dwI].s16X = gawRMVRect[dwI][0]*stURPpara.stConfigPara.s32ImgW/Y_WIDTH;
+            psr->stOscRg.astPoint[dwI].s16Y = gawRMVRect[dwI][1]*stURPpara.stConfigPara.s32ImgH/Y_HEIGHT;
         }
 #endif
 
@@ -604,10 +604,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 	stMems.u32ImgH = s32Height;
 	IMP_GetMemReq( hIMP, &stMems );
 	IMP_MemsAlloc( &stMems );
-
-    if(IMP_OSC_Create( hIMP, &stMems ) != IMP_STATUS_OK)
-		exit(0);
 	
+    if(IMP_OSC_Create( hIMP, &stMems ) != IMP_STATUS_OK)
+    {
+    	printf("create failed.\n");
+		exit(0);
+	}
     if(enVideoSource == IMP_AVI)
     {
         stImage.u32Time = 0;
@@ -645,7 +647,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
             if( !frame )
 				break;
 			
-			if (nFrmNum < 10) continue;
+			if (nFrmNum < 20) continue;
       	    if(nFrmNum % s32SubSampleT != 0) continue;
             if (!imageSrc)
             {
@@ -668,7 +670,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 			cvCopy(imageDst, gpstImgRMV, NULL);
 			memcpy(stImage.pu8Y,imageDst->imageData,s32ImgW * s32ImgH);
 			
-			if (0 && frame && !gadwRMVPntNum)
+			if (1 && frame && !gadwRMVPntNum)
   			{
   				char byKey;
     			cvShowImage("DrawRMV", pImgGray);
@@ -810,10 +812,10 @@ int main(int argc,char *argv[])
 	colors[12] = CV_RGB(128,255,0);
 	colors[13] = CV_RGB(0,0,255);
 
-#ifdef cif
 //	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/003.avi";
+	IMP_S8 *fileName = "/home/zm/video/OSC/lansepingzi.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-混合.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
@@ -827,30 +829,18 @@ int main(int argc,char *argv[])
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12115-公司大堂-展台杯子失窃.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12110-公司大堂-展台提包失窃.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12106-电子商场-柜台杯子失窃.avi";
+
+#ifdef cif
 	m_frame_width = 352;
 	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
-	IMP_S8 *fileName = "/home/zm/video/OSC/5.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-小.avi";
-//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0008.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/IMG_0015.MOV";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景小物体遗留光线干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留灯光干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景物体遗留.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/低对比度小物体遗留.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/大物体遗留灯光干扰.mp4";
-//	IMP_S8 *fileName = "/home/zm/video/OSC/osc补拍视频/椅子背景大物体遗留光线干扰.mp4";
     m_frame_width = 176;
 	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
 #endif
 
-	m_interFrame = 2;
+	m_interFrame = 1;
 
 	IMP_OpencvExample(fileName,IMP_AVI,m_frame_width,m_frame_height,m_interFrame,videoFormat);
 

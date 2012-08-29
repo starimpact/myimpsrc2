@@ -874,7 +874,8 @@ int main()
 	colors[13] = CV_RGB(0,0,255);
 
 //	IMP_S8 *fileName = "/home/zm/video/PEA/00005.avi";
-	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+//	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
+	IMP_S8 *fileName = "/home/zm/video/toyp/wb/15岗向西.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-23033-近点芦苇荡-低对比度.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11032-1.avi";
 //   IMP_S8 *fileName = "/home/zm/video/PEA/SILVER-1080.avi";

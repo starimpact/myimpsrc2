@@ -148,7 +148,7 @@ STATUS_E IMP_OSC_Create( IMP_HANDLE hModule, MEM_SET_S *pstMems )
  	
  //	printf( "max used mem is (%d, %d)\n", pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemLen, pMemMgr->astMemMgrs[IMP_MEMBLK_TYPE_SLOW].s32MemMax );
 
-	exit(0);
+//	exit(0);
 	return IMP_STATUS_OK;
 }
 
