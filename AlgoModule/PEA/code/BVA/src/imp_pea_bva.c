@@ -133,7 +133,7 @@ IMP_VOID ipConfigAnalystInternal( BEHAVIOR_ANALYSIS_S *pstBva, IpAnalystPara *ps
 	RULE_PARA_S	*pstRulePara;
 	USR_ADV_PARA_S *pstUsrAdvPara = (USR_ADV_PARA_S*)pstPara->pstRule->u8AdvParaData;
    	memcpy( &pstBva->stPara, pstPara, sizeof(IpAnalystPara) );
-#if PRINT_DBG || 0
+#if PRINT_DBG || 1
 	printf("ipConfigAnalystInternal pstBva->stPara.s32InitEventLife:%d pstPara->s32FrmDura:%d\n", pstBva->stPara.s32InitEventLife, pstPara->s32FrmDura);
 #endif
 	{

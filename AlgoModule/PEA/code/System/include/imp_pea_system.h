@@ -108,7 +108,7 @@ typedef struct
 #define IMP_PROCESSOR_PTZ_TGTEVTS 0
 #define IMP_PROCESSOR_PROC_INTERVAL 0//120 what's it
 #define IMP_PROCESSOR_TRAJECT_DIST 8
-#define IMP_PROCESSOR_FRM_DURA 20 //40 why is it 40, maybe 25, for the detect, same to imp_para.c:pstPara->stGlobal.s32TimeUnit
+#define IMP_PROCESSOR_FRM_DURA 1 //20 //40 why is it 40, maybe 25, for the detect, same to imp_para.c:pstPara->stGlobal.s32TimeUnit
 
 
 #define IMP_DETECTOR_PREPROCESS 0
@@ -500,7 +500,7 @@ typedef struct
 #define IMP_ANALYST_OUTPUT_EVENT 0
 #define IMP_ANALYST_INIT_EVENT_LIFE 1000
 #define IMP_ANALYST_OTHER
-#define IMP_ANALYST_FRM_DURA 20 //the cost time of processing a frame, for the event analyze, same to imp_para.c:pstPara->stGlobal.s32TimeUnit
+#define IMP_ANALYST_FRM_DURA 1 //20 //the cost time of processing a frame, for the event analyze, same to imp_para.c:pstPara->stGlobal.s32TimeUnit
 #define IMP_ANALYST_OBJECT_AREA_RATIO 120
 
 

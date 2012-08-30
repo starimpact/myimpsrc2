@@ -22,30 +22,23 @@
     #include <sys/time.h>
 #endif
 
-//#define cif
-#define qcif
+//#define d1
+#define cif
+//#define qcif
 
 #ifdef qcif
 #define Y_WIDTH 176
 #define Y_HEIGHT 144
-#define U_WIDTH 88
-#define U_HEIGHT 72
-#define V_WIDTH 88
-#define V_HEIGHT 72
+#endif
 
-#define CIF_Y_WIDTH 352
-#define CIF_Y_HEIGHT 288
-#define CIF_U_WIDTH 176
-#define CIF_U_HEIGHT 144
-#define CIF_V_WIDTH 176
-#define CIF_V_HEIGHT 144
-#elif defined(cif)
+#ifdef cif
 #define Y_WIDTH 352
 #define Y_HEIGHT 288
-#define U_WIDTH 176
-#define U_HEIGHT 144
-#define V_WIDTH 176
-#define V_HEIGHT 144
+#endif
+
+#ifdef d1
+#define Y_WIDTH 704
+#define Y_HEIGHT 576
 #endif
 
 
@@ -95,8 +88,7 @@ static void NICE_Example();
 int ReadImage(unsigned char *pImage,char *cFileName,int nWidth,int nHeight,long offset);
 
 unsigned char Y_space[Y_WIDTH*Y_HEIGHT];
-unsigned char U_space[U_WIDTH*U_HEIGHT];
-unsigned char V_space[V_WIDTH*V_HEIGHT];
+
 URP_PARA_S stURPpara;
 CvScalar colors[13];
 int rec_count = 0;
@@ -355,8 +347,8 @@ int dwI;
 	URP_OSC_SPECL_REGIONS_S *psr = 0;
 	memset(&stURPpara,0,sizeof(URP_PARA_S));
 	{
-		stURPpara.stConfigPara.s32ImgW = 352;
-		stURPpara.stConfigPara.s32ImgH = 288;
+		stURPpara.stConfigPara.s32ImgW = Y_WIDTH;
+		stURPpara.stConfigPara.s32ImgH = Y_HEIGHT;
 
 		stURPpara.stAdvancePara.s32AdvanceParaEnable = 1;
 		stURPpara.stAdvancePara.s32TargetOutputSensitivityLevel = IMP_HIGH_LEVEL_SENSITIVITY;
@@ -396,8 +388,8 @@ int dwI;
         IMP_POINT_S *pstPoint = psr->stOscRg.astPoint;
         for(dwI = 0; dwI < gadwRMVPntNum; dwI++)
         {
-            psr->stOscRg.astPoint[dwI].s16X = gawRMVRect[dwI][0]*stURPpara.stConfigPara.s32ImgW/Y_WIDTH;
-            psr->stOscRg.astPoint[dwI].s16Y = gawRMVRect[dwI][1]*stURPpara.stConfigPara.s32ImgH/Y_HEIGHT;
+            psr->stOscRg.astPoint[dwI].s16X = gawRMVRect[dwI][0]; //*stURPpara.stConfigPara.s32ImgW;///Y_WIDTH;
+            psr->stOscRg.astPoint[dwI].s16Y = gawRMVRect[dwI][1]; //*stURPpara.stConfigPara.s32ImgH;///Y_HEIGHT;
         }
 #endif
 
@@ -426,36 +418,7 @@ int dwI;
             psr->stOscRg.astPoint[dwI].s16X = awPos[0][dwI][0];
             psr->stOscRg.astPoint[dwI].s16Y = awPos[0][dwI][1];
         }
-#if 0
-		psr->stOscRg.s32PointNum = 6;
-        for(dwI = 0; dwI < 6; dwI++)
-        {
-            psr->stOscRg.astPoint[dwI].s16X = awCar4[0][dwI][0];
-            psr->stOscRg.astPoint[dwI].s16Y = awCar4[0][dwI][1];
-        }
-#endif
-//        printf("%d,%d;\n", psr->stOscRg.astPoint[0].s16X, psr->stOscRg.astPoint[0].s16Y);
-#if 0
-        //定义无效子区域
-		psr->astSubRgA.s32Valid = 0;
-		psr->astSubRgA.s32PointNum = 4;
-        for(dwI = 0; dwI < psr->astSubRgA.s32PointNum; dwI++)
-        {
-            psr->astSubRgA.astPoint[dwI].s16X = awPos[1][dwI][0];
-            psr->astSubRgA.astPoint[dwI].s16Y = awPos[1][dwI][1];
-        }
-#endif
 
-#if 0
-        //定义无效子区域
-		psr->astSubRgB.s32Valid = 0;
-		psr->astSubRgB.s32PointNum = 4;
-        for(dwI = 0; dwI < psr->astSubRgB.s32PointNum; dwI++)
-        {
-            psr->astSubRgB.astPoint[dwI].s16X = awPos[2][dwI][0];
-            psr->astSubRgB.astPoint[dwI].s16Y = awPos[2][dwI][1];
-        }
-#endif
 	}
 
     printf("IMP_ParaConfig\n");
@@ -569,16 +532,8 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
     cvMoveWindow("background", 0, 288+60);
     cvMoveWindow("foreground", 360, 288+60);
 
-	if (enVideoFormat == IMP_CIF)
-	{
-		s32ImgW = IMP_CIF_IMG_WIDTH;
-		s32ImgH = IMP_CIF_PAL_IMG_HEIGHT;
-	}
-	else if (enVideoFormat == IMP_QCIF)
-	{
-		s32ImgW = IMP_QCIF_IMG_WIDTH;
-		s32ImgH = IMP_QCIF_PAL_IMG_HEIGHT;
-	}
+	s32ImgW = Y_WIDTH;
+	s32ImgH = Y_HEIGHT;
 
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
     pFrImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U,1);
@@ -645,9 +600,12 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
             frame = cvQueryFrame( pCapture );   // acquire a frame
             
             if( !frame )
+            {
+            	printf("can't get frame!!!!!\n");
 				break;
+			}
 			
-			if (nFrmNum < 20) continue;
+			if (nFrmNum < 200) continue;
       	    if(nFrmNum % s32SubSampleT != 0) continue;
             if (!imageSrc)
             {
@@ -692,6 +650,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
         {
 			
         }
+#if 1
 //printf("vfprint:0\n");
         // prepare stImage...
 		IMP_OSC_ProcessImage( hIMP, &stImage );
@@ -730,7 +689,10 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		
         cvShowImage("foreground", pFrImg);
      //   printf("HI\n");
-     
+#endif
+		
+	//	cvShowImage("gray image", pImgGray);
+
      	if (nFrmNum == 1033)
      	{
         	key = cvWaitKey(0);
@@ -815,7 +777,8 @@ int main(int argc,char *argv[])
 //	IMP_S8 *fileName = "/home/zm/video/OSC/1.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-大.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/003.avi";
-	IMP_S8 *fileName = "/home/zm/video/OSC/lansepingzi.avi";
+//	IMP_S8 *fileName = "/home/zm/video/OSC/lansepingzi.avi";
+	IMP_S8 *fileName = "/home/zm/video/OSC/蓝色瓶子2.mp4";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/遗留-可见光-混合.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12113-公司大堂-书本遗落.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/5_1.avi";
@@ -830,13 +793,18 @@ int main(int argc,char *argv[])
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12110-公司大堂-展台提包失窃.avi";
 //	IMP_S8 *fileName = "/home/zm/video/OSC/OSC-12106-电子商场-柜台杯子失窃.avi";
 
+	m_frame_width = Y_WIDTH;
+	m_frame_height = Y_HEIGHT;
+
+#ifdef d1
+	videoFormat = IMP_D1;
+#endif
+
 #ifdef cif
-	m_frame_width = 352;
-	m_frame_height = 288;
 	videoFormat = IMP_CIF;
-#else
-    m_frame_width = 176;
-	m_frame_height = 144;
+#endif
+
+#ifdef qcif
 	videoFormat = IMP_QCIF;
 #endif
 

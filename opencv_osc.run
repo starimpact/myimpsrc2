@@ -2,6 +2,6 @@
 make
 make pea_static
 make -f Makefile.OPENCV.OSC
-gdb ./OSC_OPENCV_EXE
+./OSC_OPENCV_EXE
 
 

@@ -343,29 +343,40 @@ IMP_S32 impCreateRObjects(IMP_OSCD_S *pstModule)
 	pu8RSign = pstModule->stImgRObjSign.pu8Data;
 	
 	//mark the remove area
-	for (s32RI = 0; s32RI < s32H; s32RI++)
+	memset(pu8RSign, 0, s32W * s32H);
+	for (s32I = 0; s32I < IMP_MAX_OSC_NUM; s32I++)
 	{
-		for (s32CI = 0; s32CI < s32W; s32CI++)
+		OSCD_REGION_S *pstRgn = &pstRMVRgns[s32I];
+		if (pstRgn->s32Valid)
 		{
-			stPnt.s16X = s32CI;
-			stPnt.s16Y = s32RI;
-			s32PI = s32RI * s32W + s32CI;
-			for (s32I = 0; s32I < IMP_MAX_OSC_NUM; s32I++)
+			pstPolygon = &pstRgn->stRgn;
+			if (pstPolygon->s32Valid)
 			{
-				OSCD_REGION_S *pstRgn = &pstRMVRgns[s32I];
-				if (pstRgn->s32Valid)
+				int dwI;
+			//	printf("pstPolygon->s32PointNum:%d\n", pstPolygon->s32PointNum);
+			//	for (dwI = 0; dwI < pstPolygon->s32PointNum; dwI++)
+			//	{
+			//		printf("(%d,%d)", pstPolygon->astPoint[dwI].s16X, pstPolygon->astPoint[dwI].s16Y);
+			//	}
+			//	printf("\n");
+				for (s32RI = 0; s32RI < s32H; s32RI++)
 				{
-					pstPolygon = &pstRgn->stRgn;
-					if (pstPolygon->s32Valid && impInsidePolygon(pstPolygon->astPoint, pstPolygon->s32PointNum, stPnt) == INSIDE)
+					for (s32CI = 0; s32CI < s32W; s32CI++)
 					{
-						pu8RSign[s32PI] = s32I + 1;
+						stPnt.s16X = s32CI;
+						stPnt.s16Y = s32RI;
+						if (impInsidePolygon(pstPolygon->astPoint, pstPolygon->s32PointNum, stPnt) == INSIDE)
+						{
+							s32PI = s32RI * s32W + s32CI;
+							pu8RSign[s32PI] = s32I + 1;
+						}
 					}
 				}
 			}
 		}
 	}
 
-#if OSCD_DBG_SHW	
+#if OSCD_DBG_SHW
 	ipShowBinImage(s32W, s32H, pu8RSign, "r_sign");
 #endif
 
