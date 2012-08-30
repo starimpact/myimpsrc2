@@ -1499,6 +1499,7 @@ static IMP_VOID IMP_OutputTargetSet( IpTrackedTargetSet *pstTTargetSet, TGT_SET_
 			IMP_S32 x0, x1, y0, y1;
 			IpTargetPosition *pstPos0 = NULL;
 			s32Num = ipTargetTrajectoryGetLength(&pstTTarget[i].stTrajectory);
+		//	printf("id_%d_ttlen:%d. dist:%d\n", pstTTarget[i].u32TargetId, s32Num, s32TrjDist2);
 			for( m=0; m<s32Num; m++ )
 			{
 				pstPos = ipTargetTrajectoryGetPosition( &pstTTarget[i].stTrajectory, -m );

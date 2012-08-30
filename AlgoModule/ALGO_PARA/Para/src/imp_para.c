@@ -816,7 +816,7 @@ IMP_VOID IMP_RULE_InitParaPea( INNER_PARA_S *pstInnerPara, MEM_MGR_ARRAY_S *pMem
 	RULE_S *pstRule = (RULE_S*)pstInnerPara->pRule;
 
 
-	pstInnerPara->stGlobal.s32TimeUnit = 20; //rubish, 40
+	pstInnerPara->stGlobal.s32TimeUnit = 1; //20; //rubish, 40
     pstInnerPara->stGlobal.s32FuncCode = ~0;
 
 
@@ -883,7 +883,7 @@ IMP_VOID IMP_PARA_Init( EXTERNAL_PARA_S *pstPara, STR_ARRAY_PARA_S *pstScnFil,
 
 	pstPara->u32Type= ~0;
 
-	pstPara->stGlobal.s32TimeUnit = 20; //rubish, 40
+	pstPara->stGlobal.s32TimeUnit = 1; //20; //rubish, 40
     pstPara->stGlobal.s32FuncCode = ~0;
 
 

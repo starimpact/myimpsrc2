@@ -449,7 +449,7 @@ static IMP_S32 ipTripwireIsAccordantType( IpTripwirePara *pstParams, RULE_PARA_T
 
 	if( pstParams->s32TripwireUseMtrend && !IMP_IS_TGT_MTREND(pstTarget->stTargetInfo.u32Status) )
 		u32Type = IMP_TGT_TYPE_UNKNOWN;
-
+	
 	if (!pstTripwirePara->s32TypeConstrain) return 1;
 //printf("pstTripwirePara->s32TypeHuman:%d, pstTripwirePara->s32TypeVehicle:%d\n", pstTripwirePara->s32TypeHuman, pstTripwirePara->s32TypeVehicle);
 	if (!pstTargetData->s32TypeRecorded)
@@ -754,7 +754,9 @@ static IMP_S32 ipTripwireIsThroughLine(IpTripwirePara *pstParams,LINE_S stTripwi
 	}
 
 	s32XY2[0] = stCurPt.s16X;
-	s32XY2[1] = stCurPt.s16Y;	
+	s32XY2[1] = stCurPt.s16Y;
+	
+//	printf("(%d,%d), (%d,%d) \n", s32XY1[0], s32XY1[1], s32XY2[0], s32XY2[1]);
 
 	{
 		IMP_S32 dwRet;

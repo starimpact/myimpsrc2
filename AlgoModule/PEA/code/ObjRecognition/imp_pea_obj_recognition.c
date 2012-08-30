@@ -142,7 +142,8 @@ IMP_S32 IMP_PEA_TemperaryClassify(IpTrackedTarget *pstTarget)
 			
 			if (1 || areaSize > 50 && areaSize * 100 > rgSize * 40)
 			{
-				if (fRatio > 1.2f) 
+			//	if (fRatio > 1.2f) 
+				if (fRatio >= 1.1f)
 				{	
 					pstPos0->u32Type = IMP_TGT_TYPE_HUMAN;
 				//	printf("hi,");

@@ -345,6 +345,7 @@ static void draw_motion_trajectory_ntarget( RESULT_S *rs, IplImage *img, IMP_S32
 
 
 
+
 		
 		for( k=1; k<num; k++ )
 		{
@@ -549,7 +550,7 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16X = 10;
 		stURPpara.stRuleSet.astRule[0].stPara.stPerimeterRulePara.stLimitPara.stBoundary.astBoundaryPts[3].s16Y = 270;
 
-		stURPpara.stRuleSet.astRule[1].u32Enable = 1;
+		stURPpara.stRuleSet.astRule[1].u32Enable = 0;
 		stURPpara.stRuleSet.astRule[1].u32Valid = 1;
 		stURPpara.stRuleSet.astRule[1].u32Mode |= IMP_FUNC_TRIPWIRE;
 		stURPpara.stRuleSet.astRule[1].stPara.stTripwireRulePara.s32TypeLimit = 1;
@@ -575,12 +576,12 @@ static void IMP_PARA_Config( IMP_MODULE_HANDLE hModule, IMP_S32 s32ImgW, IMP_S32
 		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.stLimitPara.s32MinDist=0;
 		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.stLimitPara.s32MinTime=0;
 		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32ForbiddenDirection=180;
-		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=0;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32IsDoubleDirection=1;
 		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].s32Valid=1;
 
-		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=225;//20;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16X=250;//20;
 		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stStartPt.s16Y=0;//280;
-		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=25;//220;
+		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16X=125;//220;
 		stURPpara.stRuleSet.astRule[2].stPara.stTripwireRulePara.astLines[0].stLine.stEndPt.s16Y=280;//0;
 
 	}
@@ -661,23 +662,10 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
     cvMoveWindow("videoTrajectory", 360, 0);
     cvMoveWindow("background", 0, 288);
     cvMoveWindow("foreground", 360, 288);
-
-	if (enVideoFormat == IMP_CIF)
-	{
-		s32ImgW = IMP_CIF_IMG_WIDTH;
-		s32ImgH = IMP_CIF_PAL_IMG_HEIGHT;
-	}
-	else if (enVideoFormat == IMP_QCIF)
-	{
-		s32ImgW = IMP_QCIF_IMG_WIDTH;
-		s32ImgH = IMP_QCIF_PAL_IMG_HEIGHT;
-	}
-	else if (enVideoFormat == IMP_D1)
-	{
-		s32ImgW = IMP_D1_IMG_WIDTH;
-		s32ImgH = IMP_D1_PAL_IMG_HEIGHT;
-	}
-
+	
+	s32ImgW = Y_WIDTH;
+	s32ImgH = Y_HEIGHT;
+	
     pImgGray = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
     pFrImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
     pBkImg = cvCreateImage(cvSize(s32ImgW, s32ImgH),  IPL_DEPTH_8U, 1);
@@ -776,8 +764,9 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 			//
 			if (0)
 			{
-				int dwSmoothTime = imageSrc->width / imageDst->width;
-		//	printf("smooth time:%d\n", dwSmoothTime);
+				int dwSmoothTime = imageSrc->width / imageDst->width - 1;
+				dwSmoothTime = dwSmoothTime >= 0 ? dwSmoothTime : 0;
+			printf("smooth time:%d\n", dwSmoothTime);
 				while(dwSmoothTime)
 				{
 					cvSmooth(imageSrc, imageSrc, CV_GAUSSIAN, 3, 3, 0, 0);
@@ -861,7 +850,7 @@ void IMP_OpencvExample(IMP_S8 * cFileName,VIDEO_SOURCE_E enVideoSource, IMP_S32 
 		
         key = cvWaitKey(10);
         
-        if (nFrmNum == 420)
+        if (nFrmNum == 1700)
         {
 			cvWaitKey(0);
 	    }
@@ -950,19 +939,16 @@ int main()
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-11036-白天铁路行人-正常行走.avi";
 //	IMP_S8 *fileName = "/home/zm/video/PEA/PEA-13005.avi";
 	
+	m_frame_width = Y_WIDTH;
+	m_frame_height = Y_HEIGHT;
+	
 #ifdef cif
-	m_frame_width = 352;
-	m_frame_height = 288;
 	videoFormat = IMP_CIF;
 #else
 
 #ifdef d1
-    m_frame_width = 720;
-	m_frame_height = 576;
 	videoFormat = IMP_D1;
 #else
-    m_frame_width = 176;
-	m_frame_height = 144;
 	videoFormat = IMP_QCIF;
 #endif
 
